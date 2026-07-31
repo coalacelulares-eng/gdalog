@@ -1,5 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { cloudLoad, cloudSave } from "@/lib/cloud-store";
+import motoristaMarcosAsset from "@/assets/motorista-marcos.png.asset.json";
 import {
   Truck,
   DollarSign,
