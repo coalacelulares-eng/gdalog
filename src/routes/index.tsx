@@ -184,8 +184,11 @@ const INITIAL_DATA = {
 };
 
 export function TransportManagementSystem() {
-  // LOGIN STATE
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  // LOGIN STATE - Persistente no navegador (localStorage)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("gdalog_authenticated") === "true";
+  });
   const [loginEmail, setLoginEmail] = useState<string>("admin@gdalog.com.br");
   const [loginPassword, setLoginPassword] = useState<string>("123456");
 
@@ -598,6 +601,9 @@ export function TransportManagementSystem() {
     e.preventDefault();
     if (loginEmail && loginPassword) {
       setIsAuthenticated(true);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("gdalog_authenticated", "true");
+      }
       toast.success("Acesso ao sistema liberado!");
     } else {
       toast.error("Preencha e-mail e senha.");
@@ -677,7 +683,22 @@ export function TransportManagementSystem() {
               type="submit"
               className="w-full bg-[#0b192c] hover:bg-[#162a45] text-white font-semibold py-2.5 rounded-xl transition-all shadow-md mt-2 flex items-center justify-center gap-2 cursor-pointer"
             >
-              Clique para entrar com os dados <ArrowRight className="w-4 h-4" />
+              Entrar <ArrowRight className="w-4 h-4" />
+            </Button>
+
+            <Button
+              type="button"
+              onClick={() => {
+                setIsAuthenticated(true);
+                if (typeof window !== "undefined") {
+                  localStorage.setItem("gdalog_authenticated", "true");
+                }
+                toast.success("Acesso liberado!");
+              }}
+              variant="outline"
+              className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold py-2.5 rounded-xl transition-all cursor-pointer"
+            >
+              Entrar automaticamente
             </Button>
 
             <div className="pt-2 text-center text-xs text-slate-400">
@@ -779,6 +800,9 @@ export function TransportManagementSystem() {
             <button
               onClick={() => {
                 setIsAuthenticated(false);
+                if (typeof window !== "undefined") {
+                  localStorage.removeItem("gdalog_authenticated");
+                }
                 toast.info("Sessão encerrada.");
               }}
               className="flex items-center gap-1 text-slate-300 hover:text-white px-2 py-1.5 rounded text-xs font-semibold cursor-pointer transition-colors"
