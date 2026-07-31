@@ -25,6 +25,7 @@ import {
   BarChart3
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
+import logoAsset from "@/assets/logo.png.asset.json";
 import { FinancialReport } from "@/components/financial-report";
 
 import { Button } from "@/components/ui/button";
@@ -637,7 +638,7 @@ export function TransportManagementSystem() {
           {/* Header Banner */}
           <div className="bg-[#0b192c] p-8 text-center text-white relative border-b border-slate-800 flex flex-col items-center">
             <div className="bg-white px-4 py-2 rounded-xl mb-4 shadow-md inline-block">
-              <img src="/logo.png" alt="GDALog" className="h-10 w-auto object-contain" />
+              <img src={logoAsset.url} alt="GDALog" className="h-10 w-auto object-contain" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight">Gestão de Transportes</h1>
             <p className="text-slate-400 text-xs mt-1">Acesse sua frota, despesas e faturamento</p>
@@ -704,7 +705,7 @@ export function TransportManagementSystem() {
           {/* Logo Brand */}
           <div className="flex items-center gap-3">
             <div className="bg-white px-2 py-1.5 rounded-lg shadow-sm flex items-center">
-              <img src="/logo.png" alt="GDALog" className="h-8 w-auto object-contain" />
+              <img src={logoAsset.url} alt="GDALog" className="h-8 w-auto object-contain" />
             </div>
             <span className="font-bold text-sm sm:text-base tracking-tight hidden sm:inline-block border-l border-slate-700 pl-3 text-slate-200">
               Gestão de Transportes
