@@ -79,6 +79,14 @@ const COST_LABELS: { key: keyof FinExpenseDetails; label: string }[] = [
   { key: "outros", label: "Outros" },
 ];
 
+export const MAINT_SERVICES = [
+  "Troca de Óleo",
+  "Freios",
+  "Peças de Motor",
+  "Peças do Câmbio",
+  "Pneus",
+] as const;
+
 export function FinancialReport({
   expenses,
   freights,
