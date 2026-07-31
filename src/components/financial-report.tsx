@@ -305,11 +305,14 @@ export function FinancialReport({
     rows.push(["Custo por KM", custoPorKm.toFixed(2)]);
     rows.push([]);
     rows.push(["CUSTOS POR CATEGORIA", "Valor", "% do total"]);
-    costsByCategory.forEach((c) => rows.push([c.label, c.valor, c.pct.toFixed(1)]));
+    allCostRows.forEach((c) => rows.push([c.label, c.valor, c.pct.toFixed(1)]));
     rows.push(["TOTAL", totalDespesas, "100"]);
     rows.push([]);
-    rows.push(["MANUTENÇÃO POR SERVIÇO", "Ordens", "Valor"]);
-    maintByType.forEach(([tipo, v]) => rows.push([tipo, v.qtd, v.total]));
+    rows.push(["MANUTENÇÃO POR SERVIÇO", "Ordens", "Valor", "Média por ordem", "% manutenção"]);
+    maintByType.forEach((m) =>
+      rows.push([m.tipo, m.qtd, m.total, m.media.toFixed(2), m.pct.toFixed(1)]),
+    );
+    rows.push(["TOTAL MANUTENÇÃO", "", totalManutencaoRegistrada]);
     rows.push([]);
     rows.push(["POR VEÍCULO", "Modelo", "Receita", "Despesa", "Saldo", "KM", "Custo/KM"]);
     byVehicle.forEach((v) =>
