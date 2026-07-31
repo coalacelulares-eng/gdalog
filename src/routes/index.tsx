@@ -879,18 +879,57 @@ export function TransportManagementSystem() {
     toast.info("Registro de manutenção removido.");
   };
 
-  // LOGIN HANDLER
-  const handleLogin = (e: React.FormEvent) => {
+  // LOGIN REAL (e-mail e senha da conta do sistema)
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginEmail && loginPassword) {
-      setIsAuthenticated(true);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("gdalog_authenticated", "true");
-      }
-      toast.success("Acesso ao sistema liberado!");
-    } else {
+    if (!loginEmail || !loginPassword) {
       toast.error("Preencha e-mail e senha.");
+      return;
     }
+    setAuthLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail.trim(),
+      password: loginPassword,
+    });
+    setAuthLoading(false);
+    if (error) {
+      toast.error(
+        error.message === "Invalid login credentials"
+          ? "E-mail ou senha inválidos."
+          : error.message,
+      );
+      return;
+    }
+    toast.success("Acesso ao sistema liberado!");
+  };
+
+  // CRIAR CONTA DE ACESSO
+  const handleSignUp = async () => {
+    if (!loginEmail || loginPassword.length < 6) {
+      toast.error("Informe um e-mail e uma senha com pelo menos 6 caracteres.");
+      return;
+    }
+    setAuthLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email: loginEmail.trim(),
+      password: loginPassword,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    setAuthLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (data.session) {
+      toast.success("Conta criada e acesso liberado!");
+    } else {
+      toast.success("Conta criada! Confirme o e-mail para entrar.");
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.info("Sessão encerrada.");
   };
 
   // FORMATTER HELPER
