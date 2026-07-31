@@ -212,7 +212,7 @@ async function saveToDB(key: string, data: any): Promise<void> {
     const tx = db.transaction("storage", "readwrite");
     const store = tx.objectStore("storage");
     store.put(data, key);
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       tx.oncomplete = () => {
         // Notifica outras abas/navegadores via localStorage event e BroadcastChannel
         try {
