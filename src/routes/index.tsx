@@ -185,7 +185,7 @@ const INITIAL_DATA = {
 
 export function TransportManagementSystem() {
   // LOGIN STATE
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loginEmail, setLoginEmail] = useState<string>("admin@gdalog.com.br");
   const [loginPassword, setLoginPassword] = useState<string>("123456");
 
