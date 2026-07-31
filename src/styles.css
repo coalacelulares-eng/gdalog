@@ -153,29 +153,36 @@
   }
 }
 
+/* Proteção contra impressão, print screen e cópia */
 @media print {
   body {
-    background: #fff !important;
-  }
-  .no-print {
     display: none !important;
   }
-  .print-area {
-    position: absolute !important;
-    inset: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-shadow: none !important;
+  html {
+    display: none !important;
   }
-  .print-area * {
-    box-shadow: none !important;
-  }
-  .print-break {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
+}
+
+body {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-print-color-adjust: exact;
+}
+
+/* Camada anti-print / anti-screenshot visual */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999999;
 }
 
 /* Ocultar completamente o badge "Made with Lovable" */

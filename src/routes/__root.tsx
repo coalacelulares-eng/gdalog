@@ -114,11 +114,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" onContextMenu={(e) => e.preventDefault()}>
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body
+        onContextMenu={(e) => e.preventDefault()}
+        onCopy={(e) => e.preventDefault()}
+        onCut={(e) => e.preventDefault()}
+        onPaste={(e) => e.preventDefault()}
+        style={{
+          WebkitUserSelect: "none",
+          userSelect: "none",
+        }}
+      >
         {children}
         <Scripts />
       </body>
