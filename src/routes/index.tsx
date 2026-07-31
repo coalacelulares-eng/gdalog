@@ -206,7 +206,7 @@ function openDB(): Promise<IDBDatabase> {
   });
 }
 
-async function saveToDB(key: string, data: any) {
+async function saveToDB(key: string, data: any): Promise<void> {
   try {
     const db = await openDB();
     const tx = db.transaction("storage", "readwrite");
@@ -691,7 +691,7 @@ export function TransportManagementSystem() {
               telefone: drvTelefone || "Não informado",
               categoria: drvCategoria || "E",
               status: drvStatus,
-              foto: drvFoto || d.foto,
+              foto: drvFoto || d.foto || "",
             }
           : d,
       );
