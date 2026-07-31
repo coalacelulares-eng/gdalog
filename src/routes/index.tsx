@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import { cloudLoad, cloudSave } from "@/lib/cloud-store";
 import motoristaMarcosAsset from "@/assets/motorista-marcos.png.asset.json";
 import {
@@ -285,10 +286,25 @@ async function loadFromDB(key: string, fallback: any): Promise<any> {
 
 
 export function TransportManagementSystem() {
-  // LOGIN STATE - Desativado conforme solicitado
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
-  const [loginEmail, setLoginEmail] = useState<string>("admin@gdalog.com.br");
-  const [loginPassword, setLoginPassword] = useState<string>("123456");
+  // LOGIN REAL (conta de acesso no banco de dados)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authChecked, setAuthChecked] = useState<boolean>(false);
+  const [authLoading, setAuthLoading] = useState<boolean>(false);
+  const [loginEmail, setLoginEmail] = useState<string>("");
+  const [loginPassword, setLoginPassword] = useState<string>("");
+
+  // Sessão: escuta mudanças e verifica a sessão atual
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+      setAuthChecked(true);
+    });
+    supabase.auth.getSession().then(({ data }) => {
+      setIsAuthenticated(!!data.session);
+      setAuthChecked(true);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   // APP TABS STATE
   const [activeTab, setActiveTab] = useState<
@@ -302,8 +318,9 @@ export function TransportManagementSystem() {
   const [freights, setFreights] = useState<Freight[]>(INITIAL_DATA.freights);
   const [oilChanges, setOilChanges] = useState<OilChange[]>(INITIAL_DATA.oilChanges);
 
-  // Carrega dados iniciais do banco IndexedDB assim que o app monta
+  // Carrega os dados do banco na nuvem depois do login
   useEffect(() => {
+    if (!isAuthenticated) return;
     async function initData() {
       const [d, v, e, f, o] = await Promise.all([
         loadFromDB("drivers", INITIAL_DATA.drivers),
@@ -347,7 +364,7 @@ export function TransportManagementSystem() {
 
     window.addEventListener("storage", handleStorageSync);
     return () => window.removeEventListener("storage", handleStorageSync);
-  }, []);
+  }, [isAuthenticated]);
 
   // Salva automaticamente no banco a cada alteração
   const persistDrivers = useCallback((data: Driver[]) => {
@@ -862,18 +879,57 @@ export function TransportManagementSystem() {
     toast.info("Registro de manutenção removido.");
   };
 
-  // LOGIN HANDLER
-  const handleLogin = (e: React.FormEvent) => {
+  // LOGIN REAL (e-mail e senha da conta do sistema)
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginEmail && loginPassword) {
-      setIsAuthenticated(true);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("gdalog_authenticated", "true");
-      }
-      toast.success("Acesso ao sistema liberado!");
-    } else {
+    if (!loginEmail || !loginPassword) {
       toast.error("Preencha e-mail e senha.");
+      return;
     }
+    setAuthLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail.trim(),
+      password: loginPassword,
+    });
+    setAuthLoading(false);
+    if (error) {
+      toast.error(
+        error.message === "Invalid login credentials"
+          ? "E-mail ou senha inválidos."
+          : error.message,
+      );
+      return;
+    }
+    toast.success("Acesso ao sistema liberado!");
+  };
+
+  // CRIAR CONTA DE ACESSO
+  const handleSignUp = async () => {
+    if (!loginEmail || loginPassword.length < 6) {
+      toast.error("Informe um e-mail e uma senha com pelo menos 6 caracteres.");
+      return;
+    }
+    setAuthLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email: loginEmail.trim(),
+      password: loginPassword,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    setAuthLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (data.session) {
+      toast.success("Conta criada e acesso liberado!");
+    } else {
+      toast.success("Conta criada! Confirme o e-mail para entrar.");
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.info("Sessão encerrada.");
   };
 
   // FORMATTER HELPER
@@ -896,6 +952,14 @@ export function TransportManagementSystem() {
   // -------------------------------------------------------------
   // 1. LOGIN SCREEN IF NOT AUTHENTICATED
   // -------------------------------------------------------------
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-[#0b192c] flex items-center justify-center text-slate-300 text-sm font-sans">
+        Carregando...
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#0b192c] flex flex-col justify-center items-center p-4 relative overflow-hidden font-sans">
@@ -947,25 +1011,22 @@ export function TransportManagementSystem() {
 
             <Button
               type="submit"
-              className="w-full bg-[#0b192c] hover:bg-[#162a45] text-white font-semibold py-2.5 rounded-xl transition-all shadow-md mt-2 flex items-center justify-center gap-2 cursor-pointer"
+              disabled={authLoading}
+              className="w-full bg-[#0b192c] hover:bg-[#162a45] text-white font-semibold py-2.5 rounded-xl transition-all shadow-md mt-2 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
             >
-              Entrar <ArrowRight className="w-4 h-4" />
+              {authLoading ? "Entrando..." : "Entrar"} <ArrowRight className="w-4 h-4" />
             </Button>
 
             <Button
               type="button"
-              onClick={() => {
-                setIsAuthenticated(true);
-                if (typeof window !== "undefined") {
-                  localStorage.setItem("gdalog_authenticated", "true");
-                }
-                toast.success("Acesso liberado!");
-              }}
+              onClick={handleSignUp}
+              disabled={authLoading}
               variant="outline"
-              className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold py-2.5 rounded-xl transition-all cursor-pointer"
+              className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold py-2.5 rounded-xl transition-all cursor-pointer disabled:opacity-60"
             >
-              Entrar automaticamente
+              Criar conta de acesso
             </Button>
+
 
             <div className="pt-2 text-center text-xs text-slate-400">
               Ambiente Seguro • GDALog Transportes v2.4
@@ -1064,13 +1125,7 @@ export function TransportManagementSystem() {
           {/* Logout */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             <button
-              onClick={() => {
-                setIsAuthenticated(false);
-                if (typeof window !== "undefined") {
-                  localStorage.removeItem("gdalog_authenticated");
-                }
-                toast.info("Sessão encerrada.");
-              }}
+              onClick={handleLogout}
               className="flex items-center gap-1 text-slate-300 hover:text-white px-2 py-1.5 rounded text-xs font-semibold cursor-pointer transition-colors"
               title="Sair do Sistema"
             >
