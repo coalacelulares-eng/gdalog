@@ -312,7 +312,16 @@ export function TransportManagementSystem() {
         loadFromDB("freights", INITIAL_DATA.freights),
         loadFromDB("oilChanges", INITIAL_DATA.oilChanges),
       ]);
-      setDrivers(d);
+      // Garante a foto do motorista MARCOS mesmo em dados já salvos
+      const driversWithPhoto: Driver[] = (d as Driver[]).map((drv) =>
+        drv.nome?.toUpperCase() === "MARCOS" && !drv.foto
+          ? { ...drv, foto: motoristaMarcosAsset.url }
+          : drv,
+      );
+      setDrivers(driversWithPhoto);
+      if (JSON.stringify(driversWithPhoto) !== JSON.stringify(d)) {
+        void saveToDB("drivers", driversWithPhoto);
+      }
       setVehicles(v);
       setExpenses(e);
       setFreights(f);
