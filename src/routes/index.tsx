@@ -285,10 +285,25 @@ async function loadFromDB(key: string, fallback: any): Promise<any> {
 
 
 export function TransportManagementSystem() {
-  // LOGIN STATE - Desativado conforme solicitado
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
-  const [loginEmail, setLoginEmail] = useState<string>("admin@gdalog.com.br");
-  const [loginPassword, setLoginPassword] = useState<string>("123456");
+  // LOGIN REAL (conta de acesso no banco de dados)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authChecked, setAuthChecked] = useState<boolean>(false);
+  const [authLoading, setAuthLoading] = useState<boolean>(false);
+  const [loginEmail, setLoginEmail] = useState<string>("");
+  const [loginPassword, setLoginPassword] = useState<string>("");
+
+  // Sessão: escuta mudanças e verifica a sessão atual
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+      setAuthChecked(true);
+    });
+    supabase.auth.getSession().then(({ data }) => {
+      setIsAuthenticated(!!data.session);
+      setAuthChecked(true);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   // APP TABS STATE
   const [activeTab, setActiveTab] = useState<
