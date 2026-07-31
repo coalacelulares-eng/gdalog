@@ -188,7 +188,7 @@ a[href*="lovable.dev"][target="_blank"],
 [class*="lovable-badge"],
 [class*="lovable-watermark"],
 [id*="lovable-badge"],
-id*="lovable-watermark"] {
+[id*="lovable-watermark"] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
