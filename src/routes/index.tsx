@@ -287,6 +287,12 @@ export function TransportManagementSystem() {
   const [isOilModalOpen, setIsOilModalOpen] = useState(false);
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
 
+  // EDITING STATES
+  const [expEditingId, setExpEditingId] = useState<string | null>(null);
+  const [frtEditingId, setFrtEditingId] = useState<string | null>(null);
+  const [vehEditingId, setVehEditingId] = useState<string | null>(null);
+  const [oilEditingId, setOilEditingId] = useState<string | null>(null);
+
   // DRIVER FORM STATES
   const [drvEditingId, setDrvEditingId] = useState<string | null>(null);
   const [drvNome, setDrvNome] = useState("");
@@ -377,7 +383,7 @@ export function TransportManagementSystem() {
     });
   }, [vehicles, freights, expenses]);
 
-  // ADD EXPENSE HANDLER
+  // ADD / EDIT EXPENSE HANDLER
   const handleAddExpense = (e: React.FormEvent) => {
     e.preventDefault();
     if (!expPlaca) {
@@ -397,30 +403,60 @@ export function TransportManagementSystem() {
       num(expSalario) +
       num(expOutros);
 
-    const newExp: Expense = {
-      id: "exp_" + Date.now(),
-      placa: expPlaca.toUpperCase(),
-      data: expData,
-      motorista: expMotorista || "MOTORISTA",
-      km: num(expKm),
-      detalhes: {
-        abastecimento: num(expAbastecimento),
-        arla: num(expArla),
-        rastreador: num(expRastreador),
-        depreciacao: num(expDepreciacao),
-        ipva: num(expIpva),
-        diaria: num(expDiaria),
-        salario: num(expSalario),
-        outros: num(expOutros),
-      },
-      total: calculatedTotal,
-      observacao: expObs,
-    };
+    if (expEditingId) {
+      setExpenses(
+        expenses.map((item) =>
+          item.id === expEditingId
+            ? {
+                ...item,
+                placa: expPlaca.toUpperCase(),
+                data: expData,
+                motorista: expMotorista || "MOTORISTA",
+                km: num(expKm),
+                detalhes: {
+                  abastecimento: num(expAbastecimento),
+                  arla: num(expArla),
+                  rastreador: num(expRastreador),
+                  depreciacao: num(expDepreciacao),
+                  ipva: num(expIpva),
+                  diaria: num(expDiaria),
+                  salario: num(expSalario),
+                  outros: num(expOutros),
+                },
+                total: calculatedTotal,
+                observacao: expObs,
+              }
+            : item,
+        ),
+      );
+      toast.success(`Despesa atualizada com sucesso!`);
+    } else {
+      const newExp: Expense = {
+        id: "exp_" + Date.now(),
+        placa: expPlaca.toUpperCase(),
+        data: expData,
+        motorista: expMotorista || "MOTORISTA",
+        km: num(expKm),
+        detalhes: {
+          abastecimento: num(expAbastecimento),
+          arla: num(expArla),
+          rastreador: num(expRastreador),
+          depreciacao: num(expDepreciacao),
+          ipva: num(expIpva),
+          diaria: num(expDiaria),
+          salario: num(expSalario),
+          outros: num(expOutros),
+        },
+        total: calculatedTotal,
+        observacao: expObs,
+      };
 
-    setExpenses([newExp, ...expenses]);
-    toast.success(`Despesa de R$ ${calculatedTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} adicionada!`);
+      setExpenses([newExp, ...expenses]);
+      toast.success(`Despesa de R$ ${calculatedTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} adicionada!`);
+    }
 
     // Reset Form
+    setExpEditingId(null);
     setExpPlaca("");
     setExpMotorista("");
     setExpKm("");
@@ -436,7 +472,25 @@ export function TransportManagementSystem() {
     setIsExpenseModalOpen(false);
   };
 
-  // ADD FREIGHT HANDLER
+  const handleStartEditExpense = (exp: Expense) => {
+    setExpEditingId(exp.id);
+    setExpPlaca(exp.placa);
+    setExpData(exp.data);
+    setExpMotorista(exp.motorista);
+    setExpKm(exp.km);
+    setExpAbastecimento(exp.detalhes.abastecimento || "");
+    setExpArla(exp.detalhes.arla || "");
+    setExpRastreador(exp.detalhes.rastreador || "");
+    setExpDepreciacao(exp.detalhes.depreciacao || "");
+    setExpIpva(exp.detalhes.ipva || "");
+    setExpDiaria(exp.detalhes.diaria || "");
+    setExpSalario(exp.detalhes.salario || "");
+    setExpOutros(exp.detalhes.outros || "");
+    setExpObs(exp.observacao || "");
+    setIsExpenseModalOpen(true);
+  };
+
+  // ADD / EDIT FREIGHT HANDLER
   const handleAddFreight = (e: React.FormEvent) => {
     e.preventDefault();
     if (!frtOrigem || !frtDestino || !frtPlaca) {
@@ -447,19 +501,39 @@ export function TransportManagementSystem() {
     const val = typeof frtValor === "number" ? frtValor : 0;
     const rec = typeof frtRecebido === "number" ? frtRecebido : 0;
 
-    const newFrt: Freight = {
-      id: "frt_" + Date.now(),
-      origem: frtOrigem.toUpperCase(),
-      destino: frtDestino.toUpperCase(),
-      placa: frtPlaca.toUpperCase(),
-      data: frtData,
-      valor: val,
-      recebido: rec,
-    };
+    if (frtEditingId) {
+      setFreights(
+        freights.map((item) =>
+          item.id === frtEditingId
+            ? {
+                ...item,
+                origem: frtOrigem.toUpperCase(),
+                destino: frtDestino.toUpperCase(),
+                placa: frtPlaca.toUpperCase(),
+                data: frtData,
+                valor: val,
+                recebido: rec,
+              }
+            : item,
+        ),
+      );
+      toast.success("Frete atualizado com sucesso!");
+    } else {
+      const newFrt: Freight = {
+        id: "frt_" + Date.now(),
+        origem: frtOrigem.toUpperCase(),
+        destino: frtDestino.toUpperCase(),
+        placa: frtPlaca.toUpperCase(),
+        data: frtData,
+        valor: val,
+        recebido: rec,
+      };
 
-    setFreights([newFrt, ...freights]);
-    toast.success(`Frete de R$ ${val.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} cadastrado com sucesso!`);
+      setFreights([newFrt, ...freights]);
+      toast.success(`Frete de R$ ${val.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} cadastrado com sucesso!`);
+    }
 
+    setFrtEditingId(null);
     setFrtOrigem("");
     setFrtDestino("");
     setFrtPlaca("");
@@ -468,7 +542,18 @@ export function TransportManagementSystem() {
     setIsFreightModalOpen(false);
   };
 
-  // ADD VEHICLE HANDLER
+  const handleStartEditFreight = (frt: Freight) => {
+    setFrtEditingId(frt.id);
+    setFrtOrigem(frt.origem);
+    setFrtDestino(frt.destino);
+    setFrtPlaca(frt.placa);
+    setFrtData(frt.data);
+    setFrtValor(frt.valor);
+    setFrtRecebido(frt.recebido);
+    setIsFreightModalOpen(true);
+  };
+
+  // ADD / EDIT VEHICLE HANDLER
   const handleAddVehicle = (e: React.FormEvent) => {
     e.preventDefault();
     if (!vehPlaca || !vehModelo) {
@@ -476,21 +561,49 @@ export function TransportManagementSystem() {
       return;
     }
 
-    const newVeh: Vehicle = {
-      id: "veh_" + Date.now(),
-      placa: vehPlaca.toUpperCase(),
-      modelo: vehModelo,
-      motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
-      categoria: vehCategoria.toUpperCase() || "LOGISTICA",
-    };
+    if (vehEditingId) {
+      setVehicles(
+        vehicles.map((item) =>
+          item.id === vehEditingId
+            ? {
+                ...item,
+                placa: vehPlaca.toUpperCase(),
+                modelo: vehModelo,
+                motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
+                categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+              }
+            : item,
+        ),
+      );
+      toast.success(`Veículo ${vehPlaca.toUpperCase()} atualizado!`);
+    } else {
+      const newVeh: Vehicle = {
+        id: "veh_" + Date.now(),
+        placa: vehPlaca.toUpperCase(),
+        modelo: vehModelo,
+        motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
+        categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+      };
 
-    setVehicles([...vehicles, newVeh]);
-    toast.success(`Veículo ${newVeh.placa} cadastrado na frota!`);
+      setVehicles([...vehicles, newVeh]);
+      toast.success(`Veículo ${newVeh.placa} cadastrado na frota!`);
+    }
 
+    setVehEditingId(null);
     setVehPlaca("");
     setVehModelo("");
     setVehMotorista("");
+    setVehCategoria("LOGISTICA");
     setIsVehicleModalOpen(false);
+  };
+
+  const handleStartEditVehicle = (veh: Vehicle) => {
+    setVehEditingId(veh.id);
+    setVehPlaca(veh.placa);
+    setVehModelo(veh.modelo);
+    setVehMotorista(veh.motorista);
+    setVehCategoria(veh.categoria);
+    setIsVehicleModalOpen(true);
   };
 
   // ADD / EDIT DRIVER HANDLER
@@ -554,7 +667,7 @@ export function TransportManagementSystem() {
     setIsDriverModalOpen(true);
   };
 
-  // ADD OIL CHANGE HANDLER
+  // ADD / EDIT OIL CHANGE HANDLER
   const handleAddOilChange = (e: React.FormEvent) => {
     e.preventDefault();
     if (!oilPlaca) {
@@ -566,21 +679,43 @@ export function TransportManagementSystem() {
     const prox = typeof oilProximaKm === "number" ? oilProximaKm : km + 10000;
     const custo = typeof oilCusto === "number" ? oilCusto : 0;
 
-    const newOil: OilChange = {
-      id: "oil_" + Date.now(),
-      placa: oilPlaca.toUpperCase(),
-      motorista: oilMotorista.toUpperCase() || "MOTORISTA",
-      data: oilData,
-      kmAtual: km,
-      proximaTrocaKm: prox,
-      custo: custo,
-      categoriaServico: oilCategoriaServico,
-      observacao: oilObs,
-    };
+    if (oilEditingId) {
+      setOilChanges(
+        oilChanges.map((item) =>
+          item.id === oilEditingId
+            ? {
+                ...item,
+                placa: oilPlaca.toUpperCase(),
+                motorista: oilMotorista.toUpperCase() || "MOTORISTA",
+                data: oilData,
+                kmAtual: km,
+                proximaTrocaKm: prox,
+                custo: custo,
+                categoriaServico: oilCategoriaServico,
+                observacao: oilObs,
+              }
+            : item,
+        ),
+      );
+      toast.success("Manutenção atualizada com sucesso!");
+    } else {
+      const newOil: OilChange = {
+        id: "oil_" + Date.now(),
+        placa: oilPlaca.toUpperCase(),
+        motorista: oilMotorista.toUpperCase() || "MOTORISTA",
+        data: oilData,
+        kmAtual: km,
+        proximaTrocaKm: prox,
+        custo: custo,
+        categoriaServico: oilCategoriaServico,
+        observacao: oilObs,
+      };
 
-    setOilChanges([newOil, ...oilChanges]);
-    toast.success(`Manutenção (${oilCategoriaServico}) para ${newOil.placa} registrada!`);
+      setOilChanges([newOil, ...oilChanges]);
+      toast.success(`Manutenção (${oilCategoriaServico}) para ${newOil.placa} registrada!`);
+    }
 
+    setOilEditingId(null);
     setOilPlaca("");
     setOilMotorista("");
     setOilKmAtual("");
@@ -589,6 +724,19 @@ export function TransportManagementSystem() {
     setOilCategoriaServico("Troca de Óleo");
     setOilObs("");
     setIsOilModalOpen(false);
+  };
+
+  const handleStartEditOilChange = (oil: OilChange) => {
+    setOilEditingId(oil.id);
+    setOilPlaca(oil.placa);
+    setOilMotorista(oil.motorista);
+    setOilData(oil.data);
+    setOilKmAtual(oil.kmAtual);
+    setOilProximaKm(oil.proximaTrocaKm);
+    setOilCusto(oil.custo);
+    setOilCategoriaServico(oil.categoriaServico);
+    setOilObs(oil.observacao || "");
+    setIsOilModalOpen(true);
   };
 
   // DELETE HANDLERS
@@ -1036,13 +1184,22 @@ export function TransportManagementSystem() {
                     key={veh.id}
                     className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm relative group hover:shadow-md transition-all"
                   >
-                    <button
-                      onClick={() => handleDeleteVehicle(veh.id)}
-                      className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
-                      title="Excluir veículo"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="absolute top-4 right-4 flex items-center gap-1">
+                      <button
+                        onClick={() => handleStartEditVehicle(veh)}
+                        className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
+                        title="Editar veículo"
+                      >
+                        <Settings className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteVehicle(veh.id)}
+                        className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                        title="Excluir veículo"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
 
                     <div className="font-extrabold text-lg text-[#0c192c] tracking-wide">
                       {veh.placa}
@@ -1189,13 +1346,22 @@ export function TransportManagementSystem() {
                       <div className="font-black text-lg text-[#dc2626]">
                         {formatBRL(exp.total)}
                       </div>
-                      <button
-                        onClick={() => handleDeleteExpense(exp.id)}
-                        className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
-                        title="Excluir despesa"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleStartEditExpense(exp)}
+                          className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
+                          title="Editar despesa"
+                        >
+                          <Settings className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteExpense(exp.id)}
+                          className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                          title="Excluir despesa"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -1287,13 +1453,22 @@ export function TransportManagementSystem() {
                     key={oil.id}
                     className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3 relative hover:shadow-md transition-all"
                   >
-                    <button
-                      onClick={() => handleDeleteOilChange(oil.id)}
-                      className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
-                      title="Excluir manutenção"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="absolute top-4 right-4 flex items-center gap-1">
+                      <button
+                        onClick={() => handleStartEditOilChange(oil)}
+                        className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
+                        title="Editar manutenção"
+                      >
+                        <Settings className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteOilChange(oil.id)}
+                        className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                        title="Excluir manutenção"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
 
                     <div className="flex items-center gap-2">
                       {getCategoryIcon(oil.categoriaServico)}
@@ -1392,13 +1567,22 @@ export function TransportManagementSystem() {
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => handleDeleteFreight(frt.id)}
-                      className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
-                      title="Excluir frete"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleStartEditFreight(frt)}
+                        className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
+                        title="Editar frete"
+                      >
+                        <Settings className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteFreight(frt.id)}
+                        className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                        title="Excluir frete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1581,10 +1765,32 @@ export function TransportManagementSystem() {
       {/* ------------------------------------------------------------- */}
       {/* FORM MODAL 1: NOVA DESPESA */}
       {/* ------------------------------------------------------------- */}
-      <Dialog open={isExpenseModalOpen} onOpenChange={setIsExpenseModalOpen}>
+      <Dialog
+        open={isExpenseModalOpen}
+        onOpenChange={(open) => {
+          setIsExpenseModalOpen(open);
+          if (!open) {
+            setExpEditingId(null);
+            setExpPlaca("");
+            setExpMotorista("");
+            setExpKm("");
+            setExpAbastecimento("");
+            setExpArla("");
+            setExpRastreador("");
+            setExpDepreciacao("");
+            setExpIpva("");
+            setExpDiaria("");
+            setExpSalario("");
+            setExpOutros("");
+            setExpObs("");
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-2xl bg-white rounded-2xl p-6 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#0c192c]">Lançar Nova Despesa de Viagem</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-[#0c192c]">
+              {expEditingId ? "Editar Despesa de Viagem" : "Lançar Nova Despesa de Viagem"}
+            </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleAddExpense} className="space-y-4 py-2">
@@ -1781,7 +1987,7 @@ export function TransportManagementSystem() {
                 type="submit"
                 className="bg-[#0c192c] hover:bg-[#162a45] text-white text-xs font-bold"
               >
-                Salvar Despesa
+                {expEditingId ? "Salvar Alterações" : "Salvar Despesa"}
               </Button>
             </DialogFooter>
           </form>
@@ -1791,10 +1997,25 @@ export function TransportManagementSystem() {
       {/* ------------------------------------------------------------- */}
       {/* FORM MODAL 2: NOVO FRETE */}
       {/* ------------------------------------------------------------- */}
-      <Dialog open={isFreightModalOpen} onOpenChange={setIsFreightModalOpen}>
+      <Dialog
+        open={isFreightModalOpen}
+        onOpenChange={(open) => {
+          setIsFreightModalOpen(open);
+          if (!open) {
+            setFrtEditingId(null);
+            setFrtOrigem("");
+            setFrtDestino("");
+            setFrtPlaca("");
+            setFrtValor("");
+            setFrtRecebido("");
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md bg-white rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#0c192c]">Cadastrar Novo Frete</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-[#0c192c]">
+              {frtEditingId ? "Editar Frete" : "Cadastrar Novo Frete"}
+            </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleAddFreight} className="space-y-3 py-2">
@@ -1890,7 +2111,7 @@ export function TransportManagementSystem() {
                 type="submit"
                 className="bg-[#0c192c] hover:bg-[#162a45] text-white text-xs font-bold"
               >
-                Salvar Frete
+                {frtEditingId ? "Salvar Alterações" : "Salvar Frete"}
               </Button>
             </DialogFooter>
           </form>
@@ -1900,10 +2121,24 @@ export function TransportManagementSystem() {
       {/* ------------------------------------------------------------- */}
       {/* FORM MODAL 3: NOVO VEÍCULO */}
       {/* ------------------------------------------------------------- */}
-      <Dialog open={isVehicleModalOpen} onOpenChange={setIsVehicleModalOpen}>
+      <Dialog
+        open={isVehicleModalOpen}
+        onOpenChange={(open) => {
+          setIsVehicleModalOpen(open);
+          if (!open) {
+            setVehEditingId(null);
+            setVehPlaca("");
+            setVehModelo("");
+            setVehMotorista("");
+            setVehCategoria("LOGISTICA");
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md bg-white rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#0c192c]">Cadastrar Novo Veículo</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-[#0c192c]">
+              {vehEditingId ? "Editar Veículo" : "Cadastrar Novo Veículo"}
+            </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleAddVehicle} className="space-y-3 py-2">
@@ -1969,7 +2204,7 @@ export function TransportManagementSystem() {
                 type="submit"
                 className="bg-[#0c192c] hover:bg-[#162a45] text-white text-xs font-bold"
               >
-                Salvar Veículo
+                {vehEditingId ? "Salvar Alterações" : "Salvar Veículo"}
               </Button>
             </DialogFooter>
           </form>
@@ -2125,10 +2360,27 @@ export function TransportManagementSystem() {
       {/* ------------------------------------------------------------- */}
       {/* FORM MODAL 4: MANUTENÇÃO */}
       {/* ------------------------------------------------------------- */}
-      <Dialog open={isOilModalOpen} onOpenChange={setIsOilModalOpen}>
+      <Dialog
+        open={isOilModalOpen}
+        onOpenChange={(open) => {
+          setIsOilModalOpen(open);
+          if (!open) {
+            setOilEditingId(null);
+            setOilPlaca("");
+            setOilMotorista("");
+            setOilKmAtual("");
+            setOilProximaKm("");
+            setOilCusto("");
+            setOilCategoriaServico("Troca de Óleo");
+            setOilObs("");
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md bg-white rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#0c192c]">Registrar Manutenção</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-[#0c192c]">
+              {oilEditingId ? "Editar Manutenção" : "Registrar Manutenção"}
+            </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleAddOilChange} className="space-y-3 py-2">
@@ -2259,7 +2511,7 @@ export function TransportManagementSystem() {
                 type="submit"
                 className="bg-[#0c192c] hover:bg-[#162a45] text-white text-xs font-bold"
               >
-                Salvar Manutenção
+                {oilEditingId ? "Salvar Alterações" : "Salvar Manutenção"}
               </Button>
             </DialogFooter>
           </form>
