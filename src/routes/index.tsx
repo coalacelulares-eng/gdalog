@@ -270,6 +270,20 @@ async function loadLocal(key: string, fallback: any): Promise<any> {
   }
 }
 
+// Lê SEMPRE do banco de dados na nuvem primeiro (garante os dados em qualquer
+// navegador ou dispositivo). Se a nuvem ainda não tiver o registro, usa a cópia
+// local e a envia para a nuvem — nada é perdido.
+async function loadFromDB(key: string, fallback: any): Promise<any> {
+  const remote = await cloudLoad(key);
+  if (remote !== null && remote !== undefined) return remote;
+
+  const local = await loadLocal(key, fallback);
+  if (local !== null && local !== undefined) void cloudSave(key, local);
+  return local;
+}
+
+
+
 export function TransportManagementSystem() {
   // LOGIN STATE - Desativado conforme solicitado
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
