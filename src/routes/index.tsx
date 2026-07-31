@@ -364,7 +364,7 @@ export function TransportManagementSystem() {
 
     window.addEventListener("storage", handleStorageSync);
     return () => window.removeEventListener("storage", handleStorageSync);
-  }, []);
+  }, [isAuthenticated]);
 
   // Salva automaticamente no banco a cada alteração
   const persistDrivers = useCallback((data: Driver[]) => {
