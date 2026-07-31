@@ -1117,13 +1117,7 @@ export function TransportManagementSystem() {
           {/* Logout */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             <button
-              onClick={() => {
-                setIsAuthenticated(false);
-                if (typeof window !== "undefined") {
-                  localStorage.removeItem("gdalog_authenticated");
-                }
-                toast.info("Sessão encerrada.");
-              }}
+              onClick={handleLogout}
               className="flex items-center gap-1 text-slate-300 hover:text-white px-2 py-1.5 rounded text-xs font-semibold cursor-pointer transition-colors"
               title="Sair do Sistema"
             >
