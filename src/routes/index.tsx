@@ -264,6 +264,7 @@ export function TransportManagementSystem() {
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
 
   // DRIVER FORM STATES
+  const [drvEditingId, setDrvEditingId] = useState<string | null>(null);
   const [drvNome, setDrvNome] = useState("");
   const [drvCnh, setDrvCnh] = useState("");
   const [drvTelefone, setDrvTelefone] = useState("");
@@ -468,7 +469,7 @@ export function TransportManagementSystem() {
     setIsVehicleModalOpen(false);
   };
 
-  // ADD DRIVER HANDLER
+  // ADD / EDIT DRIVER HANDLER
   const handleAddDriver = (e: React.FormEvent) => {
     e.preventDefault();
     if (!drvNome) {
@@ -476,19 +477,39 @@ export function TransportManagementSystem() {
       return;
     }
 
-    const newDrv: Driver = {
-      id: "drv_" + Date.now(),
-      nome: drvNome.toUpperCase(),
-      cnh: drvCnh || "Não informada",
-      telefone: drvTelefone || "Não informado",
-      categoria: drvCategoria || "E",
-      status: drvStatus,
-      foto: drvFoto || "",
-    };
+    if (drvEditingId) {
+      setDrivers(
+        drivers.map((d) =>
+          d.id === drvEditingId
+            ? {
+                ...d,
+                nome: drvNome.toUpperCase(),
+                cnh: drvCnh || "Não informada",
+                telefone: drvTelefone || "Não informado",
+                categoria: drvCategoria || "E",
+                status: drvStatus,
+                foto: drvFoto || d.foto,
+              }
+            : d,
+        ),
+      );
+      toast.success(`Motorista ${drvNome.toUpperCase()} atualizado com sucesso!`);
+    } else {
+      const newDrv: Driver = {
+        id: "drv_" + Date.now(),
+        nome: drvNome.toUpperCase(),
+        cnh: drvCnh || "Não informada",
+        telefone: drvTelefone || "Não informado",
+        categoria: drvCategoria || "E",
+        status: drvStatus,
+        foto: drvFoto || "",
+      };
 
-    setDrivers([...drivers, newDrv]);
-    toast.success(`Motorista ${newDrv.nome} cadastrado com sucesso!`);
+      setDrivers([...drivers, newDrv]);
+      toast.success(`Motorista ${newDrv.nome} cadastrado com sucesso!`);
+    }
 
+    setDrvEditingId(null);
     setDrvNome("");
     setDrvCnh("");
     setDrvTelefone("");
@@ -496,6 +517,17 @@ export function TransportManagementSystem() {
     setDrvStatus("Ativo");
     setDrvFoto("");
     setIsDriverModalOpen(false);
+  };
+
+  const handleStartEditDriver = (drv: Driver) => {
+    setDrvEditingId(drv.id);
+    setDrvNome(drv.nome);
+    setDrvCnh(drv.cnh);
+    setDrvTelefone(drv.telefone);
+    setDrvCategoria(drv.categoria);
+    setDrvStatus(drv.status);
+    setDrvFoto(drv.foto || "");
+    setIsDriverModalOpen(true);
   };
 
   // ADD OIL CHANGE HANDLER
@@ -1012,13 +1044,22 @@ export function TransportManagementSystem() {
                     key={drv.id}
                     className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm relative group hover:shadow-md transition-all space-y-2"
                   >
-                    <button
-                      onClick={() => handleDeleteDriver(drv.id)}
-                      className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
-                      title="Excluir motorista"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="absolute top-4 right-4 flex items-center gap-1">
+                      <button
+                        onClick={() => handleStartEditDriver(drv)}
+                        className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
+                        title="Editar motorista"
+                      >
+                        <Settings className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteDriver(drv.id)}
+                        className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                        title="Excluir motorista"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
 
                     <div className="flex items-center gap-3">
                       {drv.foto ? (
@@ -1891,12 +1932,28 @@ export function TransportManagementSystem() {
       </Dialog>
 
       {/* ------------------------------------------------------------- */}
-      {/* FORM MODAL 3.5: NOVO MOTORISTA */}
+      {/* FORM MODAL 3.5: NOVO / EDITAR MOTORISTA */}
       {/* ------------------------------------------------------------- */}
-      <Dialog open={isDriverModalOpen} onOpenChange={setIsDriverModalOpen}>
+      <Dialog
+        open={isDriverModalOpen}
+        onOpenChange={(open) => {
+          setIsDriverModalOpen(open);
+          if (!open) {
+            setDrvEditingId(null);
+            setDrvNome("");
+            setDrvCnh("");
+            setDrvTelefone("");
+            setDrvCategoria("E");
+            setDrvStatus("Ativo");
+            setDrvFoto("");
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-md bg-white rounded-2xl p-6">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#0c192c]">Cadastrar Novo Motorista</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-[#0c192c]">
+              {drvEditingId ? "Editar Motorista" : "Cadastrar Novo Motorista"}
+            </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleAddDriver} className="space-y-3 py-2">
@@ -2013,7 +2070,7 @@ export function TransportManagementSystem() {
                 type="submit"
                 className="bg-[#f25c05] hover:bg-orange-600 text-white text-xs font-bold"
               >
-                Salvar Motorista
+                {drvEditingId ? "Salvar Alterações" : "Salvar Motorista"}
               </Button>
             </DialogFooter>
           </form>
