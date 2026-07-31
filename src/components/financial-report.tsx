@@ -19,10 +19,7 @@ export interface FinExpenseDetails {
   depreciacao: number;
   ipva: number;
   diaria: number;
-  trocaOleo: number;
   salario: number;
-  manutencao: number;
-  pneu: number;
   outros: number;
 }
 
@@ -78,10 +75,7 @@ const COST_LABELS: { key: keyof FinExpenseDetails; label: string }[] = [
   { key: "depreciacao", label: "Depreciação" },
   { key: "ipva", label: "IPVA / Licenciamento" },
   { key: "diaria", label: "Diária" },
-  { key: "trocaOleo", label: "Troca de Óleo" },
   { key: "salario", label: "Salário" },
-  { key: "manutencao", label: "Manutenção" },
-  { key: "pneu", label: "Pneus" },
   { key: "outros", label: "Outros" },
 ];
 

@@ -87,10 +87,7 @@ interface ExpenseDetails {
   depreciacao: number;
   ipva: number;
   diaria: number;
-  trocaOleo: number;
   salario: number;
-  manutencao: number;
-  pneu: number;
   outros: number;
 }
 
