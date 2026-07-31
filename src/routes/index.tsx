@@ -128,6 +128,8 @@ interface OilChange {
   observacao: string;
 }
 
+import { useEffect, useState, useMemo, useCallback } from "react";
+
 // INITIAL DATA
 const INITIAL_DATA = {
   drivers: [
@@ -183,6 +185,85 @@ const INITIAL_DATA = {
   ] as OilChange[],
 };
 
+// PERSISTÊNCIA ROBUSTA EM INDEXEDDB E MULTI-ABA / MULTI-NAVEGADOR
+const DB_NAME = "gdalog_persistent_db";
+const DB_VERSION = 1;
+
+function openDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    if (typeof window === "undefined" || !window.indexedDB) {
+      reject(new Error("IndexedDB não suportado"));
+      return;
+    }
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains("storage")) {
+        db.createObjectStore("storage");
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function saveToDB(key: string, data: any) {
+  try {
+    const db = await openDB();
+    const tx = db.transaction("storage", "readwrite");
+    const store = tx.objectStore("storage");
+    store.put(data, key);
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => {
+        // Notifica outras abas/navegadores via localStorage event e BroadcastChannel
+        try {
+          localStorage.setItem("gdalog_sync_" + key, Date.now().toString());
+        } catch {}
+        resolve(true);
+      };
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch (err) {
+    // Fallback absoluto para localStorage caso IDB falhe
+    try {
+      localStorage.setItem("gdalog_" + key, JSON.stringify(data));
+      localStorage.setItem("gdalog_sync_" + key, Date.now().toString());
+    } catch {}
+  }
+}
+
+async function loadFromDB(key: string, fallback: any): Promise<any> {
+  try {
+    const db = await openDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction("storage", "readonly");
+      const store = tx.objectStore("storage");
+      const req = store.get(key);
+      req.onsuccess = () => {
+        const res = req.result;
+        if (res !== undefined && res !== null) {
+          resolve(res);
+        } else {
+          // Tenta localStorage se IDB estiver vazio
+          const local = localStorage.getItem("gdalog_" + key);
+          resolve(local ? JSON.parse(local) : fallback);
+        }
+      };
+      req.onerror = () => {
+        const local = localStorage.getItem("gdalog_" + key);
+        resolve(local ? JSON.parse(local) : fallback);
+      };
+    });
+  } catch {
+    try {
+      const local = localStorage.getItem("gdalog_" + key);
+      return local ? JSON.parse(local) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+}
+
 export function TransportManagementSystem() {
   // LOGIN STATE - Desativado conforme solicitado
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
@@ -194,87 +275,76 @@ export function TransportManagementSystem() {
     "dashboard" | "frota" | "despesas" | "oleo" | "fretes" | "financeiro"
   >("dashboard");
 
-  // DATA PERSISTENCE STATE WITH LOCALSTORAGE
-  const [drivers, setDrivers] = useState<Driver[]>(() => {
-    if (typeof window === "undefined") return INITIAL_DATA.drivers;
-    try {
-      const saved = localStorage.getItem("gdalog_drivers");
-      return saved ? JSON.parse(saved) : INITIAL_DATA.drivers;
-    } catch {
-      return INITIAL_DATA.drivers;
-    }
-  });
+  // DATA PERSISTENCE STATE WITH INDEXEDDB
+  const [drivers, setDrivers] = useState<Driver[]>(INITIAL_DATA.drivers);
+  const [vehicles, setVehicles] = useState<Vehicle[]>(INITIAL_DATA.vehicles);
+  const [expenses, setExpenses] = useState<Expense[]>(INITIAL_DATA.expenses);
+  const [freights, setFreights] = useState<Freight[]>(INITIAL_DATA.freights);
+  const [oilChanges, setOilChanges] = useState<OilChange[]>(INITIAL_DATA.oilChanges);
 
-  const [vehicles, setVehicles] = useState<Vehicle[]>(() => {
-    if (typeof window === "undefined") return INITIAL_DATA.vehicles;
-    try {
-      const saved = localStorage.getItem("gdalog_vehicles");
-      return saved ? JSON.parse(saved) : INITIAL_DATA.vehicles;
-    } catch {
-      return INITIAL_DATA.vehicles;
+  // Carrega dados iniciais do banco IndexedDB assim que o app monta
+  useEffect(() => {
+    async function initData() {
+      const [d, v, e, f, o] = await Promise.all([
+        loadFromDB("drivers", INITIAL_DATA.drivers),
+        loadFromDB("vehicles", INITIAL_DATA.vehicles),
+        loadFromDB("expenses", INITIAL_DATA.expenses),
+        loadFromDB("freights", INITIAL_DATA.freights),
+        loadFromDB("oilChanges", INITIAL_DATA.oilChanges),
+      ]);
+      setDrivers(d);
+      setVehicles(v);
+      setExpenses(e);
+      setFreights(f);
+      setOilChanges(o);
     }
-  });
+    initData();
 
-  const [expenses, setExpenses] = useState<Expense[]>(() => {
-    if (typeof window === "undefined") return INITIAL_DATA.expenses;
-    try {
-      const saved = localStorage.getItem("gdalog_expenses");
-      return saved ? JSON.parse(saved) : INITIAL_DATA.expenses;
-    } catch {
-      return INITIAL_DATA.expenses;
-    }
-  });
+    // Listener para sincronização automática entre abas e instâncias do navegador
+    const handleStorageSync = (event: StorageEvent) => {
+      if (event.key && event.key.startsWith("gdalog_sync_")) {
+        const dataKey = event.key.replace("gdalog_sync_", "");
+        loadFromDB(dataKey, null).then((val) => {
+          if (val !== null) {
+            if (dataKey === "drivers") setDrivers(val);
+            if (dataKey === "vehicles") setVehicles(val);
+            if (dataKey === "expenses") setExpenses(val);
+            if (dataKey === "freights") setFreights(val);
+            if (dataKey === "oilChanges") setOilChanges(val);
+          }
+        });
+      }
+    };
 
-  const [freights, setFreights] = useState<Freight[]>(() => {
-    if (typeof window === "undefined") return INITIAL_DATA.freights;
-    try {
-      const saved = localStorage.getItem("gdalog_freights");
-      return saved ? JSON.parse(saved) : INITIAL_DATA.freights;
-    } catch {
-      return INITIAL_DATA.freights;
-    }
-  });
+    window.addEventListener("storage", handleStorageSync);
+    return () => window.removeEventListener("storage", handleStorageSync);
+  }, []);
 
-  const [oilChanges, setOilChanges] = useState<OilChange[]>(() => {
-    if (typeof window === "undefined") return INITIAL_DATA.oilChanges;
-    try {
-      const saved = localStorage.getItem("gdalog_oilChanges");
-      return saved ? JSON.parse(saved) : INITIAL_DATA.oilChanges;
-    } catch {
-      return INITIAL_DATA.oilChanges;
-    }
-  });
+  // Salva automaticamente no banco a cada alteração
+  const persistDrivers = useCallback((data: Driver[]) => {
+    setDrivers(data);
+    saveToDB("drivers", data);
+  }, []);
 
-  // Salva e atualiza imediatamente no localStorage a cada alteração de estado
-  useMemo(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("gdalog_drivers", JSON.stringify(drivers));
-    }
-  }, [drivers]);
+  const persistVehicles = useCallback((data: Vehicle[]) => {
+    setVehicles(data);
+    saveToDB("vehicles", data);
+  }, []);
 
-  useMemo(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("gdalog_vehicles", JSON.stringify(vehicles));
-    }
-  }, [vehicles]);
+  const persistExpenses = useCallback((data: Expense[]) => {
+    setExpenses(data);
+    saveToDB("expenses", data);
+  }, []);
 
-  useMemo(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("gdalog_expenses", JSON.stringify(expenses));
-    }
-  }, [expenses]);
+  const persistFreights = useCallback((data: Freight[]) => {
+    setFreights(data);
+    saveToDB("freights", data);
+  }, []);
 
-  useMemo(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("gdalog_freights", JSON.stringify(freights));
-    }
-  }, [freights]);
-
-  useMemo(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("gdalog_oilChanges", JSON.stringify(oilChanges));
-    }
-  }, [oilChanges]);
+  const persistOilChanges = useCallback((data: OilChange[]) => {
+    setOilChanges(data);
+    saveToDB("oilChanges", data);
+  }, []);
 
   // MODAL STATES
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
@@ -451,10 +521,7 @@ export function TransportManagementSystem() {
       toast.success(`Despesa de R$ ${calculatedTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} adicionada e computada no financeiro!`);
     }
 
-    setExpenses(updatedExpenses);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("gdalog_expenses", JSON.stringify(updatedExpenses));
-    }
+    persistExpenses(updatedExpenses);
 
     // Reset Form
     setExpEditingId(null);
@@ -533,10 +600,7 @@ export function TransportManagementSystem() {
       toast.success(`Frete de R$ ${val.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} cadastrado e adicionado ao financeiro!`);
     }
 
-    setFreights(updatedFreights);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("gdalog_freights", JSON.stringify(updatedFreights));
-    }
+    persistFreights(updatedFreights);
 
     setFrtEditingId(null);
     setFrtOrigem("");
@@ -567,19 +631,18 @@ export function TransportManagementSystem() {
     }
 
     if (vehEditingId) {
-      setVehicles(
-        vehicles.map((item) =>
-          item.id === vehEditingId
-            ? {
-                ...item,
-                placa: vehPlaca.toUpperCase(),
-                modelo: vehModelo,
-                motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
-                categoria: vehCategoria.toUpperCase() || "LOGISTICA",
-              }
-            : item,
-        ),
+      const updatedVehicles = vehicles.map((item) =>
+        item.id === vehEditingId
+          ? {
+              ...item,
+              placa: vehPlaca.toUpperCase(),
+              modelo: vehModelo,
+              motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
+              categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+            }
+          : item,
       );
+      persistVehicles(updatedVehicles);
       toast.success(`Veículo ${vehPlaca.toUpperCase()} atualizado!`);
     } else {
       const newVeh: Vehicle = {
@@ -590,7 +653,7 @@ export function TransportManagementSystem() {
         categoria: vehCategoria.toUpperCase() || "LOGISTICA",
       };
 
-      setVehicles([...vehicles, newVeh]);
+      persistVehicles([...vehicles, newVeh]);
       toast.success(`Veículo ${newVeh.placa} cadastrado na frota!`);
     }
 
@@ -620,21 +683,20 @@ export function TransportManagementSystem() {
     }
 
     if (drvEditingId) {
-      setDrivers(
-        drivers.map((d) =>
-          d.id === drvEditingId
-            ? {
-                ...d,
-                nome: drvNome.toUpperCase(),
-                cnh: drvCnh || "Não informada",
-                telefone: drvTelefone || "Não informado",
-                categoria: drvCategoria || "E",
-                status: drvStatus,
-                foto: drvFoto || d.foto,
-              }
-            : d,
-        ),
+      const updatedDrivers = drivers.map((d) =>
+        d.id === drvEditingId
+          ? {
+              ...d,
+              nome: drvNome.toUpperCase(),
+              cnh: drvCnh || "Não informada",
+              telefone: drvTelefone || "Não informado",
+              categoria: drvCategoria || "E",
+              status: drvStatus,
+              foto: drvFoto || d.foto,
+            }
+          : d,
       );
+      persistDrivers(updatedDrivers);
       toast.success(`Motorista ${drvNome.toUpperCase()} atualizado com sucesso!`);
     } else {
       const newDrv: Driver = {
@@ -647,7 +709,7 @@ export function TransportManagementSystem() {
         foto: drvFoto || "",
       };
 
-      setDrivers([...drivers, newDrv]);
+      persistDrivers([...drivers, newDrv]);
       toast.success(`Motorista ${newDrv.nome} cadastrado com sucesso!`);
     }
 
@@ -719,10 +781,7 @@ export function TransportManagementSystem() {
       toast.success(`Manutenção (${oilCategoriaServico}) registrada e adicionada imediatamente ao financeiro!`);
     }
 
-    setOilChanges(updatedOilChanges);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("gdalog_oilChanges", JSON.stringify(updatedOilChanges));
-    }
+    persistOilChanges(updatedOilChanges);
 
     setOilEditingId(null);
     setOilPlaca("");
@@ -750,28 +809,28 @@ export function TransportManagementSystem() {
 
   // DELETE HANDLERS
   const handleDeleteExpense = (id: string) => {
-    setExpenses(expenses.filter((item) => item.id !== id));
+    persistExpenses(expenses.filter((item) => item.id !== id));
     toast.info("Despesa removida.");
   };
 
   const handleDeleteFreight = (id: string) => {
-    setFreights(freights.filter((item) => item.id !== id));
+    persistFreights(freights.filter((item) => item.id !== id));
     toast.info("Frete removido.");
   };
 
   const handleDeleteVehicle = (id: string) => {
-    setVehicles(vehicles.filter((item) => item.id !== id));
+    persistVehicles(vehicles.filter((item) => item.id !== id));
     toast.info("Veículo removido da frota.");
   };
 
   const handleDeleteDriver = (id: string) => {
-    setDrivers(drivers.filter((item) => item.id !== id));
+    persistDrivers(drivers.filter((item) => item.id !== id));
     toast.info("Motorista removido do sistema.");
   };
 
   const handleDeleteOilChange = (id: string) => {
-    setOilChanges(oilChanges.filter((item) => item.id !== id));
-    toast.info("Registro de troca de óleo removido.");
+    persistOilChanges(oilChanges.filter((item) => item.id !== id));
+    toast.info("Registro de manutenção removido.");
   };
 
   // LOGIN HANDLER
