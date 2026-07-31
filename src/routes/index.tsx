@@ -1,5 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { cloudLoad, cloudSave } from "@/lib/cloud-store";
+import motoristaMarcosAsset from "@/assets/motorista-marcos.png.asset.json";
 import {
   Truck,
   DollarSign,
@@ -132,7 +134,7 @@ interface OilChange {
 // INITIAL DATA
 const INITIAL_DATA = {
   drivers: [
-    { id: "d1", nome: "MARCOS", cnh: "12345678900", telefone: "11 98765-4321", categoria: "E", status: "Em Viagem", foto: "" },
+    { id: "d1", nome: "MARCOS", cnh: "12345678900", telefone: "11 98765-4321", categoria: "E", status: "Em Viagem", foto: motoristaMarcosAsset.url },
   ] as Driver[],
   vehicles: [
     { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA" },
@@ -207,6 +209,10 @@ function openDB(): Promise<IDBDatabase> {
 }
 
 async function saveToDB(key: string, data: any): Promise<void> {
+  // 1) Banco de dados na nuvem (fonte de verdade — sobrevive à troca de navegador)
+  void cloudSave(key, data);
+
+  // 2) Cópias locais (IndexedDB + localStorage) para funcionar offline
   try {
     const db = await openDB();
     const tx = db.transaction("storage", "readwrite");
@@ -216,6 +222,7 @@ async function saveToDB(key: string, data: any): Promise<void> {
       tx.oncomplete = () => {
         // Notifica outras abas/navegadores via localStorage event e BroadcastChannel
         try {
+          localStorage.setItem("gdalog_" + key, JSON.stringify(data));
           localStorage.setItem("gdalog_sync_" + key, Date.now().toString());
         } catch {}
         resolve();
@@ -231,7 +238,7 @@ async function saveToDB(key: string, data: any): Promise<void> {
   }
 }
 
-async function loadFromDB(key: string, fallback: any): Promise<any> {
+async function loadLocal(key: string, fallback: any): Promise<any> {
   try {
     const db = await openDB();
     return new Promise((resolve) => {
@@ -263,6 +270,20 @@ async function loadFromDB(key: string, fallback: any): Promise<any> {
   }
 }
 
+// Lê SEMPRE do banco de dados na nuvem primeiro (garante os dados em qualquer
+// navegador ou dispositivo). Se a nuvem ainda não tiver o registro, usa a cópia
+// local e a envia para a nuvem — nada é perdido.
+async function loadFromDB(key: string, fallback: any): Promise<any> {
+  const remote = await cloudLoad(key);
+  if (remote !== null && remote !== undefined) return remote;
+
+  const local = await loadLocal(key, fallback);
+  if (local !== null && local !== undefined) void cloudSave(key, local);
+  return local;
+}
+
+
+
 export function TransportManagementSystem() {
   // LOGIN STATE - Desativado conforme solicitado
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
@@ -291,7 +312,16 @@ export function TransportManagementSystem() {
         loadFromDB("freights", INITIAL_DATA.freights),
         loadFromDB("oilChanges", INITIAL_DATA.oilChanges),
       ]);
-      setDrivers(d);
+      // Garante a foto do motorista MARCOS mesmo em dados já salvos
+      const driversWithPhoto: Driver[] = (d as Driver[]).map((drv) =>
+        drv.nome?.toUpperCase() === "MARCOS" && !drv.foto
+          ? { ...drv, foto: motoristaMarcosAsset.url }
+          : drv,
+      );
+      setDrivers(driversWithPhoto);
+      if (JSON.stringify(driversWithPhoto) !== JSON.stringify(d)) {
+        void saveToDB("drivers", driversWithPhoto);
+      }
       setVehicles(v);
       setExpenses(e);
       setFreights(f);
@@ -303,7 +333,7 @@ export function TransportManagementSystem() {
     const handleStorageSync = (event: StorageEvent) => {
       if (event.key && event.key.startsWith("gdalog_sync_")) {
         const dataKey = event.key.replace("gdalog_sync_", "");
-        loadFromDB(dataKey, null).then((val) => {
+        loadFromDB(dataKey, null).then((val: any) => {
           if (val !== null) {
             if (dataKey === "drivers") setDrivers(val);
             if (dataKey === "vehicles") setVehicles(val);
