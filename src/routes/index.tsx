@@ -70,6 +70,7 @@ interface Driver {
   telefone: string;
   categoria: string;
   status: "Ativo" | "Em Viagem" | "Férias";
+  foto?: string;
 }
 
 interface Vehicle {
@@ -129,7 +130,7 @@ interface OilChange {
 // INITIAL DATA
 const INITIAL_DATA = {
   drivers: [
-    { id: "d1", nome: "MARCOS", cnh: "12345678900", telefone: "(11) 98765-4321", categoria: "E", status: "Em Viagem" },
+    { id: "d1", nome: "MARCOS", cnh: "12345678900", telefone: "(11) 98765-4321", categoria: "E", status: "Em Viagem", foto: "" },
   ] as Driver[],
   vehicles: [
     { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA" },
@@ -213,6 +214,7 @@ export function TransportManagementSystem() {
   const [drvTelefone, setDrvTelefone] = useState("");
   const [drvCategoria, setDrvCategoria] = useState("E");
   const [drvStatus, setDrvStatus] = useState<"Ativo" | "Em Viagem" | "Férias">("Ativo");
+  const [drvFoto, setDrvFoto] = useState("");
 
   // FORM STATES
   // Expense Form
@@ -426,6 +428,7 @@ export function TransportManagementSystem() {
       telefone: drvTelefone || "Não informado",
       categoria: drvCategoria || "E",
       status: drvStatus,
+      foto: drvFoto || "",
     };
 
     setDrivers([...drivers, newDrv]);
@@ -436,6 +439,7 @@ export function TransportManagementSystem() {
     setDrvTelefone("");
     setDrvCategoria("E");
     setDrvStatus("Ativo");
+    setDrvFoto("");
     setIsDriverModalOpen(false);
   };
 
@@ -961,10 +965,18 @@ export function TransportManagementSystem() {
                       <Trash2 className="w-4 h-4" />
                     </button>
 
-                    <div className="flex items-center gap-2">
-                      <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-sm">
-                        <User className="w-4 h-4 text-slate-500" />
-                      </div>
+                    <div className="flex items-center gap-3">
+                      {drv.foto ? (
+                        <img
+                          src={drv.foto}
+                          alt={drv.nome}
+                          className="w-12 h-12 rounded-full object-cover border border-slate-200 shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-700 text-sm border border-slate-200">
+                          <User className="w-6 h-6 text-slate-400" />
+                        </div>
+                      )}
                       <div>
                         <div className="font-extrabold text-base text-[#0c192c]">
                           {drv.nome}
@@ -1905,6 +1917,33 @@ export function TransportManagementSystem() {
                   <option value="Férias">Férias</option>
                 </select>
               </div>
+            </div>
+
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">Foto do Motorista (Arquivo ou URL)</Label>
+              <div className="flex gap-2 mt-1">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (uploadEvent) => {
+                        setDrvFoto(uploadEvent.target?.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="text-xs cursor-pointer"
+                />
+              </div>
+              {drvFoto && (
+                <div className="mt-2 flex items-center gap-2">
+                  <img src={drvFoto} alt="Pré-visualização" className="w-10 h-10 rounded-full object-cover border" />
+                  <span className="text-[11px] text-green-600 font-semibold">Foto carregada com sucesso!</span>
+                </div>
+              )}
             </div>
 
             <DialogFooter className="pt-2 border-t border-slate-100 flex gap-2 justify-end">
