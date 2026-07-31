@@ -222,15 +222,11 @@ export function FinancialReport({
       }
     });
 
-    const lancadoManutencao =
-      (costsByCategory.find((c) => c.key === "manutencao")?.valor || 0) +
-      (costsByCategory.find((c) => c.key === "trocaOleo")?.valor || 0) +
-      (costsByCategory.find((c) => c.key === "pneu")?.valor || 0);
-    const diffManut = Number((totalManutencaoRegistrada - lancadoManutencao).toFixed(2));
+    const diffManut = Number((totalManutencaoRegistrada - 0).toFixed(2));
     if (Math.abs(diffManut) > 0.009) {
       issues.push({
         tipo: "Manutenção x Despesas",
-        descricao: `Ordens de manutenção somam ${formatBRL(totalManutencaoRegistrada)}, mas as despesas registram ${formatBRL(lancadoManutencao)} em óleo + manutenção + pneus.`,
+        descricao: `Ordens de manutenção somam ${formatBRL(totalManutencaoRegistrada)}, mas não há mais categoria de despesa vinculada a óleo, manutenção ou pneus.`,
         diferenca: diffManut,
       });
     }

@@ -1652,20 +1652,6 @@ export function TransportManagementSystem() {
                 </div>
 
                 <div>
-                  <span className="text-[11px] text-slate-500 font-medium">Troca de Óleo</span>
-                  <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
-                      value={expTrocaOleo}
-                      onChange={(e) => setExpTrocaOleo(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder="0,00"
-                      className="text-xs pl-8"
-                    />
-                  </div>
-                </div>
-
-                <div>
                   <span className="text-[11px] text-slate-500 font-medium">Salário</span>
                   <div className="relative mt-0.5">
                     <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
@@ -1673,34 +1659,6 @@ export function TransportManagementSystem() {
                       type="number"
                       value={expSalario}
                       onChange={(e) => setExpSalario(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder="0,00"
-                      className="text-xs pl-8"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-[11px] text-slate-500 font-medium">Manutenção</span>
-                  <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
-                      value={expManutencao}
-                      onChange={(e) => setExpManutencao(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder="0,00"
-                      className="text-xs pl-8"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-[11px] text-slate-500 font-medium">Pneu</span>
-                  <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
-                      value={expPneu}
-                      onChange={(e) => setExpPneu(e.target.value === "" ? "" : Number(e.target.value))}
                       placeholder="0,00"
                       className="text-xs pl-8"
                     />
