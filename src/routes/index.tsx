@@ -295,10 +295,7 @@ export function TransportManagementSystem() {
   const [expDepreciacao, setExpDepreciacao] = useState<number | "">("");
   const [expIpva, setExpIpva] = useState<number | "">("");
   const [expDiaria, setExpDiaria] = useState<number | "">("");
-  const [expTrocaOleo, setExpTrocaOleo] = useState<number | "">("");
   const [expSalario, setExpSalario] = useState<number | "">("");
-  const [expManutencao, setExpManutencao] = useState<number | "">("");
-  const [expPneu, setExpPneu] = useState<number | "">("");
   const [expOutros, setExpOutros] = useState<number | "">("");
   const [expObs, setExpObs] = useState("");
 
@@ -384,10 +381,7 @@ export function TransportManagementSystem() {
       num(expDepreciacao) +
       num(expIpva) +
       num(expDiaria) +
-      num(expTrocaOleo) +
       num(expSalario) +
-      num(expManutencao) +
-      num(expPneu) +
       num(expOutros);
 
     const newExp: Expense = {
@@ -403,10 +397,7 @@ export function TransportManagementSystem() {
         depreciacao: num(expDepreciacao),
         ipva: num(expIpva),
         diaria: num(expDiaria),
-        trocaOleo: num(expTrocaOleo),
         salario: num(expSalario),
-        manutencao: num(expManutencao),
-        pneu: num(expPneu),
         outros: num(expOutros),
       },
       total: calculatedTotal,
