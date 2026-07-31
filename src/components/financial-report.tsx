@@ -79,6 +79,14 @@ const COST_LABELS: { key: keyof FinExpenseDetails; label: string }[] = [
   { key: "outros", label: "Outros" },
 ];
 
+export const MAINT_SERVICES = [
+  "Troca de Óleo",
+  "Freios",
+  "Peças de Motor",
+  "Peças do Câmbio",
+  "Pneus",
+] as const;
+
 export function FinancialReport({
   expenses,
   freights,
@@ -126,7 +134,10 @@ export function FinancialReport({
       .sort((a, b) => b.valor - a.valor);
   }, [fExpenses]);
 
-  const totalDespesas = costsByCategory.reduce((a, c) => a + c.valor, 0);
+  const totalDespesasLancadas = costsByCategory.reduce((a, c) => a + c.valor, 0);
+  const totalManutencaoRegistrada = fMaint.reduce((a, m) => a + (Number(m.custo) || 0), 0);
+  // Despesas totais = categorias de despesa + ordens de manutenção
+  const totalDespesas = totalDespesasLancadas + totalManutencaoRegistrada;
   const totalReceita = fFreights.reduce((a, f) => a + (f.valor || 0), 0);
   const totalRecebido = fFreights.reduce((a, f) => a + (f.recebido || 0), 0);
   const aReceber = totalReceita - totalRecebido;
@@ -135,18 +146,42 @@ export function FinancialReport({
   const totalKm = fExpenses.reduce((a, e) => a + (Number(e.km) || 0), 0);
   const custoPorKm = totalKm > 0 ? totalDespesas / totalKm : 0;
   const receitaPorKm = totalKm > 0 ? totalReceita / totalKm : 0;
-  const totalManutencaoRegistrada = fMaint.reduce((a, m) => a + (Number(m.custo) || 0), 0);
+  const manutPorKm = totalKm > 0 ? totalManutencaoRegistrada / totalKm : 0;
+  const pctManutencao =
+    totalDespesas > 0 ? (totalManutencaoRegistrada / totalDespesas) * 100 : 0;
 
-  // Manutenção agrupada por tipo de serviço
+  // Categorias de despesa + Manutenção, recalculadas sobre o total geral
+  const allCostRows = useMemo(() => {
+    const rows = [
+      ...costsByCategory.map((c) => ({ key: c.key as string, label: c.label, valor: c.valor })),
+      { key: "manutencao", label: "Manutenção", valor: totalManutencaoRegistrada },
+    ];
+    return rows
+      .map((r) => ({
+        ...r,
+        pct: totalDespesas > 0 ? (r.valor / totalDespesas) * 100 : 0,
+      }))
+      .sort((a, b) => b.valor - a.valor);
+  }, [costsByCategory, totalManutencaoRegistrada, totalDespesas]);
+
+  // Manutenção agrupada por serviço (todos os serviços do cadastro)
   const maintByType = useMemo(() => {
     const map = new Map<string, { total: number; qtd: number }>();
+    MAINT_SERVICES.forEach((s) => map.set(s, { total: 0, qtd: 0 }));
     fMaint.forEach((m) => {
       const key = m.categoriaServico || "Outros";
       const cur = map.get(key) || { total: 0, qtd: 0 };
       map.set(key, { total: cur.total + (Number(m.custo) || 0), qtd: cur.qtd + 1 });
     });
-    return [...map.entries()].sort((a, b) => b[1].total - a[1].total);
-  }, [fMaint]);
+    return [...map.entries()]
+      .map(([tipo, v]) => ({
+        tipo,
+        ...v,
+        pct: totalManutencaoRegistrada > 0 ? (v.total / totalManutencaoRegistrada) * 100 : 0,
+        media: v.qtd > 0 ? v.total / v.qtd : 0,
+      }))
+      .sort((a, b) => b.total - a.total);
+  }, [fMaint, totalManutencaoRegistrada]);
 
   // Consolidado por veículo
   const byVehicle = useMemo(() => {
@@ -170,15 +205,16 @@ export function FinancialReport({
         const manut = fMaint
           .filter((m) => m.placa.toUpperCase() === placa)
           .reduce((a, m) => a + (Number(m.custo) || 0), 0);
+        const despTotal = desp + manut;
         return {
           placa,
           modelo: vehicles.find((v) => v.placa.toUpperCase() === placa)?.modelo ?? "—",
-          despesa: desp,
+          despesa: despTotal,
           receita: rec,
           manutencao: manut,
           km,
-          saldo: rec - desp,
-          custoKm: km > 0 ? desp / km : 0,
+          saldo: rec - despTotal,
+          custoKm: km > 0 ? despTotal / km : 0,
         };
       })
       .sort((a, b) => b.receita - a.receita);
@@ -222,14 +258,15 @@ export function FinancialReport({
       }
     });
 
-    const diffManut = Number((totalManutencaoRegistrada - 0).toFixed(2));
-    if (Math.abs(diffManut) > 0.009) {
-      issues.push({
-        tipo: "Manutenção x Despesas",
-        descricao: `Ordens de manutenção somam ${formatBRL(totalManutencaoRegistrada)}, mas não há mais categoria de despesa vinculada a óleo, manutenção ou pneus.`,
-        diferenca: diffManut,
-      });
-    }
+    fMaint.forEach((m) => {
+      if (!m.custo || Number(m.custo) <= 0) {
+        issues.push({
+          tipo: "Manutenção sem custo",
+          descricao: `Ordem de ${m.categoriaServico || "serviço"} da placa ${m.placa} (${formatDateBR(m.data)}) sem valor lançado.`,
+        });
+      }
+    });
+
 
     const placasSemVeiculo = [
       ...new Set(
@@ -246,7 +283,7 @@ export function FinancialReport({
     );
 
     return issues;
-  }, [fExpenses, fFreights, costsByCategory, totalManutencaoRegistrada, vehicles]);
+  }, [fExpenses, fFreights, fMaint, costsByCategory, totalManutencaoRegistrada, vehicles]);
 
   const periodoLabel =
     dateFrom || dateTo
@@ -270,11 +307,14 @@ export function FinancialReport({
     rows.push(["Custo por KM", custoPorKm.toFixed(2)]);
     rows.push([]);
     rows.push(["CUSTOS POR CATEGORIA", "Valor", "% do total"]);
-    costsByCategory.forEach((c) => rows.push([c.label, c.valor, c.pct.toFixed(1)]));
+    allCostRows.forEach((c) => rows.push([c.label, c.valor, c.pct.toFixed(1)]));
     rows.push(["TOTAL", totalDespesas, "100"]);
     rows.push([]);
-    rows.push(["MANUTENÇÃO POR SERVIÇO", "Ordens", "Valor"]);
-    maintByType.forEach(([tipo, v]) => rows.push([tipo, v.qtd, v.total]));
+    rows.push(["MANUTENÇÃO POR SERVIÇO", "Ordens", "Valor", "Média por ordem", "% manutenção"]);
+    maintByType.forEach((m) =>
+      rows.push([m.tipo, m.qtd, m.total, m.media.toFixed(2), m.pct.toFixed(1)]),
+    );
+    rows.push(["TOTAL MANUTENÇÃO", "", totalManutencaoRegistrada]);
     rows.push([]);
     rows.push(["POR VEÍCULO", "Modelo", "Receita", "Despesa", "Saldo", "KM", "Custo/KM"]);
     byVehicle.forEach((v) =>
@@ -382,7 +422,9 @@ export function FinancialReport({
             <TrendingDown className="w-4 h-4 text-[#f25c05]" /> Despesas
           </div>
           <div className="text-xl font-black text-[#f25c05] mt-1">{formatBRL(totalDespesas)}</div>
-          <div className="text-[11px] text-slate-400 mt-1">{fExpenses.length} lançamentos</div>
+          <div className="text-[11px] text-slate-400 mt-1">
+            {fExpenses.length} lançamentos · manutenção {formatBRL(totalManutencaoRegistrada)}
+          </div>
         </div>
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
           <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold uppercase">
@@ -408,12 +450,12 @@ export function FinancialReport({
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
         <h2 className="font-extrabold text-[#0c192c] mb-4">Custos por categoria</h2>
         <div className="space-y-2">
-          {costsByCategory.map((c) => (
+          {allCostRows.map((c) => (
             <div key={c.key} className="flex items-center gap-3">
               <div className="w-40 text-xs font-semibold text-slate-600 shrink-0">{c.label}</div>
               <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#f25c05] rounded-full"
+                  className={`h-full rounded-full ${c.key === "manutencao" ? "bg-[#0c192c]" : "bg-[#f25c05]"}`}
                   style={{ width: `${Math.max(c.pct, 0)}%` }}
                 />
               </div>
@@ -424,49 +466,69 @@ export function FinancialReport({
             </div>
           ))}
         </div>
-        <div className="flex justify-between border-t border-slate-100 mt-4 pt-3 text-sm font-black text-[#0c192c]">
-          <span>Total de despesas</span>
-          <span>{formatBRL(totalDespesas)}</span>
+        <div className="border-t border-slate-100 mt-4 pt-3 space-y-1">
+          <div className="flex justify-between text-xs text-slate-500">
+            <span>Despesas lançadas</span>
+            <span>{formatBRL(totalDespesasLancadas)}</span>
+          </div>
+          <div className="flex justify-between text-xs text-slate-500">
+            <span>Manutenção ({pctManutencao.toFixed(1)}% do total)</span>
+            <span>{formatBRL(totalManutencaoRegistrada)}</span>
+          </div>
+          <div className="flex justify-between text-sm font-black text-[#0c192c] pt-1">
+            <span>Total de despesas</span>
+            <span>{formatBRL(totalDespesas)}</span>
+          </div>
         </div>
       </div>
 
       {/* Manutenção */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
-        <h2 className="font-extrabold text-[#0c192c] mb-4">Manutenção por tipo de serviço</h2>
-        {maintByType.length === 0 ? (
-          <p className="text-sm text-slate-400">Nenhuma ordem de manutenção no período.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
-                  <th className="py-2">Serviço</th>
-                  <th className="py-2 text-center">Ordens</th>
-                  <th className="py-2 text-right">Custo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {maintByType.map(([tipo, v]) => (
-                  <tr key={tipo} className="border-b border-slate-50">
-                    <td className="py-2 font-semibold text-slate-700">{tipo}</td>
-                    <td className="py-2 text-center text-slate-500">{v.qtd}</td>
-                    <td className="py-2 text-right font-bold text-slate-800">
-                      {formatBRL(v.total)}
-                    </td>
-                  </tr>
-                ))}
-                <tr>
-                  <td className="py-2 font-black text-[#0c192c]">Total</td>
-                  <td />
-                  <td className="py-2 text-right font-black text-[#0c192c]">
-                    {formatBRL(totalManutencaoRegistrada)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="flex flex-wrap items-end justify-between gap-2 mb-4">
+          <h2 className="font-extrabold text-[#0c192c]">Categoria de Serviço / Manutenção</h2>
+          <div className="text-[11px] text-slate-400">
+            {fMaint.length} ordens · {formatBRL(manutPorKm)}/km
           </div>
-        )}
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
+                <th className="py-2">Serviço</th>
+                <th className="py-2 text-center">Ordens</th>
+                <th className="py-2 text-right">Custo</th>
+                <th className="py-2 text-right">Média/ordem</th>
+                <th className="py-2 text-right">% manut.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {maintByType.map((m) => (
+                <tr key={m.tipo} className="border-b border-slate-50">
+                  <td className="py-2 font-semibold text-slate-700">{m.tipo}</td>
+                  <td className="py-2 text-center text-slate-500">{m.qtd}</td>
+                  <td className="py-2 text-right font-bold text-slate-800">
+                    {formatBRL(m.total)}
+                  </td>
+                  <td className="py-2 text-right text-slate-500">{formatBRL(m.media)}</td>
+                  <td className="py-2 text-right text-slate-400">{m.pct.toFixed(1)}%</td>
+                </tr>
+              ))}
+              <tr>
+                <td className="py-2 font-black text-[#0c192c]">Total</td>
+                <td className="py-2 text-center font-black text-[#0c192c]">{fMaint.length}</td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(totalManutencaoRegistrada)}
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(fMaint.length > 0 ? totalManutencaoRegistrada / fMaint.length : 0)}
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">100%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
 
       {/* Por veículo */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
