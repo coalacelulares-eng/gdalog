@@ -55,7 +55,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Acompanhe frota, despesas, fretes e manutenção da sua operação rodoviária.",
+          "Painel GDALog: acompanhe frota, despesas por veículo, fretes e trocas de óleo em tempo real.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -77,22 +77,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "GDALog — Gestão de Transportes" },
+      { title: "GDALog — Painel de Gestão de Frota" },
       {
         name: "description",
         content:
-          "Sistema GDALog para controle de frota, despesas, fretes e trocas de óleo em operações rodoviárias.",
+          "Painel GDALog: acompanhe frota, despesas por veículo, fretes e trocas de óleo em tempo real.",
       },
       { name: "author", content: "GDALog Transportes" },
-      { property: "og:title", content: "GDALog — Gestão de Transportes" },
+      { property: "og:title", content: "GDALog — Painel de Gestão de Frota" },
       {
         property: "og:description",
         content:
-          "Controle de frota, despesas, fretes e manutenção em um só painel.",
+          "Painel GDALog: acompanhe frota, despesas por veículo, fretes e trocas de óleo em tempo real.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "GDALog — Painel de Gestão de Frota" },
+      { name: "twitter:description", content: "Painel GDALog: acompanhe frota, despesas por veículo, fretes e trocas de óleo em tempo real." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/ca8aad65-1d94-4507-8f15-0441ae89b6cd" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/ca8aad65-1d94-4507-8f15-0441ae89b6cd" },
     ],
     links: [
       {
