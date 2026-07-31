@@ -380,7 +380,7 @@ export function TransportManagementSystem() {
     });
   }, [vehicles, freights, expenses]);
 
-  // ADD / EDIT EXPENSE HANDLER
+  // ADD / EDIT EXPENSE HANDLER WITH IMMEDIATE FINANCIAL RECALCULATION
   const handleAddExpense = (e: React.FormEvent) => {
     e.preventDefault();
     if (!expPlaca) {
@@ -400,33 +400,32 @@ export function TransportManagementSystem() {
       num(expSalario) +
       num(expOutros);
 
+    let updatedExpenses = [...expenses];
     if (expEditingId) {
-      setExpenses(
-        expenses.map((item) =>
-          item.id === expEditingId
-            ? {
-                ...item,
-                placa: expPlaca.toUpperCase(),
-                data: expData,
-                motorista: expMotorista || "MOTORISTA",
-                km: num(expKm),
-                detalhes: {
-                  abastecimento: num(expAbastecimento),
-                  arla: num(expArla),
-                  rastreador: num(expRastreador),
-                  depreciacao: num(expDepreciacao),
-                  ipva: num(expIpva),
-                  diaria: num(expDiaria),
-                  salario: num(expSalario),
-                  outros: num(expOutros),
-                },
-                total: calculatedTotal,
-                observacao: expObs,
-              }
-            : item,
-        ),
+      updatedExpenses = expenses.map((item) =>
+        item.id === expEditingId
+          ? {
+              ...item,
+              placa: expPlaca.toUpperCase(),
+              data: expData,
+              motorista: expMotorista || "MOTORISTA",
+              km: num(expKm),
+              detalhes: {
+                abastecimento: num(expAbastecimento),
+                arla: num(expArla),
+                rastreador: num(expRastreador),
+                depreciacao: num(expDepreciacao),
+                ipva: num(expIpva),
+                diaria: num(expDiaria),
+                salario: num(expSalario),
+                outros: num(expOutros),
+              },
+              total: calculatedTotal,
+              observacao: expObs,
+            }
+          : item,
       );
-      toast.success(`Despesa atualizada com sucesso!`);
+      toast.success(`Despesa atualizada e calculada imediatamente no financeiro!`);
     } else {
       const newExp: Expense = {
         id: "exp_" + Date.now(),
@@ -448,8 +447,13 @@ export function TransportManagementSystem() {
         observacao: expObs,
       };
 
-      setExpenses([newExp, ...expenses]);
-      toast.success(`Despesa de R$ ${calculatedTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} adicionada!`);
+      updatedExpenses = [newExp, ...expenses];
+      toast.success(`Despesa de R$ ${calculatedTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} adicionada e computada no financeiro!`);
+    }
+
+    setExpenses(updatedExpenses);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("gdalog_expenses", JSON.stringify(updatedExpenses));
     }
 
     // Reset Form
@@ -487,7 +491,7 @@ export function TransportManagementSystem() {
     setIsExpenseModalOpen(true);
   };
 
-  // ADD / EDIT FREIGHT HANDLER
+  // ADD / EDIT FREIGHT HANDLER WITH IMMEDIATE FINANCIAL RECALCULATION
   const handleAddFreight = (e: React.FormEvent) => {
     e.preventDefault();
     if (!frtOrigem || !frtDestino || !frtPlaca) {
@@ -498,23 +502,22 @@ export function TransportManagementSystem() {
     const val = typeof frtValor === "number" ? frtValor : 0;
     const rec = typeof frtRecebido === "number" ? frtRecebido : 0;
 
+    let updatedFreights = [...freights];
     if (frtEditingId) {
-      setFreights(
-        freights.map((item) =>
-          item.id === frtEditingId
-            ? {
-                ...item,
-                origem: frtOrigem.toUpperCase(),
-                destino: frtDestino.toUpperCase(),
-                placa: frtPlaca.toUpperCase(),
-                data: frtData,
-                valor: val,
-                recebido: rec,
-              }
-            : item,
-        ),
+      updatedFreights = freights.map((item) =>
+        item.id === frtEditingId
+          ? {
+              ...item,
+              origem: frtOrigem.toUpperCase(),
+              destino: frtDestino.toUpperCase(),
+              placa: frtPlaca.toUpperCase(),
+              data: frtData,
+              valor: val,
+              recebido: rec,
+            }
+          : item,
       );
-      toast.success("Frete atualizado com sucesso!");
+      toast.success("Frete atualizado e recalculado imediatamente!");
     } else {
       const newFrt: Freight = {
         id: "frt_" + Date.now(),
@@ -526,8 +529,13 @@ export function TransportManagementSystem() {
         recebido: rec,
       };
 
-      setFreights([newFrt, ...freights]);
-      toast.success(`Frete de R$ ${val.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} cadastrado com sucesso!`);
+      updatedFreights = [newFrt, ...freights];
+      toast.success(`Frete de R$ ${val.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} cadastrado e adicionado ao financeiro!`);
+    }
+
+    setFreights(updatedFreights);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("gdalog_freights", JSON.stringify(updatedFreights));
     }
 
     setFrtEditingId(null);
@@ -664,7 +672,7 @@ export function TransportManagementSystem() {
     setIsDriverModalOpen(true);
   };
 
-  // ADD / EDIT OIL CHANGE HANDLER
+  // ADD / EDIT OIL CHANGE HANDLER WITH IMMEDIATE FINANCIAL RECALCULATION
   const handleAddOilChange = (e: React.FormEvent) => {
     e.preventDefault();
     if (!oilPlaca) {
@@ -676,25 +684,24 @@ export function TransportManagementSystem() {
     const prox = typeof oilProximaKm === "number" ? oilProximaKm : km + 10000;
     const custo = typeof oilCusto === "number" ? oilCusto : 0;
 
+    let updatedOilChanges = [...oilChanges];
     if (oilEditingId) {
-      setOilChanges(
-        oilChanges.map((item) =>
-          item.id === oilEditingId
-            ? {
-                ...item,
-                placa: oilPlaca.toUpperCase(),
-                motorista: oilMotorista.toUpperCase() || "MOTORISTA",
-                data: oilData,
-                kmAtual: km,
-                proximaTrocaKm: prox,
-                custo: custo,
-                categoriaServico: oilCategoriaServico,
-                observacao: oilObs,
-              }
-            : item,
-        ),
+      updatedOilChanges = oilChanges.map((item) =>
+        item.id === oilEditingId
+          ? {
+              ...item,
+              placa: oilPlaca.toUpperCase(),
+              motorista: oilMotorista.toUpperCase() || "MOTORISTA",
+              data: oilData,
+              kmAtual: km,
+              proximaTrocaKm: prox,
+              custo: custo,
+              categoriaServico: oilCategoriaServico,
+              observacao: oilObs,
+            }
+          : item,
       );
-      toast.success("Manutenção atualizada com sucesso!");
+      toast.success("Manutenção/peças atualizadas e computadas no financeiro!");
     } else {
       const newOil: OilChange = {
         id: "oil_" + Date.now(),
@@ -708,8 +715,13 @@ export function TransportManagementSystem() {
         observacao: oilObs,
       };
 
-      setOilChanges([newOil, ...oilChanges]);
-      toast.success(`Manutenção (${oilCategoriaServico}) para ${newOil.placa} registrada!`);
+      updatedOilChanges = [newOil, ...oilChanges];
+      toast.success(`Manutenção (${oilCategoriaServico}) registrada e adicionada imediatamente ao financeiro!`);
+    }
+
+    setOilChanges(updatedOilChanges);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("gdalog_oilChanges", JSON.stringify(updatedOilChanges));
     }
 
     setOilEditingId(null);
