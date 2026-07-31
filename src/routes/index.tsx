@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Truck,
@@ -128,7 +128,6 @@ interface OilChange {
   observacao: string;
 }
 
-import { useEffect, useState, useMemo, useCallback } from "react";
 
 // INITIAL DATA
 const INITIAL_DATA = {
