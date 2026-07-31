@@ -283,7 +283,7 @@ export function FinancialReport({
     );
 
     return issues;
-  }, [fExpenses, fFreights, costsByCategory, totalManutencaoRegistrada, vehicles]);
+  }, [fExpenses, fFreights, fMaint, costsByCategory, totalManutencaoRegistrada, vehicles]);
 
   const periodoLabel =
     dateFrom || dateTo
