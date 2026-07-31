@@ -449,22 +449,24 @@ export function FinancialReport({
       {/* Custos por categoria */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
         <h2 className="font-extrabold text-[#0c192c] mb-4">Custos por categoria</h2>
-        <div className="space-y-2">
-          {allCostRows.map((c) => (
-            <div key={c.key} className="flex items-center gap-3">
-              <div className="w-40 text-xs font-semibold text-slate-600 shrink-0">{c.label}</div>
-              <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${c.key === "manutencao" ? "bg-[#0c192c]" : "bg-[#f25c05]"}`}
-                  style={{ width: `${Math.max(c.pct, 0)}%` }}
-                />
+        <div className="overflow-x-auto pb-2">
+          <div className="min-w-[320px] space-y-2">
+            {allCostRows.map((c) => (
+              <div key={c.key} className="flex items-center gap-3">
+                <div className="w-36 sm:w-40 text-xs font-semibold text-slate-600 shrink-0">{c.label}</div>
+                <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden min-w-[80px]">
+                  <div
+                    className={`h-full rounded-full ${c.key === "manutencao" ? "bg-[#0c192c]" : "bg-[#f25c05]"}`}
+                    style={{ width: `${Math.max(c.pct, 0)}%` }}
+                  />
+                </div>
+                <div className="w-24 sm:w-28 text-right text-xs font-bold text-slate-800 shrink-0">
+                  {formatBRL(c.valor)}
+                </div>
+                <div className="w-12 text-right text-[11px] text-slate-400 shrink-0">{c.pct.toFixed(1)}%</div>
               </div>
-              <div className="w-28 text-right text-xs font-bold text-slate-800">
-                {formatBRL(c.valor)}
-              </div>
-              <div className="w-12 text-right text-[11px] text-slate-400">{c.pct.toFixed(1)}%</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
         <div className="border-t border-slate-100 mt-4 pt-3 space-y-1">
           <div className="flex justify-between text-xs text-slate-500">
@@ -612,17 +614,17 @@ export function FinancialReport({
         )}
       </div>
 
-      {/* Extrato de lançamentos */}
+      {/* Extrato de lançamentos com rolagem mobile otimizada */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
         <h2 className="font-extrabold text-[#0c192c] mb-4">Extrato de lançamentos</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
+        <div className="max-h-[380px] overflow-y-auto overflow-x-auto rounded-xl border border-slate-100 p-1">
+          <table className="w-full text-sm min-w-[500px]">
+            <thead className="sticky top-0 bg-white shadow-xs z-10">
               <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
-                <th className="py-2">Data</th>
-                <th className="py-2">Tipo</th>
-                <th className="py-2">Descrição</th>
-                <th className="py-2 text-right">Valor</th>
+                <th className="py-2 px-2">Data</th>
+                <th className="py-2 px-2">Tipo</th>
+                <th className="py-2 px-2">Descrição</th>
+                <th className="py-2 px-2 text-right">Valor</th>
               </tr>
             </thead>
             <tbody>
@@ -648,16 +650,16 @@ export function FinancialReport({
               ]
                 .sort((a, b) => (a.data < b.data ? 1 : -1))
                 .map((r, idx) => (
-                  <tr key={idx} className="border-b border-slate-50">
-                    <td className="py-2 text-slate-500">{formatDateBR(r.data)}</td>
-                    <td className="py-2">
-                      <span className="text-[11px] font-bold uppercase text-slate-600">
+                  <tr key={idx} className="border-b border-slate-50 hover:bg-slate-50/50">
+                    <td className="py-2.5 px-2 text-slate-500 text-xs whitespace-nowrap">{formatDateBR(r.data)}</td>
+                    <td className="py-2.5 px-2">
+                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
                         {r.tipo}
                       </span>
                     </td>
-                    <td className="py-2 text-slate-700">{r.desc}</td>
+                    <td className="py-2.5 px-2 text-slate-700 text-xs">{r.desc}</td>
                     <td
-                      className={`py-2 text-right font-bold ${r.valor >= 0 ? "text-[#16a34a]" : "text-[#f25c05]"}`}
+                      className={`py-2.5 px-2 text-right font-bold text-xs whitespace-nowrap ${r.valor >= 0 ? "text-[#16a34a]" : "text-[#f25c05]"}`}
                     >
                       {formatBRL(r.valor)}
                     </td>
