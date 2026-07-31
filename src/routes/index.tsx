@@ -134,7 +134,7 @@ interface OilChange {
 // INITIAL DATA
 const INITIAL_DATA = {
   drivers: [
-    { id: "d1", nome: "MARCOS", cnh: "12345678900", telefone: "11 98765-4321", categoria: "E", status: "Em Viagem", foto: "" },
+    { id: "d1", nome: "MARCOS", cnh: "12345678900", telefone: "11 98765-4321", categoria: "E", status: "Em Viagem", foto: motoristaMarcosAsset.url },
   ] as Driver[],
   vehicles: [
     { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA" },
