@@ -130,7 +130,7 @@ interface OilChange {
 // INITIAL DATA
 const INITIAL_DATA = {
   drivers: [
-    { id: "d1", nome: "MARCOS", cnh: "12345678900", telefone: "(11) 98765-4321", categoria: "E", status: "Em Viagem", foto: "" },
+    { id: "d1", nome: "MARCOS", cnh: "12345678900", telefone: "11 98765-4321", categoria: "E", status: "Em Viagem", foto: "" },
   ] as Driver[],
   vehicles: [
     { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA" },
@@ -1953,8 +1953,17 @@ export function TransportManagementSystem() {
                 <Input
                   type="text"
                   value={drvTelefone}
-                  onChange={(e) => setDrvTelefone(e.target.value)}
-                  placeholder="(11) 99999-9999"
+                  onChange={(e) => {
+                    let v = e.target.value.replace(/\D/g, "");
+                    if (v.length > 11) v = v.slice(0, 11);
+                    if (v.length > 7) {
+                      v = `${v.slice(0, 2)} ${v.slice(2, 7)}-${v.slice(7)}`;
+                    } else if (v.length > 2) {
+                      v = `${v.slice(0, 2)} ${v.slice(2)}`;
+                    }
+                    setDrvTelefone(v);
+                  }}
+                  placeholder="11 97888-9874"
                   className="mt-1 text-xs"
                 />
               </div>
