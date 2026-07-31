@@ -193,12 +193,66 @@ export function TransportManagementSystem() {
     "dashboard" | "frota" | "despesas" | "oleo" | "fretes" | "financeiro"
   >("dashboard");
 
-  // DATA PERSISTENCE STATE
-  const [drivers, setDrivers] = useState<Driver[]>(INITIAL_DATA.drivers);
-  const [vehicles, setVehicles] = useState<Vehicle[]>(INITIAL_DATA.vehicles);
-  const [expenses, setExpenses] = useState<Expense[]>(INITIAL_DATA.expenses);
-  const [freights, setFreights] = useState<Freight[]>(INITIAL_DATA.freights);
-  const [oilChanges, setOilChanges] = useState<OilChange[]>(INITIAL_DATA.oilChanges);
+  // DATA PERSISTENCE STATE WITH LOCALSTORAGE
+  const [drivers, setDrivers] = useState<Driver[]>(() => {
+    if (typeof window === "undefined") return INITIAL_DATA.drivers;
+    const saved = localStorage.getItem("gdalog_drivers");
+    return saved ? JSON.parse(saved) : INITIAL_DATA.drivers;
+  });
+
+  const [vehicles, setVehicles] = useState<Vehicle[]>(() => {
+    if (typeof window === "undefined") return INITIAL_DATA.vehicles;
+    const saved = localStorage.getItem("gdalog_vehicles");
+    return saved ? JSON.parse(saved) : INITIAL_DATA.vehicles;
+  });
+
+  const [expenses, setExpenses] = useState<Expense[]>(() => {
+    if (typeof window === "undefined") return INITIAL_DATA.expenses;
+    const saved = localStorage.getItem("gdalog_expenses");
+    return saved ? JSON.parse(saved) : INITIAL_DATA.expenses;
+  });
+
+  const [freights, setFreights] = useState<Freight[]>(() => {
+    if (typeof window === "undefined") return INITIAL_DATA.freights;
+    const saved = localStorage.getItem("gdalog_freights");
+    return saved ? JSON.parse(saved) : INITIAL_DATA.freights;
+  });
+
+  const [oilChanges, setOilChanges] = useState<OilChange[]>(() => {
+    if (typeof window === "undefined") return INITIAL_DATA.oilChanges;
+    const saved = localStorage.getItem("gdalog_oilChanges");
+    return saved ? JSON.parse(saved) : INITIAL_DATA.oilChanges;
+  });
+
+  useMemo(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("gdalog_drivers", JSON.stringify(drivers));
+    }
+  }, [drivers]);
+
+  useMemo(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("gdalog_vehicles", JSON.stringify(vehicles));
+    }
+  }, [vehicles]);
+
+  useMemo(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("gdalog_expenses", JSON.stringify(expenses));
+    }
+  }, [expenses]);
+
+  useMemo(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("gdalog_freights", JSON.stringify(freights));
+    }
+  }, [freights]);
+
+  useMemo(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("gdalog_oilChanges", JSON.stringify(oilChanges));
+    }
+  }, [oilChanges]);
 
   // MODAL STATES
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
