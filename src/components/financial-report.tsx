@@ -257,14 +257,15 @@ export function FinancialReport({
       }
     });
 
-    const diffManut = Number((totalManutencaoRegistrada - 0).toFixed(2));
-    if (Math.abs(diffManut) > 0.009) {
-      issues.push({
-        tipo: "Manutenção x Despesas",
-        descricao: `Ordens de manutenção somam ${formatBRL(totalManutencaoRegistrada)}, mas não há mais categoria de despesa vinculada a óleo, manutenção ou pneus.`,
-        diferenca: diffManut,
-      });
-    }
+    fMaint.forEach((m) => {
+      if (!m.custo || Number(m.custo) <= 0) {
+        issues.push({
+          tipo: "Manutenção sem custo",
+          descricao: `Ordem de ${m.categoriaServico || "serviço"} da placa ${m.placa} (${formatDateBR(m.data)}) sem valor lançado.`,
+        });
+      }
+    });
+
 
     const placasSemVeiculo = [
       ...new Set(
