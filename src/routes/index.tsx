@@ -637,8 +637,8 @@ export function TransportManagementSystem() {
         <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden z-10 border border-slate-100">
           {/* Header Banner */}
           <div className="bg-[#0b192c] p-8 text-center text-white relative border-b border-slate-800 flex flex-col items-center">
-            <div className="bg-white px-4 py-2 rounded-xl mb-4 shadow-md inline-block">
-              <img src={logoAsset.url} alt="GDALog" className="h-10 w-auto object-contain" />
+            <div className="bg-white px-5 py-3 rounded-xl mb-5 shadow-md inline-block">
+              <img src={logoAsset.url} alt="GDALog" className="h-16 w-auto object-contain" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight">Gestão de Transportes</h1>
             <p className="text-slate-400 text-xs mt-1">Acesse sua frota, despesas e faturamento</p>
@@ -704,8 +704,8 @@ export function TransportManagementSystem() {
           
           {/* Logo Brand */}
           <div className="flex items-center gap-3">
-            <div className="bg-white px-2 py-1.5 rounded-lg shadow-sm flex items-center">
-              <img src={logoAsset.url} alt="GDALog" className="h-8 w-auto object-contain" />
+            <div className="bg-white px-2.5 py-1 rounded-lg shadow-sm flex items-center">
+              <img src={logoAsset.url} alt="GDALog" className="h-12 w-auto object-contain" />
             </div>
             <span className="font-bold text-sm sm:text-base tracking-tight hidden sm:inline-block border-l border-slate-700 pl-3 text-slate-200">
               Gestão de Transportes
