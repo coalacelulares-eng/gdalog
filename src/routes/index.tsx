@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Truck,
@@ -128,7 +128,6 @@ interface OilChange {
   observacao: string;
 }
 
-import { useEffect, useState, useMemo, useCallback } from "react";
 
 // INITIAL DATA
 const INITIAL_DATA = {
@@ -207,19 +206,19 @@ function openDB(): Promise<IDBDatabase> {
   });
 }
 
-async function saveToDB(key: string, data: any) {
+async function saveToDB(key: string, data: any): Promise<void> {
   try {
     const db = await openDB();
     const tx = db.transaction("storage", "readwrite");
     const store = tx.objectStore("storage");
     store.put(data, key);
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       tx.oncomplete = () => {
         // Notifica outras abas/navegadores via localStorage event e BroadcastChannel
         try {
           localStorage.setItem("gdalog_sync_" + key, Date.now().toString());
         } catch {}
-        resolve(true);
+        resolve();
       };
       tx.onerror = () => reject(tx.error);
     });
@@ -692,7 +691,7 @@ export function TransportManagementSystem() {
               telefone: drvTelefone || "Não informado",
               categoria: drvCategoria || "E",
               status: drvStatus,
-              foto: drvFoto || d.foto,
+              foto: drvFoto || d.foto || "",
             }
           : d,
       );
