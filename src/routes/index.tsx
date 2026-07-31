@@ -417,10 +417,7 @@ export function TransportManagementSystem() {
     setExpDepreciacao("");
     setExpIpva("");
     setExpDiaria("");
-    setExpTrocaOleo("");
     setExpSalario("");
-    setExpManutencao("");
-    setExpPneu("");
     setExpOutros("");
     setExpObs("");
     setIsExpenseModalOpen(false);
@@ -1138,17 +1135,8 @@ export function TransportManagementSystem() {
                     {exp.detalhes.diaria > 0 && (
                       <span>Diária motorista: <strong className="text-slate-900">{formatBRL(exp.detalhes.diaria)}</strong></span>
                     )}
-                    {exp.detalhes.trocaOleo > 0 && (
-                      <span>Troca de óleo: <strong className="text-slate-900">{formatBRL(exp.detalhes.trocaOleo)}</strong></span>
-                    )}
                     {exp.detalhes.salario > 0 && (
                       <span>Salário: <strong className="text-slate-900">{formatBRL(exp.detalhes.salario)}</strong></span>
-                    )}
-                    {exp.detalhes.manutencao > 0 && (
-                      <span>Manutenção: <strong className="text-slate-900">{formatBRL(exp.detalhes.manutencao)}</strong></span>
-                    )}
-                    {exp.detalhes.pneu > 0 && (
-                      <span>Pneu: <strong className="text-slate-900">{formatBRL(exp.detalhes.pneu)}</strong></span>
                     )}
                     {exp.detalhes.outros > 0 && (
                       <span>Outros: <strong className="text-slate-900">{formatBRL(exp.detalhes.outros)}</strong></span>
