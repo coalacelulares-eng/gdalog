@@ -207,6 +207,10 @@ function openDB(): Promise<IDBDatabase> {
 }
 
 async function saveToDB(key: string, data: any): Promise<void> {
+  // 1) Banco de dados na nuvem (fonte de verdade — sobrevive à troca de navegador)
+  void cloudSave(key, data);
+
+  // 2) Cópias locais (IndexedDB + localStorage) para funcionar offline
   try {
     const db = await openDB();
     const tx = db.transaction("storage", "readwrite");
@@ -216,6 +220,7 @@ async function saveToDB(key: string, data: any): Promise<void> {
       tx.oncomplete = () => {
         // Notifica outras abas/navegadores via localStorage event e BroadcastChannel
         try {
+          localStorage.setItem("gdalog_" + key, JSON.stringify(data));
           localStorage.setItem("gdalog_sync_" + key, Date.now().toString());
         } catch {}
         resolve();
