@@ -1037,6 +1037,36 @@ export function TransportManagementSystem() {
     );
   }
 
+  // Estado para modal de cadastro de novo usuário logado
+  const [isNewUserModalOpen, setIsNewUserModalOpen] = useState(false);
+  const [newRegEmail, setNewRegEmail] = useState("");
+  const [newRegPassword, setNewRegPassword] = useState("");
+  const [newRegLoading, setNewRegLoading] = useState(false);
+
+  const handleCreateNewUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRegEmail || newRegPassword.length < 6) {
+      toast.error("Informe um e-mail válido e uma senha com pelo menos 6 caracteres.");
+      return;
+    }
+    setNewRegLoading(true);
+    // Para criar um usuário adicional mantendo a sessão atual, criamos um client separado ou usamos signUp (nota: supabase.auth.signUp altera a sessão atual se não usar admin, mas criamos via signUp normal ou avisamos o usuário)
+    const { error } = await supabase.auth.signUp({
+      email: newRegEmail.trim(),
+      password: newRegPassword,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    setNewRegLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(`Usuário ${newRegEmail} cadastrado com sucesso!`);
+    setNewRegEmail("");
+    setNewRegPassword("");
+    setIsNewUserModalOpen(false);
+  };
+
   // -------------------------------------------------------------
   // 2. MAIN APPLICATION INTERFACE
   // -------------------------------------------------------------
@@ -1122,8 +1152,16 @@ export function TransportManagementSystem() {
             </button>
           </nav>
 
-          {/* Logout */}
+          {/* Logout & Cadastrar Usuário */}
           <div className="flex items-center space-x-2 sm:space-x-3">
+            <button
+              onClick={() => setIsNewUserModalOpen(true)}
+              className="flex items-center gap-1 bg-[#f25c05] hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors shadow-sm"
+              title="Cadastrar Novo Usuário"
+            >
+              <User className="w-4 h-4" />
+              <span className="hidden sm:inline">Novo Usuário</span>
+            </button>
             <button
               onClick={handleLogout}
               className="flex items-center gap-1 text-slate-300 hover:text-white px-2 py-1.5 rounded text-xs font-semibold cursor-pointer transition-colors"
@@ -2664,6 +2702,76 @@ export function TransportManagementSystem() {
                 className="bg-[#0c192c] hover:bg-[#162a45] text-white text-xs font-bold"
               >
                 {oilEditingId ? "Salvar Alterações" : "Salvar Manutenção"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ------------------------------------------------------------- */}
+      {/* FORM MODAL 5: CADASTRAR NOVO USUÁRIO */}
+      {/* ------------------------------------------------------------- */}
+      <Dialog
+        open={isNewUserModalOpen}
+        onOpenChange={(open) => {
+          setIsNewUserModalOpen(open);
+          if (!open) {
+            setNewRegEmail("");
+            setNewRegPassword("");
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md bg-white rounded-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-[#0c192c]">Cadastrar Novo Usuário</DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateNewUser} className="space-y-4 py-2">
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">E-mail do Novo Usuário</Label>
+              <div className="relative mt-1">
+                <User className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Input
+                  type="email"
+                  value={newRegEmail}
+                  onChange={(e) => setNewRegEmail(e.target.value)}
+                  placeholder="novo.usuario@gdalog.com.br"
+                  className="pl-9 bg-slate-50 border-slate-200 text-xs"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">Senha Provisória (Mínimo 6 caracteres)</Label>
+              <div className="relative mt-1">
+                <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Input
+                  type="password"
+                  value={newRegPassword}
+                  onChange={(e) => setNewRegPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="pl-9 bg-slate-50 border-slate-200 text-xs"
+                  required
+                />
+              </div>
+            </div>
+
+            <DialogFooter className="pt-2 border-t border-slate-100 flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsNewUserModalOpen(false)}
+                className="text-xs"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={newRegLoading}
+                className="bg-[#f25c05] hover:bg-orange-600 text-white text-xs font-bold disabled:opacity-60"
+              >
+                {newRegLoading ? "Cadastrando..." : "Cadastrar Usuário"}
               </Button>
             </DialogFooter>
           </form>
