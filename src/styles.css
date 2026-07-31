@@ -177,3 +177,25 @@
     page-break-inside: avoid;
   }
 }
+
+/* Ocultar completamente o badge "Made with Lovable" */
+.lovable-badge,
+[data-lovable-badge],
+[data-testid="lovable-badge"],
+a[href*="lovable.dev"][target="_blank"],
+.lovable-badge-container,
+.lovable-watermark,
+[class*="lovable-badge"],
+[class*="lovable-watermark"],
+[id*="lovable-badge"],
+[id*="lovable-watermark"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  z-index: -9999 !important;
+}
