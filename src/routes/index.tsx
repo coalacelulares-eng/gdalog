@@ -952,6 +952,14 @@ export function TransportManagementSystem() {
   // -------------------------------------------------------------
   // 1. LOGIN SCREEN IF NOT AUTHENTICATED
   // -------------------------------------------------------------
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-[#0b192c] flex items-center justify-center text-slate-300 text-sm font-sans">
+        Carregando...
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#0b192c] flex flex-col justify-center items-center p-4 relative overflow-hidden font-sans">
