@@ -324,7 +324,7 @@ export function TransportManagementSystem() {
     const handleStorageSync = (event: StorageEvent) => {
       if (event.key && event.key.startsWith("gdalog_sync_")) {
         const dataKey = event.key.replace("gdalog_sync_", "");
-        loadFromDB(dataKey, null).then((val) => {
+        loadFromDB(dataKey, null).then((val: any) => {
           if (val !== null) {
             if (dataKey === "drivers") setDrivers(val);
             if (dataKey === "vehicles") setVehicles(val);
