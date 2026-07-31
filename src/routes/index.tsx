@@ -238,7 +238,7 @@ async function saveToDB(key: string, data: any): Promise<void> {
   }
 }
 
-async function loadFromDB(key: string, fallback: any): Promise<any> {
+async function loadLocal(key: string, fallback: any): Promise<any> {
   try {
     const db = await openDB();
     return new Promise((resolve) => {
