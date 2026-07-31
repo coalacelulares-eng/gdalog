@@ -205,15 +205,16 @@ export function FinancialReport({
         const manut = fMaint
           .filter((m) => m.placa.toUpperCase() === placa)
           .reduce((a, m) => a + (Number(m.custo) || 0), 0);
+        const despTotal = desp + manut;
         return {
           placa,
           modelo: vehicles.find((v) => v.placa.toUpperCase() === placa)?.modelo ?? "—",
-          despesa: desp,
+          despesa: despTotal,
           receita: rec,
           manutencao: manut,
           km,
-          saldo: rec - desp,
-          custoKm: km > 0 ? desp / km : 0,
+          saldo: rec - despTotal,
+          custoKm: km > 0 ? despTotal / km : 0,
         };
       })
       .sort((a, b) => b.receita - a.receita);
