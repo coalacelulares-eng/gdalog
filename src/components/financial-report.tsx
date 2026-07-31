@@ -421,7 +421,9 @@ export function FinancialReport({
             <TrendingDown className="w-4 h-4 text-[#f25c05]" /> Despesas
           </div>
           <div className="text-xl font-black text-[#f25c05] mt-1">{formatBRL(totalDespesas)}</div>
-          <div className="text-[11px] text-slate-400 mt-1">{fExpenses.length} lançamentos</div>
+          <div className="text-[11px] text-slate-400 mt-1">
+            {fExpenses.length} lançamentos · manutenção {formatBRL(totalManutencaoRegistrada)}
+          </div>
         </div>
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
           <div className="flex items-center gap-2 text-slate-500 text-xs font-semibold uppercase">
