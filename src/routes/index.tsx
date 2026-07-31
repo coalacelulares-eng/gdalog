@@ -184,11 +184,8 @@ const INITIAL_DATA = {
 };
 
 export function TransportManagementSystem() {
-  // LOGIN STATE - Persistente no navegador (localStorage)
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("gdalog_authenticated") === "true";
-  });
+  // LOGIN STATE - Desativado conforme solicitado
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
   const [loginEmail, setLoginEmail] = useState<string>("admin@gdalog.com.br");
   const [loginPassword, setLoginPassword] = useState<string>("123456");
 
