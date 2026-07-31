@@ -126,7 +126,10 @@ export function FinancialReport({
       .sort((a, b) => b.valor - a.valor);
   }, [fExpenses]);
 
-  const totalDespesas = costsByCategory.reduce((a, c) => a + c.valor, 0);
+  const totalDespesasLancadas = costsByCategory.reduce((a, c) => a + c.valor, 0);
+  const totalManutencaoRegistrada = fMaint.reduce((a, m) => a + (Number(m.custo) || 0), 0);
+  // Despesas totais = categorias de despesa + ordens de manutenção
+  const totalDespesas = totalDespesasLancadas + totalManutencaoRegistrada;
   const totalReceita = fFreights.reduce((a, f) => a + (f.valor || 0), 0);
   const totalRecebido = fFreights.reduce((a, f) => a + (f.recebido || 0), 0);
   const aReceber = totalReceita - totalRecebido;
@@ -135,18 +138,42 @@ export function FinancialReport({
   const totalKm = fExpenses.reduce((a, e) => a + (Number(e.km) || 0), 0);
   const custoPorKm = totalKm > 0 ? totalDespesas / totalKm : 0;
   const receitaPorKm = totalKm > 0 ? totalReceita / totalKm : 0;
-  const totalManutencaoRegistrada = fMaint.reduce((a, m) => a + (Number(m.custo) || 0), 0);
+  const manutPorKm = totalKm > 0 ? totalManutencaoRegistrada / totalKm : 0;
+  const pctManutencao =
+    totalDespesas > 0 ? (totalManutencaoRegistrada / totalDespesas) * 100 : 0;
 
-  // Manutenção agrupada por tipo de serviço
+  // Categorias de despesa + Manutenção, recalculadas sobre o total geral
+  const allCostRows = useMemo(() => {
+    const rows = [
+      ...costsByCategory.map((c) => ({ key: c.key as string, label: c.label, valor: c.valor })),
+      { key: "manutencao", label: "Manutenção", valor: totalManutencaoRegistrada },
+    ];
+    return rows
+      .map((r) => ({
+        ...r,
+        pct: totalDespesas > 0 ? (r.valor / totalDespesas) * 100 : 0,
+      }))
+      .sort((a, b) => b.valor - a.valor);
+  }, [costsByCategory, totalManutencaoRegistrada, totalDespesas]);
+
+  // Manutenção agrupada por serviço (todos os serviços do cadastro)
   const maintByType = useMemo(() => {
     const map = new Map<string, { total: number; qtd: number }>();
+    MAINT_SERVICES.forEach((s) => map.set(s, { total: 0, qtd: 0 }));
     fMaint.forEach((m) => {
       const key = m.categoriaServico || "Outros";
       const cur = map.get(key) || { total: 0, qtd: 0 };
       map.set(key, { total: cur.total + (Number(m.custo) || 0), qtd: cur.qtd + 1 });
     });
-    return [...map.entries()].sort((a, b) => b[1].total - a[1].total);
-  }, [fMaint]);
+    return [...map.entries()]
+      .map(([tipo, v]) => ({
+        tipo,
+        ...v,
+        pct: totalManutencaoRegistrada > 0 ? (v.total / totalManutencaoRegistrada) * 100 : 0,
+        media: v.qtd > 0 ? v.total / v.qtd : 0,
+      }))
+      .sort((a, b) => b.total - a.total);
+  }, [fMaint, totalManutencaoRegistrada]);
 
   // Consolidado por veículo
   const byVehicle = useMemo(() => {
