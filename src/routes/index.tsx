@@ -87,10 +87,7 @@ interface ExpenseDetails {
   depreciacao: number;
   ipva: number;
   diaria: number;
-  trocaOleo: number;
   salario: number;
-  manutencao: number;
-  pneu: number;
   outros: number;
 }
 
@@ -153,14 +150,11 @@ const INITIAL_DATA = {
         depreciacao: 500,
         ipva: 120,
         diaria: 250,
-        trocaOleo: 850,
         salario: 1200,
-        manutencao: 0,
-        pneu: 0,
         outros: 0,
       },
-      total: 5260,
-      observacao: "Retorno com troca de oleo",
+      total: 4410,
+      observacao: "Retorno vazio",
     },
     {
       id: "e2",
@@ -175,13 +169,10 @@ const INITIAL_DATA = {
         depreciacao: 600,
         ipva: 150,
         diaria: 300,
-        trocaOleo: 0,
         salario: 1300,
-        manutencao: 250,
-        pneu: 0,
         outros: 120,
       },
-      total: 6210,
+      total: 5960,
       observacao: "Frete Campinas x BH",
     },
     {
@@ -197,13 +188,10 @@ const INITIAL_DATA = {
         depreciacao: 500,
         ipva: 120,
         diaria: 250,
-        trocaOleo: 0,
         salario: 1250,
-        manutencao: 400,
-        pneu: 300,
         outros: 0,
       },
-      total: 5890,
+      total: 5190,
       observacao: "Frete São Paulo x Curitiba",
     },
   ] as Expense[],
@@ -307,10 +295,7 @@ export function TransportManagementSystem() {
   const [expDepreciacao, setExpDepreciacao] = useState<number | "">("");
   const [expIpva, setExpIpva] = useState<number | "">("");
   const [expDiaria, setExpDiaria] = useState<number | "">("");
-  const [expTrocaOleo, setExpTrocaOleo] = useState<number | "">("");
   const [expSalario, setExpSalario] = useState<number | "">("");
-  const [expManutencao, setExpManutencao] = useState<number | "">("");
-  const [expPneu, setExpPneu] = useState<number | "">("");
   const [expOutros, setExpOutros] = useState<number | "">("");
   const [expObs, setExpObs] = useState("");
 
@@ -396,10 +381,7 @@ export function TransportManagementSystem() {
       num(expDepreciacao) +
       num(expIpva) +
       num(expDiaria) +
-      num(expTrocaOleo) +
       num(expSalario) +
-      num(expManutencao) +
-      num(expPneu) +
       num(expOutros);
 
     const newExp: Expense = {
@@ -415,10 +397,7 @@ export function TransportManagementSystem() {
         depreciacao: num(expDepreciacao),
         ipva: num(expIpva),
         diaria: num(expDiaria),
-        trocaOleo: num(expTrocaOleo),
         salario: num(expSalario),
-        manutencao: num(expManutencao),
-        pneu: num(expPneu),
         outros: num(expOutros),
       },
       total: calculatedTotal,
@@ -438,10 +417,7 @@ export function TransportManagementSystem() {
     setExpDepreciacao("");
     setExpIpva("");
     setExpDiaria("");
-    setExpTrocaOleo("");
     setExpSalario("");
-    setExpManutencao("");
-    setExpPneu("");
     setExpOutros("");
     setExpObs("");
     setIsExpenseModalOpen(false);
@@ -1159,17 +1135,8 @@ export function TransportManagementSystem() {
                     {exp.detalhes.diaria > 0 && (
                       <span>Diária motorista: <strong className="text-slate-900">{formatBRL(exp.detalhes.diaria)}</strong></span>
                     )}
-                    {exp.detalhes.trocaOleo > 0 && (
-                      <span>Troca de óleo: <strong className="text-slate-900">{formatBRL(exp.detalhes.trocaOleo)}</strong></span>
-                    )}
                     {exp.detalhes.salario > 0 && (
                       <span>Salário: <strong className="text-slate-900">{formatBRL(exp.detalhes.salario)}</strong></span>
-                    )}
-                    {exp.detalhes.manutencao > 0 && (
-                      <span>Manutenção: <strong className="text-slate-900">{formatBRL(exp.detalhes.manutencao)}</strong></span>
-                    )}
-                    {exp.detalhes.pneu > 0 && (
-                      <span>Pneu: <strong className="text-slate-900">{formatBRL(exp.detalhes.pneu)}</strong></span>
                     )}
                     {exp.detalhes.outros > 0 && (
                       <span>Outros: <strong className="text-slate-900">{formatBRL(exp.detalhes.outros)}</strong></span>
@@ -1685,20 +1652,6 @@ export function TransportManagementSystem() {
                 </div>
 
                 <div>
-                  <span className="text-[11px] text-slate-500 font-medium">Troca de Óleo</span>
-                  <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
-                      value={expTrocaOleo}
-                      onChange={(e) => setExpTrocaOleo(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder="0,00"
-                      className="text-xs pl-8"
-                    />
-                  </div>
-                </div>
-
-                <div>
                   <span className="text-[11px] text-slate-500 font-medium">Salário</span>
                   <div className="relative mt-0.5">
                     <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
@@ -1706,34 +1659,6 @@ export function TransportManagementSystem() {
                       type="number"
                       value={expSalario}
                       onChange={(e) => setExpSalario(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder="0,00"
-                      className="text-xs pl-8"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-[11px] text-slate-500 font-medium">Manutenção</span>
-                  <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
-                      value={expManutencao}
-                      onChange={(e) => setExpManutencao(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder="0,00"
-                      className="text-xs pl-8"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-[11px] text-slate-500 font-medium">Pneu</span>
-                  <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
-                      value={expPneu}
-                      onChange={(e) => setExpPneu(e.target.value === "" ? "" : Number(e.target.value))}
                       placeholder="0,00"
                       className="text-xs pl-8"
                     />
