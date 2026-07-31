@@ -1003,25 +1003,22 @@ export function TransportManagementSystem() {
 
             <Button
               type="submit"
-              className="w-full bg-[#0b192c] hover:bg-[#162a45] text-white font-semibold py-2.5 rounded-xl transition-all shadow-md mt-2 flex items-center justify-center gap-2 cursor-pointer"
+              disabled={authLoading}
+              className="w-full bg-[#0b192c] hover:bg-[#162a45] text-white font-semibold py-2.5 rounded-xl transition-all shadow-md mt-2 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
             >
-              Entrar <ArrowRight className="w-4 h-4" />
+              {authLoading ? "Entrando..." : "Entrar"} <ArrowRight className="w-4 h-4" />
             </Button>
 
             <Button
               type="button"
-              onClick={() => {
-                setIsAuthenticated(true);
-                if (typeof window !== "undefined") {
-                  localStorage.setItem("gdalog_authenticated", "true");
-                }
-                toast.success("Acesso liberado!");
-              }}
+              onClick={handleSignUp}
+              disabled={authLoading}
               variant="outline"
-              className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold py-2.5 rounded-xl transition-all cursor-pointer"
+              className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold py-2.5 rounded-xl transition-all cursor-pointer disabled:opacity-60"
             >
-              Entrar automaticamente
+              Criar conta de acesso
             </Button>
+
 
             <div className="pt-2 text-center text-xs text-slate-400">
               Ambiente Seguro • GDALog Transportes v2.4
