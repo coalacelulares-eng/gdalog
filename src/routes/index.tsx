@@ -200,34 +200,55 @@ export function TransportManagementSystem() {
   // DATA PERSISTENCE STATE WITH LOCALSTORAGE
   const [drivers, setDrivers] = useState<Driver[]>(() => {
     if (typeof window === "undefined") return INITIAL_DATA.drivers;
-    const saved = localStorage.getItem("gdalog_drivers");
-    return saved ? JSON.parse(saved) : INITIAL_DATA.drivers;
+    try {
+      const saved = localStorage.getItem("gdalog_drivers");
+      return saved ? JSON.parse(saved) : INITIAL_DATA.drivers;
+    } catch {
+      return INITIAL_DATA.drivers;
+    }
   });
 
   const [vehicles, setVehicles] = useState<Vehicle[]>(() => {
     if (typeof window === "undefined") return INITIAL_DATA.vehicles;
-    const saved = localStorage.getItem("gdalog_vehicles");
-    return saved ? JSON.parse(saved) : INITIAL_DATA.vehicles;
+    try {
+      const saved = localStorage.getItem("gdalog_vehicles");
+      return saved ? JSON.parse(saved) : INITIAL_DATA.vehicles;
+    } catch {
+      return INITIAL_DATA.vehicles;
+    }
   });
 
   const [expenses, setExpenses] = useState<Expense[]>(() => {
     if (typeof window === "undefined") return INITIAL_DATA.expenses;
-    const saved = localStorage.getItem("gdalog_expenses");
-    return saved ? JSON.parse(saved) : INITIAL_DATA.expenses;
+    try {
+      const saved = localStorage.getItem("gdalog_expenses");
+      return saved ? JSON.parse(saved) : INITIAL_DATA.expenses;
+    } catch {
+      return INITIAL_DATA.expenses;
+    }
   });
 
   const [freights, setFreights] = useState<Freight[]>(() => {
     if (typeof window === "undefined") return INITIAL_DATA.freights;
-    const saved = localStorage.getItem("gdalog_freights");
-    return saved ? JSON.parse(saved) : INITIAL_DATA.freights;
+    try {
+      const saved = localStorage.getItem("gdalog_freights");
+      return saved ? JSON.parse(saved) : INITIAL_DATA.freights;
+    } catch {
+      return INITIAL_DATA.freights;
+    }
   });
 
   const [oilChanges, setOilChanges] = useState<OilChange[]>(() => {
     if (typeof window === "undefined") return INITIAL_DATA.oilChanges;
-    const saved = localStorage.getItem("gdalog_oilChanges");
-    return saved ? JSON.parse(saved) : INITIAL_DATA.oilChanges;
+    try {
+      const saved = localStorage.getItem("gdalog_oilChanges");
+      return saved ? JSON.parse(saved) : INITIAL_DATA.oilChanges;
+    } catch {
+      return INITIAL_DATA.oilChanges;
+    }
   });
 
+  // Salva e atualiza imediatamente no localStorage a cada alteração de estado
   useMemo(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem("gdalog_drivers", JSON.stringify(drivers));
