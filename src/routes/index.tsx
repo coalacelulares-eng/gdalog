@@ -218,7 +218,7 @@ async function saveToDB(key: string, data: any): Promise<void> {
         try {
           localStorage.setItem("gdalog_sync_" + key, Date.now().toString());
         } catch {}
-        resolve(true);
+        resolve();
       };
       tx.onerror = () => reject(tx.error);
     });
