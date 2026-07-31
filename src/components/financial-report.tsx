@@ -446,12 +446,12 @@ export function FinancialReport({
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
         <h2 className="font-extrabold text-[#0c192c] mb-4">Custos por categoria</h2>
         <div className="space-y-2">
-          {costsByCategory.map((c) => (
+          {allCostRows.map((c) => (
             <div key={c.key} className="flex items-center gap-3">
               <div className="w-40 text-xs font-semibold text-slate-600 shrink-0">{c.label}</div>
               <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#f25c05] rounded-full"
+                  className={`h-full rounded-full ${c.key === "manutencao" ? "bg-[#0c192c]" : "bg-[#f25c05]"}`}
                   style={{ width: `${Math.max(c.pct, 0)}%` }}
                 />
               </div>
@@ -462,49 +462,69 @@ export function FinancialReport({
             </div>
           ))}
         </div>
-        <div className="flex justify-between border-t border-slate-100 mt-4 pt-3 text-sm font-black text-[#0c192c]">
-          <span>Total de despesas</span>
-          <span>{formatBRL(totalDespesas)}</span>
+        <div className="border-t border-slate-100 mt-4 pt-3 space-y-1">
+          <div className="flex justify-between text-xs text-slate-500">
+            <span>Despesas lançadas</span>
+            <span>{formatBRL(totalDespesasLancadas)}</span>
+          </div>
+          <div className="flex justify-between text-xs text-slate-500">
+            <span>Manutenção ({pctManutencao.toFixed(1)}% do total)</span>
+            <span>{formatBRL(totalManutencaoRegistrada)}</span>
+          </div>
+          <div className="flex justify-between text-sm font-black text-[#0c192c] pt-1">
+            <span>Total de despesas</span>
+            <span>{formatBRL(totalDespesas)}</span>
+          </div>
         </div>
       </div>
 
       {/* Manutenção */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
-        <h2 className="font-extrabold text-[#0c192c] mb-4">Manutenção por tipo de serviço</h2>
-        {maintByType.length === 0 ? (
-          <p className="text-sm text-slate-400">Nenhuma ordem de manutenção no período.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
-                  <th className="py-2">Serviço</th>
-                  <th className="py-2 text-center">Ordens</th>
-                  <th className="py-2 text-right">Custo</th>
-                </tr>
-              </thead>
-              <tbody>
-                {maintByType.map(([tipo, v]) => (
-                  <tr key={tipo} className="border-b border-slate-50">
-                    <td className="py-2 font-semibold text-slate-700">{tipo}</td>
-                    <td className="py-2 text-center text-slate-500">{v.qtd}</td>
-                    <td className="py-2 text-right font-bold text-slate-800">
-                      {formatBRL(v.total)}
-                    </td>
-                  </tr>
-                ))}
-                <tr>
-                  <td className="py-2 font-black text-[#0c192c]">Total</td>
-                  <td />
-                  <td className="py-2 text-right font-black text-[#0c192c]">
-                    {formatBRL(totalManutencaoRegistrada)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="flex flex-wrap items-end justify-between gap-2 mb-4">
+          <h2 className="font-extrabold text-[#0c192c]">Categoria de Serviço / Manutenção</h2>
+          <div className="text-[11px] text-slate-400">
+            {fMaint.length} ordens · {formatBRL(manutPorKm)}/km
           </div>
-        )}
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
+                <th className="py-2">Serviço</th>
+                <th className="py-2 text-center">Ordens</th>
+                <th className="py-2 text-right">Custo</th>
+                <th className="py-2 text-right">Média/ordem</th>
+                <th className="py-2 text-right">% manut.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {maintByType.map((m) => (
+                <tr key={m.tipo} className="border-b border-slate-50">
+                  <td className="py-2 font-semibold text-slate-700">{m.tipo}</td>
+                  <td className="py-2 text-center text-slate-500">{m.qtd}</td>
+                  <td className="py-2 text-right font-bold text-slate-800">
+                    {formatBRL(m.total)}
+                  </td>
+                  <td className="py-2 text-right text-slate-500">{formatBRL(m.media)}</td>
+                  <td className="py-2 text-right text-slate-400">{m.pct.toFixed(1)}%</td>
+                </tr>
+              ))}
+              <tr>
+                <td className="py-2 font-black text-[#0c192c]">Total</td>
+                <td className="py-2 text-center font-black text-[#0c192c]">{fMaint.length}</td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(totalManutencaoRegistrada)}
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(fMaint.length > 0 ? totalManutencaoRegistrada / fMaint.length : 0)}
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">100%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+
 
       {/* Por veículo */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
