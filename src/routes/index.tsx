@@ -318,8 +318,9 @@ export function TransportManagementSystem() {
   const [freights, setFreights] = useState<Freight[]>(INITIAL_DATA.freights);
   const [oilChanges, setOilChanges] = useState<OilChange[]>(INITIAL_DATA.oilChanges);
 
-  // Carrega dados iniciais do banco IndexedDB assim que o app monta
+  // Carrega os dados do banco na nuvem depois do login
   useEffect(() => {
+    if (!isAuthenticated) return;
     async function initData() {
       const [d, v, e, f, o] = await Promise.all([
         loadFromDB("drivers", INITIAL_DATA.drivers),
