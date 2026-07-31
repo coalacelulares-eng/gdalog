@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import { cloudLoad, cloudSave } from "@/lib/cloud-store";
 import motoristaMarcosAsset from "@/assets/motorista-marcos.png.asset.json";
 import {
