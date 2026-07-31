@@ -27,6 +27,7 @@ import {
 import { Toaster, toast } from "sonner";
 import logoAsset from "@/assets/logo.png.asset.json";
 import { FinancialReport } from "@/components/financial-report";
+import { CurrencyInput } from "@/components/currency-input";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -1567,11 +1568,10 @@ export function TransportManagementSystem() {
                 <div>
                   <span className="text-[11px] text-slate-500 font-medium">Abastecimento</span>
                   <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
                       value={expAbastecimento}
-                      onChange={(e) => setExpAbastecimento(e.target.value === "" ? "" : Number(e.target.value))}
+                      onChange={setExpAbastecimento}
                       placeholder="0,00"
                       className="text-xs pl-8"
                     />
@@ -1581,11 +1581,10 @@ export function TransportManagementSystem() {
                 <div>
                   <span className="text-[11px] text-slate-500 font-medium">Arla</span>
                   <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
                       value={expArla}
-                      onChange={(e) => setExpArla(e.target.value === "" ? "" : Number(e.target.value))}
+                      onChange={setExpArla}
                       placeholder="0,00"
                       className="text-xs pl-8"
                     />
@@ -1595,11 +1594,10 @@ export function TransportManagementSystem() {
                 <div>
                   <span className="text-[11px] text-slate-500 font-medium">Rastreador</span>
                   <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
                       value={expRastreador}
-                      onChange={(e) => setExpRastreador(e.target.value === "" ? "" : Number(e.target.value))}
+                      onChange={setExpRastreador}
                       placeholder="0,00"
                       className="text-xs pl-8"
                     />
@@ -1609,11 +1607,10 @@ export function TransportManagementSystem() {
                 <div>
                   <span className="text-[11px] text-slate-500 font-medium">Depreciação</span>
                   <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
                       value={expDepreciacao}
-                      onChange={(e) => setExpDepreciacao(e.target.value === "" ? "" : Number(e.target.value))}
+                      onChange={setExpDepreciacao}
                       placeholder="0,00"
                       className="text-xs pl-8"
                     />
@@ -1623,11 +1620,10 @@ export function TransportManagementSystem() {
                 <div>
                   <span className="text-[11px] text-slate-500 font-medium">IPVA</span>
                   <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
                       value={expIpva}
-                      onChange={(e) => setExpIpva(e.target.value === "" ? "" : Number(e.target.value))}
+                      onChange={setExpIpva}
                       placeholder="0,00"
                       className="text-xs pl-8"
                     />
@@ -1637,11 +1633,10 @@ export function TransportManagementSystem() {
                 <div>
                   <span className="text-[11px] text-slate-500 font-medium">Diária Motorista</span>
                   <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
                       value={expDiaria}
-                      onChange={(e) => setExpDiaria(e.target.value === "" ? "" : Number(e.target.value))}
+                      onChange={setExpDiaria}
                       placeholder="0,00"
                       className="text-xs pl-8"
                     />
@@ -1651,11 +1646,10 @@ export function TransportManagementSystem() {
                 <div>
                   <span className="text-[11px] text-slate-500 font-medium">Salário</span>
                   <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
                       value={expSalario}
-                      onChange={(e) => setExpSalario(e.target.value === "" ? "" : Number(e.target.value))}
+                      onChange={setExpSalario}
                       placeholder="0,00"
                       className="text-xs pl-8"
                     />
@@ -1665,11 +1659,10 @@ export function TransportManagementSystem() {
                 <div>
                   <span className="text-[11px] text-slate-500 font-medium">Outros / Pedágio</span>
                   <div className="relative mt-0.5">
-                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                    <Input
-                      type="number"
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
                       value={expOutros}
-                      onChange={(e) => setExpOutros(e.target.value === "" ? "" : Number(e.target.value))}
+                      onChange={setExpOutros}
                       placeholder="0,00"
                       className="text-xs pl-8"
                     />
@@ -1773,12 +1766,11 @@ export function TransportManagementSystem() {
               <div>
                 <Label className="text-xs font-semibold text-slate-700">Valor Total Frete (R$)</Label>
                 <div className="relative mt-1">
-                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                  <Input
-                    type="number"
+                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                  <CurrencyInput
                     value={frtValor}
-                    onChange={(e) => setFrtValor(e.target.value === "" ? "" : Number(e.target.value))}
-                    placeholder="Ex: 8500"
+                    onChange={setFrtValor}
+                    placeholder="0,00"
                     className="text-xs pl-8"
                     required
                   />
@@ -1788,12 +1780,11 @@ export function TransportManagementSystem() {
               <div>
                 <Label className="text-xs font-semibold text-slate-700">Valor Já Recebido (R$)</Label>
                 <div className="relative mt-1">
-                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                  <Input
-                    type="number"
+                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                  <CurrencyInput
                     value={frtRecebido}
-                    onChange={(e) => setFrtRecebido(e.target.value === "" ? "" : Number(e.target.value))}
-                    placeholder="Ex: 4000"
+                    onChange={setFrtRecebido}
+                    placeholder="0,00"
                     className="text-xs pl-8"
                   />
                 </div>
@@ -2100,12 +2091,11 @@ export function TransportManagementSystem() {
               <div>
                 <Label className="text-xs font-semibold text-slate-700">Custo (R$)</Label>
                 <div className="relative mt-1">
-                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400">R$</span>
-                  <Input
-                    type="number"
+                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                  <CurrencyInput
                     value={oilCusto}
-                    onChange={(e) => setOilCusto(e.target.value === "" ? "" : Number(e.target.value))}
-                    placeholder="Ex: 850"
+                    onChange={setOilCusto}
+                    placeholder="0,00"
                     className="text-xs pl-8"
                   />
                 </div>
