@@ -213,6 +213,12 @@ export function FinancialReport({
           .filter((m) => m.placa.toUpperCase() === placa)
           .reduce((a, m) => a + (Number(m.custo) || 0), 0);
         const despTotal = desp + manut;
+        const litros = fExpenses
+          .filter((e) => e.placa.toUpperCase() === placa)
+          .reduce((a, e) => a + (Number(e.litros) || 0), 0);
+        const diesel = fExpenses
+          .filter((e) => e.placa.toUpperCase() === placa)
+          .reduce((a, e) => a + (Number(e.detalhes?.abastecimento) || 0), 0);
         return {
           placa,
           modelo: vehicles.find((v) => v.placa.toUpperCase() === placa)?.modelo ?? "—",
@@ -220,12 +226,84 @@ export function FinancialReport({
           receita: rec,
           manutencao: manut,
           km,
+          litros,
+          diesel,
+          kmPorLitro: litros > 0 ? km / litros : 0,
+          custoLitro: litros > 0 ? diesel / litros : 0,
           saldo: rec - despTotal,
+          margemPct: rec > 0 ? ((rec - despTotal) / rec) * 100 : 0,
           custoKm: km > 0 ? despTotal / km : 0,
+          receitaKm: km > 0 ? rec / km : 0,
         };
       })
       .sort((a, b) => b.receita - a.receita);
   }, [vehicles, fExpenses, fFreights, fMaint, placaFilter]);
+
+  // Soma de uma categoria de custo lançada
+  const sumKey = (k: keyof FinExpenseDetails) =>
+    fExpenses.reduce((a, e) => a + (Number(e.detalhes?.[k]) || 0), 0);
+
+  // MÉDIA DE CONSUMO (km/l e custo do diesel)
+  const totalLitros = fExpenses.reduce((a, e) => a + (Number(e.litros) || 0), 0);
+  const totalDiesel = sumKey("abastecimento");
+  const kmPorLitro = totalLitros > 0 ? totalKm / totalLitros : 0;
+  const litrosPorKm = totalKm > 0 ? totalLitros / totalKm : 0;
+  const precoMedioLitro = totalLitros > 0 ? totalDiesel / totalLitros : 0;
+  const custoDieselPorKm = totalKm > 0 ? totalDiesel / totalKm : 0;
+
+  // DRE FINAL
+  const dre = useMemo(() => {
+    const diesel = sumKey("abastecimento") + sumKey("arla");
+    const manutencao = totalManutencaoRegistrada;
+    const operacional =
+      sumKey("rastreador") + sumKey("depreciacao") + sumKey("diaria") + sumKey("salario") + sumKey("outros");
+    const comissoes = sumKey("comissao");
+    const prestacao = sumKey("prestacao");
+    const ipva = sumKey("ipva");
+    const seguro = sumKey("seguro");
+    const resultado =
+      totalReceita - diesel - manutencao - operacional - comissoes - prestacao - ipva - seguro;
+    return {
+      diesel,
+      manutencao,
+      operacional,
+      comissoes,
+      prestacao,
+      ipva,
+      seguro,
+      resultado,
+      pctLiquido: totalReceita > 0 ? (resultado / totalReceita) * 100 : 0,
+    };
+  }, [fExpenses, totalManutencaoRegistrada, totalReceita]);
+
+  // MARGEM POR VIAGEM (custo do veículo rateado pela participação na receita)
+  const byTrip = useMemo(() => {
+    return fFreights
+      .map((f) => {
+        const placa = f.placa.toUpperCase();
+        const veh = byVehicle.find((v) => v.placa === placa);
+        const receitaPlaca = veh?.receita ?? 0;
+        const custoPlaca = veh?.despesa ?? 0;
+        const share = receitaPlaca > 0 ? (f.valor || 0) / receitaPlaca : 0;
+        const custo = custoPlaca * share;
+        const margem = (f.valor || 0) - custo;
+        return {
+          id: f.id,
+          data: f.data,
+          rota: `${f.origem} → ${f.destino}`,
+          placa,
+          receita: f.valor || 0,
+          custo,
+          margem,
+          margemPct: (f.valor || 0) > 0 ? (margem / (f.valor || 0)) * 100 : 0,
+        };
+      })
+      .sort((a, b) => (a.data < b.data ? 1 : -1));
+  }, [fFreights, byVehicle]);
+
+  const margemMediaViagem =
+    byTrip.length > 0 ? byTrip.reduce((a, t) => a + t.margemPct, 0) / byTrip.length : 0;
+
 
   // AUDITORIA DE CÁLCULOS
   const auditoria = useMemo(() => {
