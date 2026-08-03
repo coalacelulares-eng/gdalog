@@ -429,6 +429,7 @@ export function TransportManagementSystem() {
   const [expData, setExpData] = useState(new Date().toISOString().slice(0, 10));
   const [expMotorista, setExpMotorista] = useState("");
   const [expKm, setExpKm] = useState<number | "">("");
+  const [expLitros, setExpLitros] = useState<number | "">("");
   const [expAbastecimento, setExpAbastecimento] = useState<number | "">("");
   const [expArla, setExpArla] = useState<number | "">("");
   const [expRastreador, setExpRastreador] = useState<number | "">("");
@@ -436,6 +437,9 @@ export function TransportManagementSystem() {
   const [expIpva, setExpIpva] = useState<number | "">("");
   const [expDiaria, setExpDiaria] = useState<number | "">("");
   const [expSalario, setExpSalario] = useState<number | "">("");
+  const [expComissao, setExpComissao] = useState<number | "">("");
+  const [expPrestacao, setExpPrestacao] = useState<number | "">("");
+  const [expSeguro, setExpSeguro] = useState<number | "">("");
   const [expOutros, setExpOutros] = useState<number | "">("");
   const [expObs, setExpObs] = useState("");
 
