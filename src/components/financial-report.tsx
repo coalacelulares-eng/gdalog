@@ -406,6 +406,49 @@ export function FinancialReport({
       rows.push([v.placa, v.modelo, v.receita, v.despesa, v.saldo, v.km, v.custoKm.toFixed(2)]),
     );
     rows.push([]);
+    rows.push(["DRE FINAL", "Valor", "% da receita"]);
+    rows.push(["Receita total", totalReceita, "100"]);
+    rows.push(["(-) Diesel / Arla", dre.diesel, ((dre.diesel / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) Manutenção", dre.manutencao, ((dre.manutencao / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) Custo operacional", dre.operacional, ((dre.operacional / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) Comissões de motorista", dre.comissoes, ((dre.comissoes / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) Prestação de veículos", dre.prestacao, ((dre.prestacao / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) IPVA", dre.ipva, ((dre.ipva / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) Seguro", dre.seguro, ((dre.seguro / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["= Resultado líquido", dre.resultado, dre.pctLiquido.toFixed(1)]);
+    rows.push([]);
+    rows.push(["MÉDIA DE CONSUMO", "KM", "Litros", "km/l", "R$/litro"]);
+    byVehicle.forEach((v) =>
+      rows.push([v.placa, v.km, v.litros, v.kmPorLitro.toFixed(2), v.custoLitro.toFixed(2)]),
+    );
+    rows.push(["TOTAL", totalKm, totalLitros, kmPorLitro.toFixed(2), precoMedioLitro.toFixed(2)]);
+    rows.push([]);
+    rows.push(["MARGEM POR VIAGEM", "Rota", "Placa", "Receita", "Custo rateado", "Margem", "Margem %"]);
+    byTrip.forEach((t) =>
+      rows.push([
+        formatDateBR(t.data),
+        t.rota,
+        t.placa,
+        t.receita,
+        t.custo.toFixed(2),
+        t.margem.toFixed(2),
+        t.margemPct.toFixed(1),
+      ]),
+    );
+    rows.push([]);
+    rows.push(["MARGEM FINAL POR PLACA", "Receita", "Custo", "Margem", "Margem %", "Receita/KM", "Custo/KM"]);
+    byVehicle.forEach((v) =>
+      rows.push([
+        v.placa,
+        v.receita,
+        v.despesa,
+        v.saldo,
+        v.margemPct.toFixed(1),
+        v.receitaKm.toFixed(2),
+        v.custoKm.toFixed(2),
+      ]),
+    );
+    rows.push([]);
     rows.push(["AUDITORIA", "Descrição"]);
     if (auditoria.length === 0) rows.push(["OK", "Nenhuma inconsistência encontrada"]);
     auditoria.forEach((i) => rows.push([i.tipo, i.descricao]));
