@@ -93,6 +93,9 @@ interface ExpenseDetails {
   ipva: number;
   diaria: number;
   salario: number;
+  comissao: number;
+  prestacao: number;
+  seguro: number;
   outros: number;
 }
 
@@ -102,6 +105,7 @@ interface Expense {
   data: string;
   motorista: string;
   km: number;
+  litros: number;
   detalhes: ExpenseDetails;
   total: number;
   observacao: string;
@@ -147,6 +151,7 @@ const INITIAL_DATA = {
       data: "2026-07-28",
       motorista: "MARCOS",
       km: 975,
+      litros: 800,
       detalhes: {
         abastecimento: 3200,
         arla: 200,
@@ -155,6 +160,9 @@ const INITIAL_DATA = {
         ipva: 150,
         diaria: 300,
         salario: 1300,
+        comissao: 0,
+        prestacao: 0,
+        seguro: 0,
         outros: 120,
       },
       total: 5960,
@@ -421,6 +429,7 @@ export function TransportManagementSystem() {
   const [expData, setExpData] = useState(new Date().toISOString().slice(0, 10));
   const [expMotorista, setExpMotorista] = useState("");
   const [expKm, setExpKm] = useState<number | "">("");
+  const [expLitros, setExpLitros] = useState<number | "">("");
   const [expAbastecimento, setExpAbastecimento] = useState<number | "">("");
   const [expArla, setExpArla] = useState<number | "">("");
   const [expRastreador, setExpRastreador] = useState<number | "">("");
@@ -428,6 +437,9 @@ export function TransportManagementSystem() {
   const [expIpva, setExpIpva] = useState<number | "">("");
   const [expDiaria, setExpDiaria] = useState<number | "">("");
   const [expSalario, setExpSalario] = useState<number | "">("");
+  const [expComissao, setExpComissao] = useState<number | "">("");
+  const [expPrestacao, setExpPrestacao] = useState<number | "">("");
+  const [expSeguro, setExpSeguro] = useState<number | "">("");
   const [expOutros, setExpOutros] = useState<number | "">("");
   const [expObs, setExpObs] = useState("");
 
@@ -506,15 +518,21 @@ export function TransportManagementSystem() {
 
     const num = (v: number | "") => (typeof v === "number" ? v : 0);
 
-    const calculatedTotal =
-      num(expAbastecimento) +
-      num(expArla) +
-      num(expRastreador) +
-      num(expDepreciacao) +
-      num(expIpva) +
-      num(expDiaria) +
-      num(expSalario) +
-      num(expOutros);
+    const detalhes: ExpenseDetails = {
+      abastecimento: num(expAbastecimento),
+      arla: num(expArla),
+      rastreador: num(expRastreador),
+      depreciacao: num(expDepreciacao),
+      ipva: num(expIpva),
+      diaria: num(expDiaria),
+      salario: num(expSalario),
+      comissao: num(expComissao),
+      prestacao: num(expPrestacao),
+      seguro: num(expSeguro),
+      outros: num(expOutros),
+    };
+
+    const calculatedTotal = Object.values(detalhes).reduce((a, v) => a + v, 0);
 
     let updatedExpenses = [...expenses];
     if (expEditingId) {
@@ -526,16 +544,8 @@ export function TransportManagementSystem() {
               data: expData,
               motorista: expMotorista || "MOTORISTA",
               km: num(expKm),
-              detalhes: {
-                abastecimento: num(expAbastecimento),
-                arla: num(expArla),
-                rastreador: num(expRastreador),
-                depreciacao: num(expDepreciacao),
-                ipva: num(expIpva),
-                diaria: num(expDiaria),
-                salario: num(expSalario),
-                outros: num(expOutros),
-              },
+              litros: num(expLitros),
+              detalhes,
               total: calculatedTotal,
               observacao: expObs,
             }
@@ -549,16 +559,8 @@ export function TransportManagementSystem() {
         data: expData,
         motorista: expMotorista || "MOTORISTA",
         km: num(expKm),
-        detalhes: {
-          abastecimento: num(expAbastecimento),
-          arla: num(expArla),
-          rastreador: num(expRastreador),
-          depreciacao: num(expDepreciacao),
-          ipva: num(expIpva),
-          diaria: num(expDiaria),
-          salario: num(expSalario),
-          outros: num(expOutros),
-        },
+        litros: num(expLitros),
+        detalhes,
         total: calculatedTotal,
         observacao: expObs,
       };
@@ -574,6 +576,7 @@ export function TransportManagementSystem() {
     setExpPlaca("");
     setExpMotorista("");
     setExpKm("");
+    setExpLitros("");
     setExpAbastecimento("");
     setExpArla("");
     setExpRastreador("");
@@ -581,6 +584,9 @@ export function TransportManagementSystem() {
     setExpIpva("");
     setExpDiaria("");
     setExpSalario("");
+    setExpComissao("");
+    setExpPrestacao("");
+    setExpSeguro("");
     setExpOutros("");
     setExpObs("");
     setIsExpenseModalOpen(false);
@@ -592,6 +598,7 @@ export function TransportManagementSystem() {
     setExpData(exp.data);
     setExpMotorista(exp.motorista);
     setExpKm(exp.km);
+    setExpLitros(exp.litros || "");
     setExpAbastecimento(exp.detalhes.abastecimento || "");
     setExpArla(exp.detalhes.arla || "");
     setExpRastreador(exp.detalhes.rastreador || "");
@@ -599,6 +606,9 @@ export function TransportManagementSystem() {
     setExpIpva(exp.detalhes.ipva || "");
     setExpDiaria(exp.detalhes.diaria || "");
     setExpSalario(exp.detalhes.salario || "");
+    setExpComissao(exp.detalhes.comissao || "");
+    setExpPrestacao(exp.detalhes.prestacao || "");
+    setExpSeguro(exp.detalhes.seguro || "");
     setExpOutros(exp.detalhes.outros || "");
     setExpObs(exp.observacao || "");
     setIsExpenseModalOpen(true);
@@ -1540,8 +1550,20 @@ export function TransportManagementSystem() {
                     {exp.detalhes.salario > 0 && (
                       <span>Salário: <strong className="text-slate-900">{formatBRL(exp.detalhes.salario)}</strong></span>
                     )}
+                    {exp.detalhes.comissao > 0 && (
+                      <span>Comissão: <strong className="text-slate-900">{formatBRL(exp.detalhes.comissao)}</strong></span>
+                    )}
+                    {exp.detalhes.prestacao > 0 && (
+                      <span>Prestação: <strong className="text-slate-900">{formatBRL(exp.detalhes.prestacao)}</strong></span>
+                    )}
+                    {exp.detalhes.seguro > 0 && (
+                      <span>Seguro: <strong className="text-slate-900">{formatBRL(exp.detalhes.seguro)}</strong></span>
+                    )}
                     {exp.detalhes.outros > 0 && (
                       <span>Outros: <strong className="text-slate-900">{formatBRL(exp.detalhes.outros)}</strong></span>
+                    )}
+                    {(exp.litros || 0) > 0 && (
+                      <span>Litros: <strong className="text-slate-900">{exp.litros.toLocaleString("pt-BR")} L</strong></span>
                     )}
                   </div>
 
@@ -2000,6 +2022,18 @@ export function TransportManagementSystem() {
                   className="mt-1 text-xs"
                 />
               </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">Litros abastecidos</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={expLitros}
+                  onChange={(e) => setExpLitros(e.target.value === "" ? "" : Number(e.target.value))}
+                  placeholder="Ex: 250"
+                  className="mt-1 text-xs"
+                />
+              </div>
             </div>
 
             {/* Detalhamento dos custos (11 categorias) */}
@@ -2094,6 +2128,45 @@ export function TransportManagementSystem() {
                     <CurrencyInput
                       value={expSalario}
                       onChange={setExpSalario}
+                      placeholder="0,00"
+                      className="text-xs pl-8"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[11px] text-slate-500 font-medium">Comissão do Motorista</span>
+                  <div className="relative mt-0.5">
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
+                      value={expComissao}
+                      onChange={setExpComissao}
+                      placeholder="0,00"
+                      className="text-xs pl-8"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[11px] text-slate-500 font-medium">Prestação do Veículo</span>
+                  <div className="relative mt-0.5">
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
+                      value={expPrestacao}
+                      onChange={setExpPrestacao}
+                      placeholder="0,00"
+                      className="text-xs pl-8"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[11px] text-slate-500 font-medium">Seguro</span>
+                  <div className="relative mt-0.5">
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
+                      value={expSeguro}
+                      onChange={setExpSeguro}
                       placeholder="0,00"
                       className="text-xs pl-8"
                     />

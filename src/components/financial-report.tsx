@@ -20,6 +20,9 @@ export interface FinExpenseDetails {
   ipva: number;
   diaria: number;
   salario: number;
+  comissao: number;
+  prestacao: number;
+  seguro: number;
   outros: number;
 }
 
@@ -29,6 +32,7 @@ export interface FinExpense {
   data: string;
   motorista: string;
   km: number;
+  litros?: number;
   detalhes: FinExpenseDetails;
   total: number;
   observacao: string;
@@ -69,11 +73,14 @@ interface FinancialReportProps {
 }
 
 const COST_LABELS: { key: keyof FinExpenseDetails; label: string }[] = [
-  { key: "abastecimento", label: "Abastecimento" },
+  { key: "abastecimento", label: "Diesel / Abastecimento" },
   { key: "arla", label: "Arla" },
   { key: "rastreador", label: "Rastreador" },
   { key: "depreciacao", label: "Depreciação" },
   { key: "ipva", label: "IPVA / Licenciamento" },
+  { key: "seguro", label: "Seguro" },
+  { key: "prestacao", label: "Prestação de veículos" },
+  { key: "comissao", label: "Comissão de motorista" },
   { key: "diaria", label: "Diária" },
   { key: "salario", label: "Salário" },
   { key: "outros", label: "Outros" },
@@ -206,6 +213,12 @@ export function FinancialReport({
           .filter((m) => m.placa.toUpperCase() === placa)
           .reduce((a, m) => a + (Number(m.custo) || 0), 0);
         const despTotal = desp + manut;
+        const litros = fExpenses
+          .filter((e) => e.placa.toUpperCase() === placa)
+          .reduce((a, e) => a + (Number(e.litros) || 0), 0);
+        const diesel = fExpenses
+          .filter((e) => e.placa.toUpperCase() === placa)
+          .reduce((a, e) => a + (Number(e.detalhes?.abastecimento) || 0), 0);
         return {
           placa,
           modelo: vehicles.find((v) => v.placa.toUpperCase() === placa)?.modelo ?? "—",
@@ -213,12 +226,84 @@ export function FinancialReport({
           receita: rec,
           manutencao: manut,
           km,
+          litros,
+          diesel,
+          kmPorLitro: litros > 0 ? km / litros : 0,
+          custoLitro: litros > 0 ? diesel / litros : 0,
           saldo: rec - despTotal,
+          margemPct: rec > 0 ? ((rec - despTotal) / rec) * 100 : 0,
           custoKm: km > 0 ? despTotal / km : 0,
+          receitaKm: km > 0 ? rec / km : 0,
         };
       })
       .sort((a, b) => b.receita - a.receita);
   }, [vehicles, fExpenses, fFreights, fMaint, placaFilter]);
+
+  // Soma de uma categoria de custo lançada
+  const sumKey = (k: keyof FinExpenseDetails) =>
+    fExpenses.reduce((a, e) => a + (Number(e.detalhes?.[k]) || 0), 0);
+
+  // MÉDIA DE CONSUMO (km/l e custo do diesel)
+  const totalLitros = fExpenses.reduce((a, e) => a + (Number(e.litros) || 0), 0);
+  const totalDiesel = sumKey("abastecimento");
+  const kmPorLitro = totalLitros > 0 ? totalKm / totalLitros : 0;
+  const litrosPorKm = totalKm > 0 ? totalLitros / totalKm : 0;
+  const precoMedioLitro = totalLitros > 0 ? totalDiesel / totalLitros : 0;
+  const custoDieselPorKm = totalKm > 0 ? totalDiesel / totalKm : 0;
+
+  // DRE FINAL
+  const dre = useMemo(() => {
+    const diesel = sumKey("abastecimento") + sumKey("arla");
+    const manutencao = totalManutencaoRegistrada;
+    const operacional =
+      sumKey("rastreador") + sumKey("depreciacao") + sumKey("diaria") + sumKey("salario") + sumKey("outros");
+    const comissoes = sumKey("comissao");
+    const prestacao = sumKey("prestacao");
+    const ipva = sumKey("ipva");
+    const seguro = sumKey("seguro");
+    const resultado =
+      totalReceita - diesel - manutencao - operacional - comissoes - prestacao - ipva - seguro;
+    return {
+      diesel,
+      manutencao,
+      operacional,
+      comissoes,
+      prestacao,
+      ipva,
+      seguro,
+      resultado,
+      pctLiquido: totalReceita > 0 ? (resultado / totalReceita) * 100 : 0,
+    };
+  }, [fExpenses, totalManutencaoRegistrada, totalReceita]);
+
+  // MARGEM POR VIAGEM (custo do veículo rateado pela participação na receita)
+  const byTrip = useMemo(() => {
+    return fFreights
+      .map((f) => {
+        const placa = f.placa.toUpperCase();
+        const veh = byVehicle.find((v) => v.placa === placa);
+        const receitaPlaca = veh?.receita ?? 0;
+        const custoPlaca = veh?.despesa ?? 0;
+        const share = receitaPlaca > 0 ? (f.valor || 0) / receitaPlaca : 0;
+        const custo = custoPlaca * share;
+        const margem = (f.valor || 0) - custo;
+        return {
+          id: f.id,
+          data: f.data,
+          rota: `${f.origem} → ${f.destino}`,
+          placa,
+          receita: f.valor || 0,
+          custo,
+          margem,
+          margemPct: (f.valor || 0) > 0 ? (margem / (f.valor || 0)) * 100 : 0,
+        };
+      })
+      .sort((a, b) => (a.data < b.data ? 1 : -1));
+  }, [fFreights, byVehicle]);
+
+  const margemMediaViagem =
+    byTrip.length > 0 ? byTrip.reduce((a, t) => a + t.margemPct, 0) / byTrip.length : 0;
+
 
   // AUDITORIA DE CÁLCULOS
   const auditoria = useMemo(() => {
@@ -319,6 +404,49 @@ export function FinancialReport({
     rows.push(["POR VEÍCULO", "Modelo", "Receita", "Despesa", "Saldo", "KM", "Custo/KM"]);
     byVehicle.forEach((v) =>
       rows.push([v.placa, v.modelo, v.receita, v.despesa, v.saldo, v.km, v.custoKm.toFixed(2)]),
+    );
+    rows.push([]);
+    rows.push(["DRE FINAL", "Valor", "% da receita"]);
+    rows.push(["Receita total", totalReceita, "100"]);
+    rows.push(["(-) Diesel / Arla", dre.diesel, ((dre.diesel / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) Manutenção", dre.manutencao, ((dre.manutencao / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) Custo operacional", dre.operacional, ((dre.operacional / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) Comissões de motorista", dre.comissoes, ((dre.comissoes / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) Prestação de veículos", dre.prestacao, ((dre.prestacao / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) IPVA", dre.ipva, ((dre.ipva / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["(-) Seguro", dre.seguro, ((dre.seguro / (totalReceita || 1)) * 100).toFixed(1)]);
+    rows.push(["= Resultado líquido", dre.resultado, dre.pctLiquido.toFixed(1)]);
+    rows.push([]);
+    rows.push(["MÉDIA DE CONSUMO", "KM", "Litros", "km/l", "R$/litro"]);
+    byVehicle.forEach((v) =>
+      rows.push([v.placa, v.km, v.litros, v.kmPorLitro.toFixed(2), v.custoLitro.toFixed(2)]),
+    );
+    rows.push(["TOTAL", totalKm, totalLitros, kmPorLitro.toFixed(2), precoMedioLitro.toFixed(2)]);
+    rows.push([]);
+    rows.push(["MARGEM POR VIAGEM", "Rota", "Placa", "Receita", "Custo rateado", "Margem", "Margem %"]);
+    byTrip.forEach((t) =>
+      rows.push([
+        formatDateBR(t.data),
+        t.rota,
+        t.placa,
+        t.receita,
+        t.custo.toFixed(2),
+        t.margem.toFixed(2),
+        t.margemPct.toFixed(1),
+      ]),
+    );
+    rows.push([]);
+    rows.push(["MARGEM FINAL POR PLACA", "Receita", "Custo", "Margem", "Margem %", "Receita/KM", "Custo/KM"]);
+    byVehicle.forEach((v) =>
+      rows.push([
+        v.placa,
+        v.receita,
+        v.despesa,
+        v.saldo,
+        v.margemPct.toFixed(1),
+        v.receitaKm.toFixed(2),
+        v.custoKm.toFixed(2),
+      ]),
     );
     rows.push([]);
     rows.push(["AUDITORIA", "Descrição"]);
@@ -445,6 +573,263 @@ export function FinancialReport({
           </div>
         </div>
       </div>
+
+      {/* DRE FINAL */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
+        <div className="flex flex-wrap items-end justify-between gap-2 mb-4">
+          <h2 className="font-extrabold text-[#0c192c]">DRE final da operação</h2>
+          <span className="text-[11px] text-slate-400">{periodoLabel}</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[420px]">
+            <tbody>
+              <tr className="border-b border-slate-100">
+                <td className="py-2 font-bold text-[#0c192c]">Receita total de fretes</td>
+                <td className="py-2 text-right font-black text-[#16a34a]">{formatBRL(totalReceita)}</td>
+                <td className="py-2 text-right text-[11px] text-slate-400 w-20">100,0%</td>
+              </tr>
+              {[
+                { label: "(−) Diesel / Arla", valor: dre.diesel },
+                { label: "(−) Manutenção", valor: dre.manutencao },
+                { label: "(−) Custo operacional", valor: dre.operacional },
+                { label: "(−) Comissões de motorista", valor: dre.comissoes },
+                { label: "(−) Prestação de veículos", valor: dre.prestacao },
+                { label: "(−) IPVA / Licenciamento", valor: dre.ipva },
+                { label: "(−) Seguro", valor: dre.seguro },
+              ].map((r) => (
+                <tr key={r.label} className="border-b border-slate-50">
+                  <td className="py-2 text-slate-600 font-semibold">{r.label}</td>
+                  <td className="py-2 text-right font-semibold text-[#f25c05]">
+                    {formatBRL(r.valor)}
+                  </td>
+                  <td className="py-2 text-right text-[11px] text-slate-400">
+                    {(totalReceita > 0 ? (r.valor / totalReceita) * 100 : 0).toFixed(1)}%
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <td className="py-3 font-black text-[#0c192c]">= Resultado líquido</td>
+                <td
+                  className={`py-3 text-right font-black ${dre.resultado >= 0 ? "text-[#16a34a]" : "text-red-600"}`}
+                >
+                  {formatBRL(dre.resultado)}
+                </td>
+                <td
+                  className={`py-3 text-right font-black ${dre.resultado >= 0 ? "text-[#16a34a]" : "text-red-600"}`}
+                >
+                  {dre.pctLiquido.toFixed(1)}%
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-slate-400 mt-2">
+          Percentual líquido da operação: {dre.pctLiquido.toFixed(1)}% da receita total.
+        </p>
+      </div>
+
+      {/* MÉDIA DE CONSUMO */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
+        <div className="flex flex-wrap items-end justify-between gap-2 mb-4">
+          <h2 className="font-extrabold text-[#0c192c]">Média de consumo</h2>
+          <span className="text-[11px] text-slate-400">
+            {totalLitros.toLocaleString("pt-BR")} L · {totalKm.toLocaleString("pt-BR")} km
+          </span>
+        </div>
+        {totalLitros === 0 ? (
+          <p className="text-sm text-slate-500">
+            Informe os <strong>litros abastecidos</strong> no lançamento de despesas para calcular a
+            média de consumo.
+          </p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="rounded-xl bg-slate-50 p-3">
+                <div className="text-[11px] uppercase text-slate-500 font-semibold">Média km/l</div>
+                <div className="text-lg font-black text-[#0c192c]">
+                  {kmPorLitro.toFixed(2)} km/l
+                </div>
+              </div>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <div className="text-[11px] uppercase text-slate-500 font-semibold">Litros por km</div>
+                <div className="text-lg font-black text-[#0c192c]">{litrosPorKm.toFixed(3)} L</div>
+              </div>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <div className="text-[11px] uppercase text-slate-500 font-semibold">Preço médio/litro</div>
+                <div className="text-lg font-black text-[#0c192c]">{formatBRL(precoMedioLitro)}</div>
+              </div>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <div className="text-[11px] uppercase text-slate-500 font-semibold">Diesel por km</div>
+                <div className="text-lg font-black text-[#0c192c]">{formatBRL(custoDieselPorKm)}</div>
+              </div>
+            </div>
+            <div className="overflow-x-auto mt-4">
+              <table className="w-full text-sm min-w-[460px]">
+                <thead>
+                  <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
+                    <th className="py-2">Veículo</th>
+                    <th className="py-2 text-right">KM</th>
+                    <th className="py-2 text-right">Litros</th>
+                    <th className="py-2 text-right">Média km/l</th>
+                    <th className="py-2 text-right">R$/litro</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {byVehicle.map((v) => (
+                    <tr key={v.placa} className="border-b border-slate-50">
+                      <td className="py-2 font-bold text-slate-800">{v.placa}</td>
+                      <td className="py-2 text-right text-slate-500">
+                        {v.km.toLocaleString("pt-BR")}
+                      </td>
+                      <td className="py-2 text-right text-slate-500">
+                        {v.litros.toLocaleString("pt-BR")}
+                      </td>
+                      <td className="py-2 text-right font-bold text-[#0c192c]">
+                        {v.kmPorLitro > 0 ? `${v.kmPorLitro.toFixed(2)} km/l` : "—"}
+                      </td>
+                      <td className="py-2 text-right text-slate-500">
+                        {v.custoLitro > 0 ? formatBRL(v.custoLitro) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* MARGEM POR VIAGEM */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
+        <div className="flex flex-wrap items-end justify-between gap-2 mb-4">
+          <h2 className="font-extrabold text-[#0c192c]">Margem por viagem</h2>
+          <span className="text-[11px] text-slate-400">
+            {byTrip.length} viagens · margem média {margemMediaViagem.toFixed(1)}%
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[520px]">
+            <thead>
+              <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
+                <th className="py-2">Data</th>
+                <th className="py-2">Rota / Placa</th>
+                <th className="py-2 text-right">Receita</th>
+                <th className="py-2 text-right">Custo rateado</th>
+                <th className="py-2 text-right">Margem</th>
+                <th className="py-2 text-right">%</th>
+              </tr>
+            </thead>
+            <tbody>
+              {byTrip.map((t) => (
+                <tr key={t.id} className="border-b border-slate-50">
+                  <td className="py-2 text-slate-500 text-xs whitespace-nowrap">
+                    {formatDateBR(t.data)}
+                  </td>
+                  <td className="py-2">
+                    <div className="font-semibold text-slate-800 text-xs">{t.rota}</div>
+                    <div className="text-[11px] text-slate-400">{t.placa}</div>
+                  </td>
+                  <td className="py-2 text-right text-[#16a34a] font-semibold">
+                    {formatBRL(t.receita)}
+                  </td>
+                  <td className="py-2 text-right text-[#f25c05] font-semibold">
+                    {formatBRL(t.custo)}
+                  </td>
+                  <td
+                    className={`py-2 text-right font-bold ${t.margem >= 0 ? "text-slate-800" : "text-red-600"}`}
+                  >
+                    {formatBRL(t.margem)}
+                  </td>
+                  <td
+                    className={`py-2 text-right font-bold ${t.margemPct >= 0 ? "text-slate-500" : "text-red-600"}`}
+                  >
+                    {t.margemPct.toFixed(1)}%
+                  </td>
+                </tr>
+              ))}
+              {byTrip.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-4 text-center text-slate-400">
+                    Sem fretes no período selecionado.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-slate-400 mt-3">
+          O custo de cada viagem é rateado a partir dos custos do veículo, na proporção da receita da
+          viagem sobre a receita total daquela placa.
+        </p>
+      </div>
+
+      {/* APURAÇÃO FINAL DE MARGEM POR PLACA */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
+        <h2 className="font-extrabold text-[#0c192c] mb-4">Apuração final de margem por placa</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[560px]">
+            <thead>
+              <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
+                <th className="py-2">Placa</th>
+                <th className="py-2 text-right">Receita</th>
+                <th className="py-2 text-right">Custo total</th>
+                <th className="py-2 text-right">Margem R$</th>
+                <th className="py-2 text-right">Margem %</th>
+                <th className="py-2 text-right">Receita/KM</th>
+                <th className="py-2 text-right">Custo/KM</th>
+              </tr>
+            </thead>
+            <tbody>
+              {byVehicle.map((v) => (
+                <tr key={v.placa} className="border-b border-slate-50">
+                  <td className="py-2">
+                    <div className="font-bold text-slate-800">{v.placa}</div>
+                    <div className="text-[11px] text-slate-400">{v.modelo}</div>
+                  </td>
+                  <td className="py-2 text-right text-[#16a34a] font-semibold">
+                    {formatBRL(v.receita)}
+                  </td>
+                  <td className="py-2 text-right text-[#f25c05] font-semibold">
+                    {formatBRL(v.despesa)}
+                  </td>
+                  <td
+                    className={`py-2 text-right font-bold ${v.saldo >= 0 ? "text-slate-800" : "text-red-600"}`}
+                  >
+                    {formatBRL(v.saldo)}
+                  </td>
+                  <td
+                    className={`py-2 text-right font-black ${v.margemPct >= 0 ? "text-[#16a34a]" : "text-red-600"}`}
+                  >
+                    {v.margemPct.toFixed(1)}%
+                  </td>
+                  <td className="py-2 text-right text-slate-500">{formatBRL(v.receitaKm)}</td>
+                  <td className="py-2 text-right text-slate-500">{formatBRL(v.custoKm)}</td>
+                </tr>
+              ))}
+              <tr>
+                <td className="py-2 font-black text-[#0c192c]">Total da operação</td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(totalReceita)}
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(totalDespesas)}
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">{formatBRL(lucro)}</td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {margem.toFixed(1)}%
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(receitaPorKm)}
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(custoPorKm)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
 
       {/* Custos por categoria */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
@@ -669,8 +1054,8 @@ export function FinancialReport({
           </table>
         </div>
         <p className="text-[11px] text-slate-400 mt-3">
-          Observação: ordens de manutenção são exibidas para conferência e não são somadas ao total
-          de despesas, que considera apenas os lançamentos da aba Despesas.
+          Observação: ordens de manutenção são somadas às despesas totais, ao DRE e à margem por
+          placa.
         </p>
       </div>
     </div>
