@@ -2123,6 +2123,45 @@ export function TransportManagementSystem() {
                 </div>
 
                 <div>
+                  <span className="text-[11px] text-slate-500 font-medium">Comissão do Motorista</span>
+                  <div className="relative mt-0.5">
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
+                      value={expComissao}
+                      onChange={setExpComissao}
+                      placeholder="0,00"
+                      className="text-xs pl-8"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[11px] text-slate-500 font-medium">Prestação do Veículo</span>
+                  <div className="relative mt-0.5">
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
+                      value={expPrestacao}
+                      onChange={setExpPrestacao}
+                      placeholder="0,00"
+                      className="text-xs pl-8"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[11px] text-slate-500 font-medium">Seguro</span>
+                  <div className="relative mt-0.5">
+                    <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                    <CurrencyInput
+                      value={expSeguro}
+                      onChange={setExpSeguro}
+                      placeholder="0,00"
+                      className="text-xs pl-8"
+                    />
+                  </div>
+                </div>
+
+                <div>
                   <span className="text-[11px] text-slate-500 font-medium">Outros / Pedágio</span>
                   <div className="relative mt-0.5">
                     <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
