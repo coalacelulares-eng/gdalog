@@ -1550,8 +1550,20 @@ export function TransportManagementSystem() {
                     {exp.detalhes.salario > 0 && (
                       <span>Salário: <strong className="text-slate-900">{formatBRL(exp.detalhes.salario)}</strong></span>
                     )}
+                    {exp.detalhes.comissao > 0 && (
+                      <span>Comissão: <strong className="text-slate-900">{formatBRL(exp.detalhes.comissao)}</strong></span>
+                    )}
+                    {exp.detalhes.prestacao > 0 && (
+                      <span>Prestação: <strong className="text-slate-900">{formatBRL(exp.detalhes.prestacao)}</strong></span>
+                    )}
+                    {exp.detalhes.seguro > 0 && (
+                      <span>Seguro: <strong className="text-slate-900">{formatBRL(exp.detalhes.seguro)}</strong></span>
+                    )}
                     {exp.detalhes.outros > 0 && (
                       <span>Outros: <strong className="text-slate-900">{formatBRL(exp.detalhes.outros)}</strong></span>
+                    )}
+                    {(exp.litros || 0) > 0 && (
+                      <span>Litros: <strong className="text-slate-900">{exp.litros.toLocaleString("pt-BR")} L</strong></span>
                     )}
                   </div>
 
