@@ -1054,8 +1054,8 @@ export function FinancialReport({
           </table>
         </div>
         <p className="text-[11px] text-slate-400 mt-3">
-          Observação: ordens de manutenção são exibidas para conferência e não são somadas ao total
-          de despesas, que considera apenas os lançamentos da aba Despesas.
+          Observação: ordens de manutenção são somadas às despesas totais, ao DRE e à margem por
+          placa.
         </p>
       </div>
     </div>
