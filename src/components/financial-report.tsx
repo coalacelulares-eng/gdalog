@@ -73,11 +73,14 @@ interface FinancialReportProps {
 }
 
 const COST_LABELS: { key: keyof FinExpenseDetails; label: string }[] = [
-  { key: "abastecimento", label: "Abastecimento" },
+  { key: "abastecimento", label: "Diesel / Abastecimento" },
   { key: "arla", label: "Arla" },
   { key: "rastreador", label: "Rastreador" },
   { key: "depreciacao", label: "Depreciação" },
   { key: "ipva", label: "IPVA / Licenciamento" },
+  { key: "seguro", label: "Seguro" },
+  { key: "prestacao", label: "Prestação de veículos" },
+  { key: "comissao", label: "Comissão de motorista" },
   { key: "diaria", label: "Diária" },
   { key: "salario", label: "Salário" },
   { key: "outros", label: "Outros" },
