@@ -531,6 +531,263 @@ export function FinancialReport({
         </div>
       </div>
 
+      {/* DRE FINAL */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
+        <div className="flex flex-wrap items-end justify-between gap-2 mb-4">
+          <h2 className="font-extrabold text-[#0c192c]">DRE final da operação</h2>
+          <span className="text-[11px] text-slate-400">{periodoLabel}</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[420px]">
+            <tbody>
+              <tr className="border-b border-slate-100">
+                <td className="py-2 font-bold text-[#0c192c]">Receita total de fretes</td>
+                <td className="py-2 text-right font-black text-[#16a34a]">{formatBRL(totalReceita)}</td>
+                <td className="py-2 text-right text-[11px] text-slate-400 w-20">100,0%</td>
+              </tr>
+              {[
+                { label: "(−) Diesel / Arla", valor: dre.diesel },
+                { label: "(−) Manutenção", valor: dre.manutencao },
+                { label: "(−) Custo operacional", valor: dre.operacional },
+                { label: "(−) Comissões de motorista", valor: dre.comissoes },
+                { label: "(−) Prestação de veículos", valor: dre.prestacao },
+                { label: "(−) IPVA / Licenciamento", valor: dre.ipva },
+                { label: "(−) Seguro", valor: dre.seguro },
+              ].map((r) => (
+                <tr key={r.label} className="border-b border-slate-50">
+                  <td className="py-2 text-slate-600 font-semibold">{r.label}</td>
+                  <td className="py-2 text-right font-semibold text-[#f25c05]">
+                    {formatBRL(r.valor)}
+                  </td>
+                  <td className="py-2 text-right text-[11px] text-slate-400">
+                    {(totalReceita > 0 ? (r.valor / totalReceita) * 100 : 0).toFixed(1)}%
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <td className="py-3 font-black text-[#0c192c]">= Resultado líquido</td>
+                <td
+                  className={`py-3 text-right font-black ${dre.resultado >= 0 ? "text-[#16a34a]" : "text-red-600"}`}
+                >
+                  {formatBRL(dre.resultado)}
+                </td>
+                <td
+                  className={`py-3 text-right font-black ${dre.resultado >= 0 ? "text-[#16a34a]" : "text-red-600"}`}
+                >
+                  {dre.pctLiquido.toFixed(1)}%
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-slate-400 mt-2">
+          Percentual líquido da operação: {dre.pctLiquido.toFixed(1)}% da receita total.
+        </p>
+      </div>
+
+      {/* MÉDIA DE CONSUMO */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
+        <div className="flex flex-wrap items-end justify-between gap-2 mb-4">
+          <h2 className="font-extrabold text-[#0c192c]">Média de consumo</h2>
+          <span className="text-[11px] text-slate-400">
+            {totalLitros.toLocaleString("pt-BR")} L · {totalKm.toLocaleString("pt-BR")} km
+          </span>
+        </div>
+        {totalLitros === 0 ? (
+          <p className="text-sm text-slate-500">
+            Informe os <strong>litros abastecidos</strong> no lançamento de despesas para calcular a
+            média de consumo.
+          </p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="rounded-xl bg-slate-50 p-3">
+                <div className="text-[11px] uppercase text-slate-500 font-semibold">Média km/l</div>
+                <div className="text-lg font-black text-[#0c192c]">
+                  {kmPorLitro.toFixed(2)} km/l
+                </div>
+              </div>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <div className="text-[11px] uppercase text-slate-500 font-semibold">Litros por km</div>
+                <div className="text-lg font-black text-[#0c192c]">{litrosPorKm.toFixed(3)} L</div>
+              </div>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <div className="text-[11px] uppercase text-slate-500 font-semibold">Preço médio/litro</div>
+                <div className="text-lg font-black text-[#0c192c]">{formatBRL(precoMedioLitro)}</div>
+              </div>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <div className="text-[11px] uppercase text-slate-500 font-semibold">Diesel por km</div>
+                <div className="text-lg font-black text-[#0c192c]">{formatBRL(custoDieselPorKm)}</div>
+              </div>
+            </div>
+            <div className="overflow-x-auto mt-4">
+              <table className="w-full text-sm min-w-[460px]">
+                <thead>
+                  <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
+                    <th className="py-2">Veículo</th>
+                    <th className="py-2 text-right">KM</th>
+                    <th className="py-2 text-right">Litros</th>
+                    <th className="py-2 text-right">Média km/l</th>
+                    <th className="py-2 text-right">R$/litro</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {byVehicle.map((v) => (
+                    <tr key={v.placa} className="border-b border-slate-50">
+                      <td className="py-2 font-bold text-slate-800">{v.placa}</td>
+                      <td className="py-2 text-right text-slate-500">
+                        {v.km.toLocaleString("pt-BR")}
+                      </td>
+                      <td className="py-2 text-right text-slate-500">
+                        {v.litros.toLocaleString("pt-BR")}
+                      </td>
+                      <td className="py-2 text-right font-bold text-[#0c192c]">
+                        {v.kmPorLitro > 0 ? `${v.kmPorLitro.toFixed(2)} km/l` : "—"}
+                      </td>
+                      <td className="py-2 text-right text-slate-500">
+                        {v.custoLitro > 0 ? formatBRL(v.custoLitro) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* MARGEM POR VIAGEM */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
+        <div className="flex flex-wrap items-end justify-between gap-2 mb-4">
+          <h2 className="font-extrabold text-[#0c192c]">Margem por viagem</h2>
+          <span className="text-[11px] text-slate-400">
+            {byTrip.length} viagens · margem média {margemMediaViagem.toFixed(1)}%
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[520px]">
+            <thead>
+              <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
+                <th className="py-2">Data</th>
+                <th className="py-2">Rota / Placa</th>
+                <th className="py-2 text-right">Receita</th>
+                <th className="py-2 text-right">Custo rateado</th>
+                <th className="py-2 text-right">Margem</th>
+                <th className="py-2 text-right">%</th>
+              </tr>
+            </thead>
+            <tbody>
+              {byTrip.map((t) => (
+                <tr key={t.id} className="border-b border-slate-50">
+                  <td className="py-2 text-slate-500 text-xs whitespace-nowrap">
+                    {formatDateBR(t.data)}
+                  </td>
+                  <td className="py-2">
+                    <div className="font-semibold text-slate-800 text-xs">{t.rota}</div>
+                    <div className="text-[11px] text-slate-400">{t.placa}</div>
+                  </td>
+                  <td className="py-2 text-right text-[#16a34a] font-semibold">
+                    {formatBRL(t.receita)}
+                  </td>
+                  <td className="py-2 text-right text-[#f25c05] font-semibold">
+                    {formatBRL(t.custo)}
+                  </td>
+                  <td
+                    className={`py-2 text-right font-bold ${t.margem >= 0 ? "text-slate-800" : "text-red-600"}`}
+                  >
+                    {formatBRL(t.margem)}
+                  </td>
+                  <td
+                    className={`py-2 text-right font-bold ${t.margemPct >= 0 ? "text-slate-500" : "text-red-600"}`}
+                  >
+                    {t.margemPct.toFixed(1)}%
+                  </td>
+                </tr>
+              ))}
+              {byTrip.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-4 text-center text-slate-400">
+                    Sem fretes no período selecionado.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-slate-400 mt-3">
+          O custo de cada viagem é rateado a partir dos custos do veículo, na proporção da receita da
+          viagem sobre a receita total daquela placa.
+        </p>
+      </div>
+
+      {/* APURAÇÃO FINAL DE MARGEM POR PLACA */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
+        <h2 className="font-extrabold text-[#0c192c] mb-4">Apuração final de margem por placa</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[560px]">
+            <thead>
+              <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
+                <th className="py-2">Placa</th>
+                <th className="py-2 text-right">Receita</th>
+                <th className="py-2 text-right">Custo total</th>
+                <th className="py-2 text-right">Margem R$</th>
+                <th className="py-2 text-right">Margem %</th>
+                <th className="py-2 text-right">Receita/KM</th>
+                <th className="py-2 text-right">Custo/KM</th>
+              </tr>
+            </thead>
+            <tbody>
+              {byVehicle.map((v) => (
+                <tr key={v.placa} className="border-b border-slate-50">
+                  <td className="py-2">
+                    <div className="font-bold text-slate-800">{v.placa}</div>
+                    <div className="text-[11px] text-slate-400">{v.modelo}</div>
+                  </td>
+                  <td className="py-2 text-right text-[#16a34a] font-semibold">
+                    {formatBRL(v.receita)}
+                  </td>
+                  <td className="py-2 text-right text-[#f25c05] font-semibold">
+                    {formatBRL(v.despesa)}
+                  </td>
+                  <td
+                    className={`py-2 text-right font-bold ${v.saldo >= 0 ? "text-slate-800" : "text-red-600"}`}
+                  >
+                    {formatBRL(v.saldo)}
+                  </td>
+                  <td
+                    className={`py-2 text-right font-black ${v.margemPct >= 0 ? "text-[#16a34a]" : "text-red-600"}`}
+                  >
+                    {v.margemPct.toFixed(1)}%
+                  </td>
+                  <td className="py-2 text-right text-slate-500">{formatBRL(v.receitaKm)}</td>
+                  <td className="py-2 text-right text-slate-500">{formatBRL(v.custoKm)}</td>
+                </tr>
+              ))}
+              <tr>
+                <td className="py-2 font-black text-[#0c192c]">Total da operação</td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(totalReceita)}
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(totalDespesas)}
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">{formatBRL(lucro)}</td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {margem.toFixed(1)}%
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(receitaPorKm)}
+                </td>
+                <td className="py-2 text-right font-black text-[#0c192c]">
+                  {formatBRL(custoPorKm)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
       {/* Custos por categoria */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
         <h2 className="font-extrabold text-[#0c192c] mb-4">Custos por categoria</h2>
