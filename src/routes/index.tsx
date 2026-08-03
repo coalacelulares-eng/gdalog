@@ -151,6 +151,7 @@ const INITIAL_DATA = {
       data: "2026-07-28",
       motorista: "MARCOS",
       km: 975,
+      litros: 800,
       detalhes: {
         abastecimento: 3200,
         arla: 200,
@@ -159,6 +160,9 @@ const INITIAL_DATA = {
         ipva: 150,
         diaria: 300,
         salario: 1300,
+        comissao: 0,
+        prestacao: 0,
+        seguro: 0,
         outros: 120,
       },
       total: 5960,
