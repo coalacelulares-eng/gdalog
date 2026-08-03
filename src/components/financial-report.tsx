@@ -20,6 +20,9 @@ export interface FinExpenseDetails {
   ipva: number;
   diaria: number;
   salario: number;
+  comissao: number;
+  prestacao: number;
+  seguro: number;
   outros: number;
 }
 
@@ -29,6 +32,7 @@ export interface FinExpense {
   data: string;
   motorista: string;
   km: number;
+  litros?: number;
   detalhes: FinExpenseDetails;
   total: number;
   observacao: string;
