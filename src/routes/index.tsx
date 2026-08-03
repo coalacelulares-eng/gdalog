@@ -2010,6 +2010,18 @@ export function TransportManagementSystem() {
                   className="mt-1 text-xs"
                 />
               </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">Litros abastecidos</Label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={expLitros}
+                  onChange={(e) => setExpLitros(e.target.value === "" ? "" : Number(e.target.value))}
+                  placeholder="Ex: 250"
+                  className="mt-1 text-xs"
+                />
+              </div>
             </div>
 
             {/* Detalhamento dos custos (11 categorias) */}
