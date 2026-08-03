@@ -514,15 +514,21 @@ export function TransportManagementSystem() {
 
     const num = (v: number | "") => (typeof v === "number" ? v : 0);
 
-    const calculatedTotal =
-      num(expAbastecimento) +
-      num(expArla) +
-      num(expRastreador) +
-      num(expDepreciacao) +
-      num(expIpva) +
-      num(expDiaria) +
-      num(expSalario) +
-      num(expOutros);
+    const detalhes: ExpenseDetails = {
+      abastecimento: num(expAbastecimento),
+      arla: num(expArla),
+      rastreador: num(expRastreador),
+      depreciacao: num(expDepreciacao),
+      ipva: num(expIpva),
+      diaria: num(expDiaria),
+      salario: num(expSalario),
+      comissao: num(expComissao),
+      prestacao: num(expPrestacao),
+      seguro: num(expSeguro),
+      outros: num(expOutros),
+    };
+
+    const calculatedTotal = Object.values(detalhes).reduce((a, v) => a + v, 0);
 
     let updatedExpenses = [...expenses];
     if (expEditingId) {
@@ -534,16 +540,8 @@ export function TransportManagementSystem() {
               data: expData,
               motorista: expMotorista || "MOTORISTA",
               km: num(expKm),
-              detalhes: {
-                abastecimento: num(expAbastecimento),
-                arla: num(expArla),
-                rastreador: num(expRastreador),
-                depreciacao: num(expDepreciacao),
-                ipva: num(expIpva),
-                diaria: num(expDiaria),
-                salario: num(expSalario),
-                outros: num(expOutros),
-              },
+              litros: num(expLitros),
+              detalhes,
               total: calculatedTotal,
               observacao: expObs,
             }
@@ -557,16 +555,8 @@ export function TransportManagementSystem() {
         data: expData,
         motorista: expMotorista || "MOTORISTA",
         km: num(expKm),
-        detalhes: {
-          abastecimento: num(expAbastecimento),
-          arla: num(expArla),
-          rastreador: num(expRastreador),
-          depreciacao: num(expDepreciacao),
-          ipva: num(expIpva),
-          diaria: num(expDiaria),
-          salario: num(expSalario),
-          outros: num(expOutros),
-        },
+        litros: num(expLitros),
+        detalhes,
         total: calculatedTotal,
         observacao: expObs,
       };
@@ -582,6 +572,7 @@ export function TransportManagementSystem() {
     setExpPlaca("");
     setExpMotorista("");
     setExpKm("");
+    setExpLitros("");
     setExpAbastecimento("");
     setExpArla("");
     setExpRastreador("");
@@ -589,6 +580,9 @@ export function TransportManagementSystem() {
     setExpIpva("");
     setExpDiaria("");
     setExpSalario("");
+    setExpComissao("");
+    setExpPrestacao("");
+    setExpSeguro("");
     setExpOutros("");
     setExpObs("");
     setIsExpenseModalOpen(false);
@@ -600,6 +594,7 @@ export function TransportManagementSystem() {
     setExpData(exp.data);
     setExpMotorista(exp.motorista);
     setExpKm(exp.km);
+    setExpLitros(exp.litros || "");
     setExpAbastecimento(exp.detalhes.abastecimento || "");
     setExpArla(exp.detalhes.arla || "");
     setExpRastreador(exp.detalhes.rastreador || "");
@@ -607,6 +602,9 @@ export function TransportManagementSystem() {
     setExpIpva(exp.detalhes.ipva || "");
     setExpDiaria(exp.detalhes.diaria || "");
     setExpSalario(exp.detalhes.salario || "");
+    setExpComissao(exp.detalhes.comissao || "");
+    setExpPrestacao(exp.detalhes.prestacao || "");
+    setExpSeguro(exp.detalhes.seguro || "");
     setExpOutros(exp.detalhes.outros || "");
     setExpObs(exp.observacao || "");
     setIsExpenseModalOpen(true);
