@@ -93,6 +93,9 @@ interface ExpenseDetails {
   ipva: number;
   diaria: number;
   salario: number;
+  comissao: number;
+  prestacao: number;
+  seguro: number;
   outros: number;
 }
 
@@ -102,6 +105,7 @@ interface Expense {
   data: string;
   motorista: string;
   km: number;
+  litros: number;
   detalhes: ExpenseDetails;
   total: number;
   observacao: string;
