@@ -40,10 +40,12 @@ export interface FinExpense {
 
 export interface FinFreight {
   id: string;
+  empresa?: string;
   origem: string;
   destino: string;
   placa: string;
   data: string;
+  cotacao?: number;
   valor: number;
   recebido: number;
 }

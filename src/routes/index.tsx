@@ -113,10 +113,12 @@ interface Expense {
 
 interface Freight {
   id: string;
+  empresa: string;
   origem: string;
   destino: string;
   placa: string;
   data: string;
+  cotacao: number;
   valor: number;
   recebido: number;
 }
@@ -172,10 +174,12 @@ const INITIAL_DATA = {
   freights: [
     {
       id: "f1",
+      empresa: "TRANSPORTADORA EXEMPLO LTDA",
       origem: "CAMPINAS",
       destino: "BELO HORIZONTE",
       placa: "AHV 9J29",
       data: "2026-07-28",
+      cotacao: 12000,
       valor: 12000,
       recebido: 12000,
     },
@@ -444,10 +448,12 @@ export function TransportManagementSystem() {
   const [expObs, setExpObs] = useState("");
 
   // Freight Form
+  const [frtEmpresa, setFrtEmpresa] = useState("");
   const [frtOrigem, setFrtOrigem] = useState("");
   const [frtDestino, setFrtDestino] = useState("");
   const [frtPlaca, setFrtPlaca] = useState("");
   const [frtData, setFrtData] = useState(new Date().toISOString().slice(0, 10));
+  const [frtCotacao, setFrtCotacao] = useState<number | "">("");
   const [frtValor, setFrtValor] = useState<number | "">("");
   const [frtRecebido, setFrtRecebido] = useState<number | "">("");
 
@@ -488,6 +494,26 @@ export function TransportManagementSystem() {
 
   const totalToReceive = useMemo(() => {
     return freights.reduce((acc, f) => acc + ((f.valor || 0) - (f.recebido || 0)), 0);
+  }, [freights]);
+
+  // SALDO A RECEBER AGRUPADO POR EMPRESA (calculado automaticamente)
+  const receivableByCompany = useMemo(() => {
+    const map = new Map<
+      string,
+      { empresa: string; cotacao: number; valor: number; recebido: number; saldo: number; fretes: number }
+    >();
+    for (const f of freights) {
+      const empresa = (f.empresa || "SEM EMPRESA").toUpperCase();
+      const cur =
+        map.get(empresa) ?? { empresa, cotacao: 0, valor: 0, recebido: 0, saldo: 0, fretes: 0 };
+      cur.cotacao += Number(f.cotacao) || 0;
+      cur.valor += Number(f.valor) || 0;
+      cur.recebido += Number(f.recebido) || 0;
+      cur.saldo = cur.valor - cur.recebido;
+      cur.fretes += 1;
+      map.set(empresa, cur);
+    }
+    return Array.from(map.values()).sort((a, b) => b.saldo - a.saldo);
   }, [freights]);
 
   // Vehicle Financial Breakdown
@@ -617,12 +643,14 @@ export function TransportManagementSystem() {
   // ADD / EDIT FREIGHT HANDLER WITH IMMEDIATE FINANCIAL RECALCULATION
   const handleAddFreight = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!frtOrigem || !frtDestino || !frtPlaca) {
-      toast.error("Preencha origem, destino e a placa do veículo.");
+    if (!frtEmpresa || !frtOrigem || !frtDestino || !frtPlaca) {
+      toast.error("Preencha empresa, origem, destino e a placa do veículo.");
       return;
     }
 
-    const val = typeof frtValor === "number" ? frtValor : 0;
+    const cot = typeof frtCotacao === "number" ? frtCotacao : 0;
+    // Se o valor final não for informado, usa a cotação automaticamente.
+    const val = typeof frtValor === "number" && frtValor > 0 ? frtValor : cot;
     const rec = typeof frtRecebido === "number" ? frtRecebido : 0;
 
     let updatedFreights = [...freights];
@@ -631,10 +659,12 @@ export function TransportManagementSystem() {
         item.id === frtEditingId
           ? {
               ...item,
+              empresa: frtEmpresa.toUpperCase(),
               origem: frtOrigem.toUpperCase(),
               destino: frtDestino.toUpperCase(),
               placa: frtPlaca.toUpperCase(),
               data: frtData,
+              cotacao: cot,
               valor: val,
               recebido: rec,
             }
@@ -644,10 +674,12 @@ export function TransportManagementSystem() {
     } else {
       const newFrt: Freight = {
         id: "frt_" + Date.now(),
+        empresa: frtEmpresa.toUpperCase(),
         origem: frtOrigem.toUpperCase(),
         destino: frtDestino.toUpperCase(),
         placa: frtPlaca.toUpperCase(),
         data: frtData,
+        cotacao: cot,
         valor: val,
         recebido: rec,
       };
@@ -659,9 +691,11 @@ export function TransportManagementSystem() {
     persistFreights(updatedFreights);
 
     setFrtEditingId(null);
+    setFrtEmpresa("");
     setFrtOrigem("");
     setFrtDestino("");
     setFrtPlaca("");
+    setFrtCotacao("");
     setFrtValor("");
     setFrtRecebido("");
     setIsFreightModalOpen(false);
@@ -669,10 +703,12 @@ export function TransportManagementSystem() {
 
   const handleStartEditFreight = (frt: Freight) => {
     setFrtEditingId(frt.id);
+    setFrtEmpresa(frt.empresa || "");
     setFrtOrigem(frt.origem);
     setFrtDestino(frt.destino);
     setFrtPlaca(frt.placa);
     setFrtData(frt.data);
+    setFrtCotacao(frt.cotacao || frt.valor || "");
     setFrtValor(frt.valor);
     setFrtRecebido(frt.recebido);
     setIsFreightModalOpen(true);
@@ -1715,6 +1751,64 @@ export function TransportManagementSystem() {
               </Button>
             </div>
 
+            {/* SALDO A RECEBER POR EMPRESA (destacado, calculado automaticamente) */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+              <div className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-3">
+                Saldo a receber por empresa
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-slate-400 uppercase text-[10px] font-bold border-b border-slate-100">
+                      <th className="text-left py-2">Empresa</th>
+                      <th className="text-right py-2">Fretes</th>
+                      <th className="text-right py-2">Cotação</th>
+                      <th className="text-right py-2">Valor</th>
+                      <th className="text-right py-2">Recebido</th>
+                      <th className="text-right py-2">A receber</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {receivableByCompany.map((c) => (
+                      <tr key={c.empresa} className="border-b border-slate-50">
+                        <td className="py-2 font-extrabold text-[#0c192c] uppercase">{c.empresa}</td>
+                        <td className="py-2 text-right text-slate-500">{c.fretes}</td>
+                        <td className="py-2 text-right text-slate-500">{formatBRL(c.cotacao)}</td>
+                        <td className="py-2 text-right font-semibold text-slate-700">{formatBRL(c.valor)}</td>
+                        <td className="py-2 text-right text-[#16a34a] font-semibold">{formatBRL(c.recebido)}</td>
+                        <td className={`py-2 text-right font-black ${c.saldo > 0 ? "text-[#dc2626]" : "text-slate-400"}`}>
+                          {formatBRL(c.saldo)}
+                        </td>
+                      </tr>
+                    ))}
+                    {receivableByCompany.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="py-4 text-center text-slate-400">
+                          Nenhum frete lançado.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                  {receivableByCompany.length > 0 && (
+                    <tfoot>
+                      <tr className="border-t border-slate-200 font-black text-[#0c192c]">
+                        <td className="py-2">TOTAL</td>
+                        <td className="py-2 text-right">{freights.length}</td>
+                        <td className="py-2 text-right">
+                          {formatBRL(receivableByCompany.reduce((a, c) => a + c.cotacao, 0))}
+                        </td>
+                        <td className="py-2 text-right">{formatBRL(totalFreightsRevenue)}</td>
+                        <td className="py-2 text-right">
+                          {formatBRL(receivableByCompany.reduce((a, c) => a + c.recebido, 0))}
+                        </td>
+                        <td className="py-2 text-right text-[#dc2626]">{formatBRL(totalToReceive)}</td>
+                      </tr>
+                    </tfoot>
+                  )}
+                </table>
+              </div>
+            </div>
+
             {/* Freights List */}
             <div className="space-y-3">
               {freights.map((frt) => (
@@ -1723,11 +1817,15 @@ export function TransportManagementSystem() {
                   className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition-all"
                 >
                   <div>
+                    <div className="text-[10px] font-black uppercase tracking-wider text-[#f25c05]">
+                      {frt.empresa || "SEM EMPRESA"}
+                    </div>
                     <div className="font-extrabold text-base text-[#0c192c] uppercase">
                       {frt.origem} → {frt.destino}
                     </div>
                     <div className="text-xs text-slate-400 font-medium mt-0.5">
                       {frt.placa} · {formatDateBR(frt.data)}
+                      {frt.cotacao ? ` · Cotação ${formatBRL(frt.cotacao)}` : ""}
                     </div>
                   </div>
 
@@ -1739,7 +1837,11 @@ export function TransportManagementSystem() {
                       <div className="text-xs text-slate-400 font-medium">
                         Recebido {formatBRL(frt.recebido)}
                       </div>
+                      <div className={`text-xs font-bold ${frt.valor - frt.recebido > 0 ? "text-[#dc2626]" : "text-slate-300"}`}>
+                        A receber {formatBRL(frt.valor - frt.recebido)}
+                      </div>
                     </div>
+
 
                     <div className="flex items-center gap-1">
                       <button
@@ -2245,6 +2347,24 @@ export function TransportManagementSystem() {
 
           <form onSubmit={handleAddFreight} className="space-y-3 py-2">
             <div>
+              <Label className="text-xs font-semibold text-slate-700">Empresa / Cliente</Label>
+              <Input
+                type="text"
+                list="empresas-fretes"
+                value={frtEmpresa}
+                onChange={(e) => setFrtEmpresa(e.target.value)}
+                placeholder="Ex: TRANSPORTES ALFA LTDA"
+                className="mt-1 text-xs uppercase font-bold"
+                required
+              />
+              <datalist id="empresas-fretes">
+                {receivableByCompany.map((c) => (
+                  <option key={c.empresa} value={c.empresa} />
+                ))}
+              </datalist>
+            </div>
+
+            <div>
               <Label className="text-xs font-semibold text-slate-700">Origem</Label>
               <Input
                 type="text"
@@ -2294,9 +2414,26 @@ export function TransportManagementSystem() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <Label className="text-xs font-semibold text-slate-700">Valor Total Frete (R$)</Label>
+                <Label className="text-xs font-semibold text-slate-700">Cotação (R$)</Label>
+                <div className="relative mt-1">
+                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                  <CurrencyInput
+                    value={frtCotacao}
+                    onChange={(v) => {
+                      // A cotação alimenta o valor final automaticamente enquanto não houver ajuste manual.
+                      if (frtValor === "" || frtValor === frtCotacao) setFrtValor(v);
+                      setFrtCotacao(v);
+                    }}
+                    placeholder="0,00"
+                    className="text-xs pl-8"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">Valor Ajustado / Final (R$)</Label>
                 <div className="relative mt-1">
                   <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
                   <CurrencyInput
@@ -2304,7 +2441,6 @@ export function TransportManagementSystem() {
                     onChange={setFrtValor}
                     placeholder="0,00"
                     className="text-xs pl-8"
-                    required
                   />
                 </div>
               </div>
@@ -2322,6 +2458,32 @@ export function TransportManagementSystem() {
                 </div>
               </div>
             </div>
+
+            {/* CÁLCULO AUTOMÁTICO DO LANÇAMENTO */}
+            <div className="rounded-xl bg-slate-50 border border-slate-100 p-3 grid grid-cols-3 gap-2 text-center">
+              <div>
+                <div className="text-[10px] font-bold uppercase text-slate-400">Ajuste vs cotação</div>
+                <div className="text-xs font-black text-[#0c192c]">
+                  {formatBRL((typeof frtValor === "number" ? frtValor : 0) - (typeof frtCotacao === "number" ? frtCotacao : 0))}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] font-bold uppercase text-slate-400">A receber</div>
+                <div className="text-xs font-black text-[#dc2626]">
+                  {formatBRL((typeof frtValor === "number" ? frtValor : 0) - (typeof frtRecebido === "number" ? frtRecebido : 0))}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] font-bold uppercase text-slate-400">% recebido</div>
+                <div className="text-xs font-black text-[#16a34a]">
+                  {typeof frtValor === "number" && frtValor > 0
+                    ? Math.round(((typeof frtRecebido === "number" ? frtRecebido : 0) / frtValor) * 100)
+                    : 0}
+                  %
+                </div>
+              </div>
+            </div>
+
 
             <DialogFooter className="pt-2 border-t border-slate-100 flex gap-2 justify-end">
               <Button
