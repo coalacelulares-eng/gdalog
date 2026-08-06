@@ -25,7 +25,8 @@ import {
   Menu,
   Settings,
   Disc,
-  BarChart3
+  BarChart3,
+  MessageCircle
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import logoAsset from "@/assets/logo.png.asset.json";
@@ -1170,7 +1171,7 @@ export function TransportManagementSystem() {
               <span className="hidden sm:inline">Sair</span>
             </button>
             <div className="text-[10px] text-slate-500 font-medium px-2 py-1 border-l border-slate-700 hidden lg:block whitespace-pre-line">
-              adicionar a opção dos colaboradores no sistema, o gestor vai poder adicionar e excluir todos os colabolaradores, e retirar da tela inicial o login de criar conta de acesso
+              no mobile ajuste o layout e design para os numeros não ficarem amontuados, juntos adicionar barra de rolagem lateral, em fretes, no financeiro deixe mais visivel os numeros na barra de rolagem, e adcione o icone do whatsapp para compartilhar os dados tanto no mobile quanto no desktop
             </div>
           </div>
 
@@ -1178,7 +1179,7 @@ export function TransportManagementSystem() {
       </header>
 
       {/* MAIN CONTENT AREA */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24 md:pb-6">
 
         {/* ------------------------------------------------------------- */}
         {/* TAB 1: INÍCIO (DASHBOARD) - Exact visual layout from Image 1 */}
@@ -1231,7 +1232,7 @@ export function TransportManagementSystem() {
             </div>
 
             {/* Quick Action Shortcut Buttons (Image 1 replica) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <button
                 onClick={() => setIsExpenseModalOpen(true)}
                 className="bg-white hover:bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex items-center gap-3 transition-all cursor-pointer shadow-sm text-left group"
@@ -1751,7 +1752,7 @@ export function TransportManagementSystem() {
               <div className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-3">
                 Saldo a receber por empresa
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="text-slate-400 uppercase text-[10px] font-bold border-b border-slate-100">
@@ -1809,9 +1810,9 @@ export function TransportManagementSystem() {
               {freights.map((frt) => (
                 <div
                   key={frt.id}
-                  className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition-all"
+                  className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between hover:shadow-md transition-all gap-4"
                 >
-                  <div>
+                  <div className="flex-1">
                     <div className="text-[10px] font-black uppercase tracking-wider text-[#f25c05]">
                       {frt.empresa || "SEM EMPRESA"}
                     </div>
@@ -1838,7 +1839,17 @@ export function TransportManagementSystem() {
                     </div>
 
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          const text = `*FRETE GDALog*\nEmpresa: ${frt.empresa || "—"}\nRota: ${frt.origem} → ${frt.destino}\nValor: ${formatBRL(frt.valor)}\nRecebido: ${formatBRL(frt.recebido)}`;
+                          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+                        }}
+                        className="text-slate-300 hover:text-[#25D366] transition-colors p-1.5 cursor-pointer bg-slate-50 rounded-lg"
+                        title="Compartilhar no WhatsApp"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={() => handleStartEditFreight(frt)}
                         className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"

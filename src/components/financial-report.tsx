@@ -9,6 +9,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MessageCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -475,8 +476,19 @@ export function FinancialReport({
     URL.revokeObjectURL(url);
   };
 
+  const handleShareWhatsApp = () => {
+    const text = `*RELATÓRIO FINANCEIRO — GDALog*\n` +
+      `Período: ${periodoLabel}\n` +
+      `Receita: ${formatBRL(totalReceita)}\n` +
+      `Despesas: ${formatBRL(totalDespesas)}\n` +
+      `Resultado: ${formatBRL(lucro)}\n` +
+      `Margem: ${margem.toFixed(1)}%`;
+    
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
   return (
-    <div className="space-y-6 print-area">
+    <div className="space-y-6 print-area pb-20 md:pb-6">
       {/* Header + Ações */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -486,6 +498,14 @@ export function FinancialReport({
           </p>
         </div>
         <div className="flex items-center gap-2 no-print">
+          <Button
+            onClick={handleShareWhatsApp}
+            className="bg-[#25D366] hover:bg-[#128C7E] text-white font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow-sm cursor-pointer text-xs sm:text-sm"
+            title="Compartilhar no WhatsApp"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span className="hidden sm:inline">WhatsApp</span>
+          </Button>
           <Button
             onClick={handleExportCSV}
             className="bg-white border border-slate-200 text-[#0c192c] hover:bg-slate-50 font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow-sm cursor-pointer text-xs sm:text-sm"
@@ -582,7 +602,7 @@ export function FinancialReport({
           <h2 className="font-extrabold text-[#0c192c]">DRE final da operação</h2>
           <span className="text-[11px] text-slate-400">{periodoLabel}</span>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
           <table className="w-full text-sm min-w-[420px]">
             <tbody>
               <tr className="border-b border-slate-100">
@@ -665,7 +685,7 @@ export function FinancialReport({
                 <div className="text-lg font-black text-[#0c192c]">{formatBRL(custoDieselPorKm)}</div>
               </div>
             </div>
-            <div className="overflow-x-auto mt-4">
+            <div className="overflow-x-auto mt-4 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
               <table className="w-full text-sm min-w-[460px]">
                 <thead>
                   <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
@@ -709,7 +729,7 @@ export function FinancialReport({
             {byTrip.length} viagens · margem média {margemMediaViagem.toFixed(1)}%
           </span>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
           <table className="w-full text-sm min-w-[520px]">
             <thead>
               <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
@@ -768,7 +788,7 @@ export function FinancialReport({
       {/* APURAÇÃO FINAL DE MARGEM POR PLACA */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
         <h2 className="font-extrabold text-[#0c192c] mb-4">Apuração final de margem por placa</h2>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
           <table className="w-full text-sm min-w-[560px]">
             <thead>
               <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
@@ -836,7 +856,7 @@ export function FinancialReport({
       {/* Custos por categoria */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
         <h2 className="font-extrabold text-[#0c192c] mb-4">Custos por categoria</h2>
-        <div className="overflow-x-auto pb-2">
+        <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
           <div className="min-w-[320px] space-y-2">
             {allCostRows.map((c) => (
               <div key={c.key} className="flex items-center gap-3">
