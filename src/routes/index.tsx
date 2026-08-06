@@ -1751,6 +1751,64 @@ export function TransportManagementSystem() {
               </Button>
             </div>
 
+            {/* SALDO A RECEBER POR EMPRESA (destacado, calculado automaticamente) */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+              <div className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-3">
+                Saldo a receber por empresa
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-slate-400 uppercase text-[10px] font-bold border-b border-slate-100">
+                      <th className="text-left py-2">Empresa</th>
+                      <th className="text-right py-2">Fretes</th>
+                      <th className="text-right py-2">Cotação</th>
+                      <th className="text-right py-2">Valor</th>
+                      <th className="text-right py-2">Recebido</th>
+                      <th className="text-right py-2">A receber</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {receivableByCompany.map((c) => (
+                      <tr key={c.empresa} className="border-b border-slate-50">
+                        <td className="py-2 font-extrabold text-[#0c192c] uppercase">{c.empresa}</td>
+                        <td className="py-2 text-right text-slate-500">{c.fretes}</td>
+                        <td className="py-2 text-right text-slate-500">{formatBRL(c.cotacao)}</td>
+                        <td className="py-2 text-right font-semibold text-slate-700">{formatBRL(c.valor)}</td>
+                        <td className="py-2 text-right text-[#16a34a] font-semibold">{formatBRL(c.recebido)}</td>
+                        <td className={`py-2 text-right font-black ${c.saldo > 0 ? "text-[#dc2626]" : "text-slate-400"}`}>
+                          {formatBRL(c.saldo)}
+                        </td>
+                      </tr>
+                    ))}
+                    {receivableByCompany.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="py-4 text-center text-slate-400">
+                          Nenhum frete lançado.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                  {receivableByCompany.length > 0 && (
+                    <tfoot>
+                      <tr className="border-t border-slate-200 font-black text-[#0c192c]">
+                        <td className="py-2">TOTAL</td>
+                        <td className="py-2 text-right">{freights.length}</td>
+                        <td className="py-2 text-right">
+                          {formatBRL(receivableByCompany.reduce((a, c) => a + c.cotacao, 0))}
+                        </td>
+                        <td className="py-2 text-right">{formatBRL(totalFreightsRevenue)}</td>
+                        <td className="py-2 text-right">
+                          {formatBRL(receivableByCompany.reduce((a, c) => a + c.recebido, 0))}
+                        </td>
+                        <td className="py-2 text-right text-[#dc2626]">{formatBRL(totalToReceive)}</td>
+                      </tr>
+                    </tfoot>
+                  )}
+                </table>
+              </div>
+            </div>
+
             {/* Freights List */}
             <div className="space-y-3">
               {freights.map((frt) => (
@@ -1759,11 +1817,15 @@ export function TransportManagementSystem() {
                   className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition-all"
                 >
                   <div>
+                    <div className="text-[10px] font-black uppercase tracking-wider text-[#f25c05]">
+                      {frt.empresa || "SEM EMPRESA"}
+                    </div>
                     <div className="font-extrabold text-base text-[#0c192c] uppercase">
                       {frt.origem} → {frt.destino}
                     </div>
                     <div className="text-xs text-slate-400 font-medium mt-0.5">
                       {frt.placa} · {formatDateBR(frt.data)}
+                      {frt.cotacao ? ` · Cotação ${formatBRL(frt.cotacao)}` : ""}
                     </div>
                   </div>
 
@@ -1775,7 +1837,11 @@ export function TransportManagementSystem() {
                       <div className="text-xs text-slate-400 font-medium">
                         Recebido {formatBRL(frt.recebido)}
                       </div>
+                      <div className={`text-xs font-bold ${frt.valor - frt.recebido > 0 ? "text-[#dc2626]" : "text-slate-300"}`}>
+                        A receber {formatBRL(frt.valor - frt.recebido)}
+                      </div>
                     </div>
+
 
                     <div className="flex items-center gap-1">
                       <button
