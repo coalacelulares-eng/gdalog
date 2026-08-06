@@ -2347,6 +2347,24 @@ export function TransportManagementSystem() {
 
           <form onSubmit={handleAddFreight} className="space-y-3 py-2">
             <div>
+              <Label className="text-xs font-semibold text-slate-700">Empresa / Cliente</Label>
+              <Input
+                type="text"
+                list="empresas-fretes"
+                value={frtEmpresa}
+                onChange={(e) => setFrtEmpresa(e.target.value)}
+                placeholder="Ex: TRANSPORTES ALFA LTDA"
+                className="mt-1 text-xs uppercase font-bold"
+                required
+              />
+              <datalist id="empresas-fretes">
+                {receivableByCompany.map((c) => (
+                  <option key={c.empresa} value={c.empresa} />
+                ))}
+              </datalist>
+            </div>
+
+            <div>
               <Label className="text-xs font-semibold text-slate-700">Origem</Label>
               <Input
                 type="text"
@@ -2396,9 +2414,26 @@ export function TransportManagementSystem() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <Label className="text-xs font-semibold text-slate-700">Valor Total Frete (R$)</Label>
+                <Label className="text-xs font-semibold text-slate-700">Cotação (R$)</Label>
+                <div className="relative mt-1">
+                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                  <CurrencyInput
+                    value={frtCotacao}
+                    onChange={(v) => {
+                      // A cotação alimenta o valor final automaticamente enquanto não houver ajuste manual.
+                      if (frtValor === "" || frtValor === frtCotacao) setFrtValor(v);
+                      setFrtCotacao(v);
+                    }}
+                    placeholder="0,00"
+                    className="text-xs pl-8"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">Valor Ajustado / Final (R$)</Label>
                 <div className="relative mt-1">
                   <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
                   <CurrencyInput
@@ -2406,7 +2441,6 @@ export function TransportManagementSystem() {
                     onChange={setFrtValor}
                     placeholder="0,00"
                     className="text-xs pl-8"
-                    required
                   />
                 </div>
               </div>
@@ -2424,6 +2458,32 @@ export function TransportManagementSystem() {
                 </div>
               </div>
             </div>
+
+            {/* CÁLCULO AUTOMÁTICO DO LANÇAMENTO */}
+            <div className="rounded-xl bg-slate-50 border border-slate-100 p-3 grid grid-cols-3 gap-2 text-center">
+              <div>
+                <div className="text-[10px] font-bold uppercase text-slate-400">Ajuste vs cotação</div>
+                <div className="text-xs font-black text-[#0c192c]">
+                  {formatBRL((typeof frtValor === "number" ? frtValor : 0) - (typeof frtCotacao === "number" ? frtCotacao : 0))}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] font-bold uppercase text-slate-400">A receber</div>
+                <div className="text-xs font-black text-[#dc2626]">
+                  {formatBRL((typeof frtValor === "number" ? frtValor : 0) - (typeof frtRecebido === "number" ? frtRecebido : 0))}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] font-bold uppercase text-slate-400">% recebido</div>
+                <div className="text-xs font-black text-[#16a34a]">
+                  {typeof frtValor === "number" && frtValor > 0
+                    ? Math.round(((typeof frtRecebido === "number" ? frtRecebido : 0) / frtValor) * 100)
+                    : 0}
+                  %
+                </div>
+              </div>
+            </div>
+
 
             <DialogFooter className="pt-2 border-t border-slate-100 flex gap-2 justify-end">
               <Button
