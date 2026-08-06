@@ -113,10 +113,12 @@ interface Expense {
 
 interface Freight {
   id: string;
+  empresa: string;
   origem: string;
   destino: string;
   placa: string;
   data: string;
+  cotacao: number;
   valor: number;
   recebido: number;
 }
@@ -172,10 +174,12 @@ const INITIAL_DATA = {
   freights: [
     {
       id: "f1",
+      empresa: "TRANSPORTADORA EXEMPLO LTDA",
       origem: "CAMPINAS",
       destino: "BELO HORIZONTE",
       placa: "AHV 9J29",
       data: "2026-07-28",
+      cotacao: 12000,
       valor: 12000,
       recebido: 12000,
     },
@@ -444,10 +448,12 @@ export function TransportManagementSystem() {
   const [expObs, setExpObs] = useState("");
 
   // Freight Form
+  const [frtEmpresa, setFrtEmpresa] = useState("");
   const [frtOrigem, setFrtOrigem] = useState("");
   const [frtDestino, setFrtDestino] = useState("");
   const [frtPlaca, setFrtPlaca] = useState("");
   const [frtData, setFrtData] = useState(new Date().toISOString().slice(0, 10));
+  const [frtCotacao, setFrtCotacao] = useState<number | "">("");
   const [frtValor, setFrtValor] = useState<number | "">("");
   const [frtRecebido, setFrtRecebido] = useState<number | "">("");
 
@@ -488,6 +494,26 @@ export function TransportManagementSystem() {
 
   const totalToReceive = useMemo(() => {
     return freights.reduce((acc, f) => acc + ((f.valor || 0) - (f.recebido || 0)), 0);
+  }, [freights]);
+
+  // SALDO A RECEBER AGRUPADO POR EMPRESA (calculado automaticamente)
+  const receivableByCompany = useMemo(() => {
+    const map = new Map<
+      string,
+      { empresa: string; cotacao: number; valor: number; recebido: number; saldo: number; fretes: number }
+    >();
+    for (const f of freights) {
+      const empresa = (f.empresa || "SEM EMPRESA").toUpperCase();
+      const cur =
+        map.get(empresa) ?? { empresa, cotacao: 0, valor: 0, recebido: 0, saldo: 0, fretes: 0 };
+      cur.cotacao += Number(f.cotacao) || 0;
+      cur.valor += Number(f.valor) || 0;
+      cur.recebido += Number(f.recebido) || 0;
+      cur.saldo = cur.valor - cur.recebido;
+      cur.fretes += 1;
+      map.set(empresa, cur);
+    }
+    return Array.from(map.values()).sort((a, b) => b.saldo - a.saldo);
   }, [freights]);
 
   // Vehicle Financial Breakdown
@@ -617,12 +643,14 @@ export function TransportManagementSystem() {
   // ADD / EDIT FREIGHT HANDLER WITH IMMEDIATE FINANCIAL RECALCULATION
   const handleAddFreight = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!frtOrigem || !frtDestino || !frtPlaca) {
-      toast.error("Preencha origem, destino e a placa do veículo.");
+    if (!frtEmpresa || !frtOrigem || !frtDestino || !frtPlaca) {
+      toast.error("Preencha empresa, origem, destino e a placa do veículo.");
       return;
     }
 
-    const val = typeof frtValor === "number" ? frtValor : 0;
+    const cot = typeof frtCotacao === "number" ? frtCotacao : 0;
+    // Se o valor final não for informado, usa a cotação automaticamente.
+    const val = typeof frtValor === "number" && frtValor > 0 ? frtValor : cot;
     const rec = typeof frtRecebido === "number" ? frtRecebido : 0;
 
     let updatedFreights = [...freights];
@@ -631,10 +659,12 @@ export function TransportManagementSystem() {
         item.id === frtEditingId
           ? {
               ...item,
+              empresa: frtEmpresa.toUpperCase(),
               origem: frtOrigem.toUpperCase(),
               destino: frtDestino.toUpperCase(),
               placa: frtPlaca.toUpperCase(),
               data: frtData,
+              cotacao: cot,
               valor: val,
               recebido: rec,
             }
@@ -644,10 +674,12 @@ export function TransportManagementSystem() {
     } else {
       const newFrt: Freight = {
         id: "frt_" + Date.now(),
+        empresa: frtEmpresa.toUpperCase(),
         origem: frtOrigem.toUpperCase(),
         destino: frtDestino.toUpperCase(),
         placa: frtPlaca.toUpperCase(),
         data: frtData,
+        cotacao: cot,
         valor: val,
         recebido: rec,
       };
@@ -659,9 +691,11 @@ export function TransportManagementSystem() {
     persistFreights(updatedFreights);
 
     setFrtEditingId(null);
+    setFrtEmpresa("");
     setFrtOrigem("");
     setFrtDestino("");
     setFrtPlaca("");
+    setFrtCotacao("");
     setFrtValor("");
     setFrtRecebido("");
     setIsFreightModalOpen(false);
@@ -669,10 +703,12 @@ export function TransportManagementSystem() {
 
   const handleStartEditFreight = (frt: Freight) => {
     setFrtEditingId(frt.id);
+    setFrtEmpresa(frt.empresa || "");
     setFrtOrigem(frt.origem);
     setFrtDestino(frt.destino);
     setFrtPlaca(frt.placa);
     setFrtData(frt.data);
+    setFrtCotacao(frt.cotacao || frt.valor || "");
     setFrtValor(frt.valor);
     setFrtRecebido(frt.recebido);
     setIsFreightModalOpen(true);
