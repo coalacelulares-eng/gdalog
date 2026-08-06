@@ -1063,15 +1063,6 @@ export function TransportManagementSystem() {
               {authLoading ? "Entrando..." : "Entrar"} <ArrowRight className="w-4 h-4" />
             </Button>
 
-            <Button
-              type="button"
-              onClick={handleSignUp}
-              disabled={authLoading}
-              variant="outline"
-              className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold py-2.5 rounded-xl transition-all cursor-pointer disabled:opacity-60"
-            >
-              Criar conta de acesso
-            </Button>
 
 
             <div className="pt-2 text-center text-xs text-slate-400">
@@ -1179,8 +1170,7 @@ export function TransportManagementSystem() {
               <span className="hidden sm:inline">Sair</span>
             </button>
             <div className="text-[10px] text-slate-500 font-medium px-2 py-1 border-l border-slate-700 hidden lg:block whitespace-pre-line">
-              Implementar a funcionalidade real de compartilhamento via WhatsApp em cada categoria.{"\n\n"}
-              Adicionar ícones do WhatsApp nas listas de despesas, fretes e motoristas.
+              adicionar a opção dos colaboradores no sistema, o gestor vai poder adicionar e excluir todos os colabolaradores, e retirar da tela inicial o login de criar conta de acesso
             </div>
           </div>
 
