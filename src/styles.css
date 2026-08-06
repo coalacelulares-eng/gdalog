@@ -1,4 +1,31 @@
 @import "tailwindcss" source(none);
+
+/* Melhoria de acessibilidade e design para números em dispositivos móveis */
+@layer base {
+  .overflow-x-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #f25c05 transparent;
+  }
+  
+  .overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .overflow-x-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    background-color: #f25c05;
+    border-radius: 20px;
+  }
+}
+
+@layer utilities {
+  .mobile-number-grid {
+    @apply grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4;
+  }
+}
 @source "../src";
 @import "tw-animate-css";
 
