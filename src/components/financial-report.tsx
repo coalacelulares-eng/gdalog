@@ -9,6 +9,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MessageCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -475,8 +476,19 @@ export function FinancialReport({
     URL.revokeObjectURL(url);
   };
 
+  const handleShareWhatsApp = () => {
+    const text = `*RELATÓRIO FINANCEIRO — GDALog*\n` +
+      `Período: ${periodoLabel}\n` +
+      `Receita: ${formatBRL(totalReceita)}\n` +
+      `Despesas: ${formatBRL(totalDespesas)}\n` +
+      `Resultado: ${formatBRL(lucro)}\n` +
+      `Margem: ${margem.toFixed(1)}%`;
+    
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
   return (
-    <div className="space-y-6 print-area">
+    <div className="space-y-6 print-area pb-20 md:pb-6">
       {/* Header + Ações */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -486,6 +498,14 @@ export function FinancialReport({
           </p>
         </div>
         <div className="flex items-center gap-2 no-print">
+          <Button
+            onClick={handleShareWhatsApp}
+            className="bg-[#25D366] hover:bg-[#128C7E] text-white font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow-sm cursor-pointer text-xs sm:text-sm"
+            title="Compartilhar no WhatsApp"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span className="hidden sm:inline">WhatsApp</span>
+          </Button>
           <Button
             onClick={handleExportCSV}
             className="bg-white border border-slate-200 text-[#0c192c] hover:bg-slate-50 font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow-sm cursor-pointer text-xs sm:text-sm"
