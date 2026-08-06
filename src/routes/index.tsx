@@ -1178,7 +1178,11 @@ export function TransportManagementSystem() {
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Sair</span>
             </button>
+            <div className="text-[10px] text-slate-500 font-medium px-2 py-1 border-l border-slate-700 hidden lg:block">
+              adicione para fazer o compartilhamento para o whatsapp nas em todas categorias, se forma simples e prática
+            </div>
           </div>
+
         </div>
       </header>
 
