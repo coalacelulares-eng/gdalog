@@ -1063,15 +1063,6 @@ export function TransportManagementSystem() {
               {authLoading ? "Entrando..." : "Entrar"} <ArrowRight className="w-4 h-4" />
             </Button>
 
-            <Button
-              type="button"
-              onClick={handleSignUp}
-              disabled={authLoading}
-              variant="outline"
-              className="w-full border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold py-2.5 rounded-xl transition-all cursor-pointer disabled:opacity-60"
-            >
-              Criar conta de acesso
-            </Button>
 
 
             <div className="pt-2 text-center text-xs text-slate-400">
