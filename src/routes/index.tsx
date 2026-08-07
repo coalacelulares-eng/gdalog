@@ -1363,12 +1363,9 @@ export function TransportManagementSystem() {
           
           {/* Logo Brand */}
           <div className="flex items-center gap-3">
-            <div className="bg-white px-3 py-0.5 rounded-lg shadow-sm flex items-center">
-              <img src={logoAsset.url} alt="GDALog" className="h-14 w-auto object-contain" />
+            <div className="bg-white px-4 py-1.5 rounded-xl shadow-md flex items-center transform hover:scale-105 transition-transform duration-300">
+              <img src={logoAsset.url} alt="GDALog" className="h-16 md:h-20 w-auto object-contain" />
             </div>
-            <span className="font-bold text-sm sm:text-base tracking-tight hidden sm:inline-block border-l border-slate-700 pl-3 text-slate-200">
-              Gestão de Transportes
-            </span>
           </div>
 
           {/* Navigation Links */}
