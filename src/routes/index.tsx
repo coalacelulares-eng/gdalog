@@ -334,7 +334,7 @@ export function TransportManagementSystem() {
 
   // APP TABS STATE
   const [activeTab, setActiveTab] = useState<
-    "dashboard" | "frota" | "despesas" | "oleo" | "fretes" | "financeiro"
+    "dashboard" | "frota" | "despesas" | "oleo" | "fretes" | "financeiro" | "clientes"
   >("dashboard");
 
   // DATA PERSISTENCE STATE WITH INDEXEDDB
