@@ -42,6 +42,7 @@ export interface FinExpense {
 export interface FinFreight {
   id: string;
   empresa?: string;
+  clienteId?: string | null;
   origem: string;
   destino: string;
   placa: string;
@@ -71,6 +72,7 @@ interface FinancialReportProps {
   freights: FinFreight[];
   maintenances: FinMaintenance[];
   vehicles: FinVehicle[];
+  clients: { id: string; nome: string }[];
   formatBRL: (v: number) => string;
   formatDateBR: (v: string) => string;
 }
@@ -102,6 +104,7 @@ export function FinancialReport({
   freights,
   maintenances,
   vehicles,
+  clients,
   formatBRL,
   formatDateBR,
 }: FinancialReportProps) {
@@ -290,11 +293,14 @@ export function FinancialReport({
         const share = receitaPlaca > 0 ? (f.valor || 0) / receitaPlaca : 0;
         const custo = custoPlaca * share;
         const margem = (f.valor || 0) - custo;
+        const clienteNome = clients.find(c => c.id === f.clienteId)?.nome || f.empresa || "—";
+        
         return {
           id: f.id,
           data: f.data,
           rota: `${f.origem} → ${f.destino}`,
           placa,
+          cliente: clienteNome,
           receita: f.valor || 0,
           custo,
           margem,
@@ -302,7 +308,7 @@ export function FinancialReport({
         };
       })
       .sort((a, b) => (a.data < b.data ? 1 : -1));
-  }, [fFreights, byVehicle]);
+  }, [fFreights, byVehicle, clients]);
 
   const margemMediaViagem =
     byTrip.length > 0 ? byTrip.reduce((a, t) => a + t.margemPct, 0) / byTrip.length : 0;
@@ -426,11 +432,12 @@ export function FinancialReport({
     );
     rows.push(["TOTAL", totalKm, totalLitros, kmPorLitro.toFixed(2), precoMedioLitro.toFixed(2)]);
     rows.push([]);
-    rows.push(["MARGEM POR VIAGEM", "Rota", "Placa", "Receita", "Custo rateado", "Margem", "Margem %"]);
+    rows.push(["MARGEM POR VIAGEM", "Rota", "Cliente", "Placa", "Receita", "Custo rateado", "Margem", "Margem %"]);
     byTrip.forEach((t) =>
       rows.push([
         formatDateBR(t.data),
         t.rota,
+        t.cliente,
         t.placa,
         t.receita,
         t.custo.toFixed(2),
@@ -734,7 +741,8 @@ export function FinancialReport({
             <thead>
               <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
                 <th className="py-2">Data</th>
-                <th className="py-2">Rota / Placa</th>
+                <th className="py-2">Rota / Cliente</th>
+                <th className="py-2">Placa</th>
                 <th className="py-2 text-right">Receita</th>
                 <th className="py-2 text-right">Custo rateado</th>
                 <th className="py-2 text-right">Margem</th>
@@ -749,8 +757,9 @@ export function FinancialReport({
                   </td>
                   <td className="py-2">
                     <div className="font-semibold text-slate-800 text-xs">{t.rota}</div>
-                    <div className="text-[11px] text-slate-400">{t.placa}</div>
+                    <div className="text-[11px] text-slate-400">{t.cliente}</div>
                   </td>
+                  <td className="py-2 text-[11px] text-slate-400">{t.placa}</td>
                   <td className="py-2 text-right text-[#16a34a] font-semibold">
                     {formatBRL(t.receita)}
                   </td>
