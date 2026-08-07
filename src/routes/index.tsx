@@ -2140,14 +2140,14 @@ export function TransportManagementSystem() {
             <button
               onClick={() => {
                 setIsQuickActionsOpen(false);
-                setIsDriverModalOpen(true);
+                setIsClientModalOpen(true);
               }}
-              className="bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 p-4 rounded-xl text-left flex flex-col items-center justify-center text-center gap-2 cursor-pointer transition-all col-span-2"
+              className="bg-sky-50 hover:bg-sky-100 border border-sky-200 p-4 rounded-xl text-left flex flex-col items-center justify-center text-center gap-2 cursor-pointer transition-all col-span-2"
             >
-              <div className="bg-emerald-600 text-white p-2.5 rounded-full shadow">
+              <div className="bg-sky-600 text-white p-2.5 rounded-full shadow">
                 <User className="w-5 h-5" />
               </div>
-              <span className="font-bold text-xs text-[#0c192c]">Novo Motorista</span>
+              <span className="font-bold text-xs text-[#0c192c]">Novo Cliente</span>
             </button>
           </div>
         </DialogContent>
