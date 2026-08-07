@@ -2025,52 +2025,52 @@ export function TransportManagementSystem() {
               <div className="text-xs font-bold text-slate-400 tracking-wider uppercase mb-3">
                 Saldo a receber por empresa
               </div>
-              <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
-                <table className="w-full text-xs">
+              <div className="overflow-x-auto scroll-smooth pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
+                <table className="w-full text-xs min-w-[600px]">
                   <thead>
                     <tr className="text-slate-400 uppercase text-[10px] font-bold border-b border-slate-100">
-                      <th className="text-left py-2">Empresa</th>
-                      <th className="text-right py-2">Fretes</th>
-                      <th className="text-right py-2">Cotação</th>
-                      <th className="text-right py-2">Valor</th>
-                      <th className="text-right py-2">Recebido</th>
-                      <th className="text-right py-2">A receber</th>
+                      <th className="text-left py-2 px-1">Empresa</th>
+                      <th className="text-right py-2 px-1">Fretes</th>
+                      <th className="text-right py-2 px-1">Cotação</th>
+                      <th className="text-right py-2 px-1">Frete</th>
+                      <th className="text-right py-2 px-1">Recebido</th>
+                      <th className="text-right py-2 px-1">A receber</th>
                     </tr>
                   </thead>
                   <tbody>
                     {receivableByCompany.map((c) => (
-                      <tr key={c.empresa} className="border-b border-slate-50">
-                        <td className="py-2 font-extrabold text-[#0c192c] uppercase">{c.empresa}</td>
-                        <td className="py-2 text-right text-slate-500">{c.fretes}</td>
-                        <td className="py-2 text-right text-slate-500">{formatBRL(c.cotacao)}</td>
-                        <td className="py-2 text-right font-semibold text-slate-700">{formatBRL(c.valor)}</td>
-                        <td className="py-2 text-right text-[#16a34a] font-semibold">{formatBRL(c.recebido)}</td>
-                        <td className={`py-2 text-right font-black ${c.saldo > 0 ? "text-[#dc2626]" : "text-slate-400"}`}>
+                      <tr key={c.empresa} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                        <td className="py-2.5 px-1 font-extrabold text-[#0c192c] uppercase whitespace-nowrap">{c.empresa}</td>
+                        <td className="py-2.5 px-1 text-right text-slate-500">{c.fretes}</td>
+                        <td className="py-2.5 px-1 text-right text-slate-500 font-medium">{formatBRL(c.cotacao)}</td>
+                        <td className="py-2.5 px-1 text-right font-bold text-slate-700">{formatBRL(c.valor)}</td>
+                        <td className="py-2.5 px-1 text-right text-[#16a34a] font-bold">{formatBRL(c.recebido)}</td>
+                        <td className={`py-2.5 px-1 text-right font-black ${c.saldo > 0 ? "text-[#dc2626]" : "text-slate-400"}`}>
                           {formatBRL(c.saldo)}
                         </td>
                       </tr>
                     ))}
                     {receivableByCompany.length === 0 && (
                       <tr>
-                        <td colSpan={6} className="py-4 text-center text-slate-400">
-                          Nenhum frete lançado.
+                        <td colSpan={6} className="py-8 text-center text-slate-400 italic">
+                          Nenhum frete lançado na carteira.
                         </td>
                       </tr>
                     )}
                   </tbody>
                   {receivableByCompany.length > 0 && (
                     <tfoot>
-                      <tr className="border-t border-slate-200 font-black text-[#0c192c]">
-                        <td className="py-2">TOTAL</td>
-                        <td className="py-2 text-right">{freights.length}</td>
-                        <td className="py-2 text-right">
+                      <tr className="border-t border-slate-200 font-black text-[#0c192c] bg-slate-50/30">
+                        <td className="py-3 px-1">TOTAL</td>
+                        <td className="py-3 px-1 text-right">{freights.length}</td>
+                        <td className="py-3 px-1 text-right">
                           {formatBRL(receivableByCompany.reduce((a, c) => a + c.cotacao, 0))}
                         </td>
-                        <td className="py-2 text-right">{formatBRL(totalFreightsRevenue)}</td>
-                        <td className="py-2 text-right">
+                        <td className="py-3 px-1 text-right">{formatBRL(totalFreightsRevenue)}</td>
+                        <td className="py-3 px-1 text-right">
                           {formatBRL(receivableByCompany.reduce((a, c) => a + c.recebido, 0))}
                         </td>
-                        <td className="py-2 text-right text-[#dc2626]">{formatBRL(totalToReceive)}</td>
+                        <td className="py-3 px-1 text-right text-[#dc2626] text-sm">{formatBRL(totalToReceive)}</td>
                       </tr>
                     </tfoot>
                   )}
@@ -2229,6 +2229,16 @@ export function TransportManagementSystem() {
         >
           <BarChart3 className="w-5 h-5" />
           <span>Financeiro</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("clientes")}
+          className={`flex flex-col items-center gap-0.5 p-1 rounded-lg text-[10px] font-bold transition-all ${
+            activeTab === "clientes" ? "text-[#f25c05]" : "text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <Building2 className="w-5 h-5" />
+          <span>Clientes</span>
         </button>
       </div>
 
