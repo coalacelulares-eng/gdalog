@@ -124,7 +124,7 @@ interface Client {
 interface Freight {
   id: string;
   empresa: string;
-  clienteId?: string; // ID do cliente cadastrado
+  clienteId?: string | null; // ID do cliente cadastrado
   origem: string;
   destino: string;
   placa: string;
@@ -777,13 +777,16 @@ export function TransportManagementSystem() {
     const val = typeof frtValor === "number" && frtValor > 0 ? frtValor : cot;
     const rec = typeof frtRecebido === "number" ? frtRecebido : 0;
 
-    let updatedFreights = [...freights];
+    const foundClient = clients.find(c => c.nome.toUpperCase() === frtEmpresa.toUpperCase());
+
+    let updatedFreights: Freight[] = [...freights];
     if (frtEditingId) {
       updatedFreights = freights.map((item) =>
         item.id === frtEditingId
           ? {
               ...item,
               empresa: frtEmpresa.toUpperCase(),
+              clienteId: foundClient?.id || item.clienteId || null,
               origem: frtOrigem.toUpperCase(),
               destino: frtDestino.toUpperCase(),
               placa: frtPlaca.toUpperCase(),
@@ -799,6 +802,7 @@ export function TransportManagementSystem() {
       const newFrt: Freight = {
         id: "frt_" + Date.now(),
         empresa: frtEmpresa.toUpperCase(),
+        clienteId: foundClient?.id || null,
         origem: frtOrigem.toUpperCase(),
         destino: frtDestino.toUpperCase(),
         placa: frtPlaca.toUpperCase(),
@@ -2583,26 +2587,33 @@ export function TransportManagementSystem() {
             <div>
               <Label className="text-xs font-semibold text-slate-700">Empresa / Cliente</Label>
               <div className="flex flex-col gap-2">
-                <select
-                  value={frtEmpresa}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setFrtEmpresa(val);
-                    // Tenta encontrar o cliente pelo nome para associar o clienteId
-                    const client = clients.find(c => c.nome.toUpperCase() === val.toUpperCase());
-                    if (client) {
-                      // Se houver uma variável ou estado para clienteId no formulário de frete, atualizaríamos aqui.
-                      // Por enquanto o handleAddFreight já usa o nome para vincular no filtro da aba de clientes.
-                    }
-                  }}
-                  className="w-full mt-1 p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold"
-                  required
-                >
-                  <option value="">Selecione um cliente cadastrado...</option>
-                  {clients.map((c) => (
-                    <option key={c.id} value={c.nome}>{c.nome} ({c.tipo})</option>
-                  ))}
-                </select>
+                <div className="flex gap-2">
+                  <select
+                    value={frtEmpresa}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFrtEmpresa(val);
+                      const client = clients.find(c => c.nome.toUpperCase() === val.toUpperCase());
+                      // Se houver um estado frtClienteId, atualizaríamos aqui.
+                    }}
+                    className="flex-1 mt-1 p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold"
+                    required
+                  >
+                    <option value="">Selecione um cliente cadastrado...</option>
+                    {clients.map((c) => (
+                      <option key={c.id} value={c.nome}>{c.nome} ({c.tipo})</option>
+                    ))}
+                  </select>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsClientModalOpen(true)}
+                    className="mt-1 h-9 px-3 border-dashed border-[#f25c05] text-[#f25c05] hover:bg-orange-50"
+                    title="Cadastrar Novo Cliente"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] text-slate-400 font-bold uppercase">Ou digite:</span>
                   <Input
@@ -3240,54 +3251,52 @@ export function TransportManagementSystem() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs font-semibold text-slate-700">Tipo</Label>
-                <div className="flex gap-2 mt-1">
-                  <Button
-                    type="button"
-                    variant={cliTipo === "PF" ? "default" : "outline"}
-                    onClick={() => setCliTipo("PF")}
-                    className="flex-1 text-xs h-9"
-                  >
-                    Pessoa Física
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={cliTipo === "PJ" ? "default" : "outline"}
-                    onClick={() => setCliTipo("PJ")}
-                    className="flex-1 text-xs h-9"
-                  >
-                    Pessoa Jurídica
-                  </Button>
-                </div>
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">Tipo</Label>
+              <div className="flex gap-2 mt-1">
+                <Button
+                  type="button"
+                  variant={cliTipo === "PF" ? "default" : "outline"}
+                  onClick={() => setCliTipo("PF")}
+                  className="flex-1 text-xs h-9"
+                >
+                  Pessoa Física
+                </Button>
+                <Button
+                  type="button"
+                  variant={cliTipo === "PJ" ? "default" : "outline"}
+                  onClick={() => setCliTipo("PJ")}
+                  className="flex-1 text-xs h-9"
+                >
+                  Pessoa Jurídica
+                </Button>
               </div>
+            </div>
 
-              <div>
-                <Label className="text-xs font-semibold text-slate-700">
-                  {cliTipo === "PF" ? "CPF" : "CNPJ"}
-                </Label>
-                <Input
-                  type="text"
-                  value={cliDocumento}
-                  onChange={(e) => {
-                    let v = e.target.value.replace(/\D/g, "");
-                    if (cliTipo === "PF") {
-                      if (v.length > 11) v = v.slice(0, 11);
-                      if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-                      else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1})/, "$1.$2.$3");
-                      else if (v.length > 3) v = v.replace(/(\d{3})(\d{1})/, "$1.$2");
-                    } else {
-                      if (v.length > 14) v = v.slice(0, 14);
-                      if (v.length > 12) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
-                      else if (v.length > 8) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{1})/, "$1.$2.$3/$4");
-                    }
-                    setCliDocumento(v);
-                  }}
-                  placeholder={cliTipo === "PF" ? "000.000.000-00" : "00.000.000/0000-00"}
-                  className="mt-1 text-xs"
-                />
-              </div>
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">
+                {cliTipo === "PF" ? "CPF" : "CNPJ"}
+              </Label>
+              <Input
+                type="text"
+                value={cliDocumento}
+                onChange={(e) => {
+                  let v = e.target.value.replace(/\D/g, "");
+                  if (cliTipo === "PF") {
+                    if (v.length > 11) v = v.slice(0, 11);
+                    if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+                    else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1})/, "$1.$2.$3");
+                    else if (v.length > 3) v = v.replace(/(\d{3})(\d{1})/, "$1.$2");
+                  } else {
+                    if (v.length > 14) v = v.slice(0, 14);
+                    if (v.length > 12) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+                    else if (v.length > 8) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{1})/, "$1.$2.$3/$4");
+                  }
+                  setCliDocumento(v);
+                }}
+                placeholder={cliTipo === "PF" ? "000.000.000-00" : "00.000.000/0000-00"}
+                className="mt-1 text-xs"
+              />
             </div>
 
             <div>
