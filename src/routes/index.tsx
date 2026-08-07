@@ -3240,54 +3240,52 @@ export function TransportManagementSystem() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs font-semibold text-slate-700">Tipo</Label>
-                <div className="flex gap-2 mt-1">
-                  <Button
-                    type="button"
-                    variant={cliTipo === "PF" ? "default" : "outline"}
-                    onClick={() => setCliTipo("PF")}
-                    className="flex-1 text-xs h-9"
-                  >
-                    Pessoa Física
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={cliTipo === "PJ" ? "default" : "outline"}
-                    onClick={() => setCliTipo("PJ")}
-                    className="flex-1 text-xs h-9"
-                  >
-                    Pessoa Jurídica
-                  </Button>
-                </div>
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">Tipo</Label>
+              <div className="flex gap-2 mt-1">
+                <Button
+                  type="button"
+                  variant={cliTipo === "PF" ? "default" : "outline"}
+                  onClick={() => setCliTipo("PF")}
+                  className="flex-1 text-xs h-9"
+                >
+                  Pessoa Física
+                </Button>
+                <Button
+                  type="button"
+                  variant={cliTipo === "PJ" ? "default" : "outline"}
+                  onClick={() => setCliTipo("PJ")}
+                  className="flex-1 text-xs h-9"
+                >
+                  Pessoa Jurídica
+                </Button>
               </div>
+            </div>
 
-              <div>
-                <Label className="text-xs font-semibold text-slate-700">
-                  {cliTipo === "PF" ? "CPF" : "CNPJ"}
-                </Label>
-                <Input
-                  type="text"
-                  value={cliDocumento}
-                  onChange={(e) => {
-                    let v = e.target.value.replace(/\D/g, "");
-                    if (cliTipo === "PF") {
-                      if (v.length > 11) v = v.slice(0, 11);
-                      if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-                      else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1})/, "$1.$2.$3");
-                      else if (v.length > 3) v = v.replace(/(\d{3})(\d{1})/, "$1.$2");
-                    } else {
-                      if (v.length > 14) v = v.slice(0, 14);
-                      if (v.length > 12) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
-                      else if (v.length > 8) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{1})/, "$1.$2.$3/$4");
-                    }
-                    setCliDocumento(v);
-                  }}
-                  placeholder={cliTipo === "PF" ? "000.000.000-00" : "00.000.000/0000-00"}
-                  className="mt-1 text-xs"
-                />
-              </div>
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">
+                {cliTipo === "PF" ? "CPF" : "CNPJ"}
+              </Label>
+              <Input
+                type="text"
+                value={cliDocumento}
+                onChange={(e) => {
+                  let v = e.target.value.replace(/\D/g, "");
+                  if (cliTipo === "PF") {
+                    if (v.length > 11) v = v.slice(0, 11);
+                    if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+                    else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1})/, "$1.$2.$3");
+                    else if (v.length > 3) v = v.replace(/(\d{3})(\d{1})/, "$1.$2");
+                  } else {
+                    if (v.length > 14) v = v.slice(0, 14);
+                    if (v.length > 12) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
+                    else if (v.length > 8) v = v.replace(/(\d{2})(\d{3})(\d{3})(\d{1})/, "$1.$2.$3/$4");
+                  }
+                  setCliDocumento(v);
+                }}
+                placeholder={cliTipo === "PF" ? "000.000.000-00" : "00.000.000/0000-00"}
+                className="mt-1 text-xs"
+              />
             </div>
 
             <div>
