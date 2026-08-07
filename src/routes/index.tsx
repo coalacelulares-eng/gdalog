@@ -333,6 +333,7 @@ export function TransportManagementSystem() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+
   // APP TABS STATE
   const [activeTab, setActiveTab] = useState<
     "dashboard" | "frota" | "despesas" | "oleo" | "fretes" | "financeiro" | "clientes"
@@ -498,6 +499,92 @@ export function TransportManagementSystem() {
   const [oilCusto, setOilCusto] = useState<number | "">("");
   const [oilCategoriaServico, setOilCategoriaServico] = useState<MaintenanceCategory>("Troca de Óleo");
   const [oilObs, setOilObs] = useState("");
+
+  // AUTO-SAVE DRAFTS FOR LONG FORMS
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const draftData = {
+      expense: {
+        placa: expPlaca, data: expData, motorista: expMotorista, km: expKm, litros: expLitros,
+        abastecimento: expAbastecimento, arla: expArla, rastreador: expRastreador,
+        depreciacao: expDepreciacao, ipva: expIpva, diaria: expDiaria, salario: expSalario,
+        comissao: expComissao, prestacao: expPrestacao, seguro: expSeguro, outros: expOutros, obs: expObs
+      },
+      freight: {
+        empresa: frtEmpresa, origem: frtOrigem, destino: frtDestino, placa: frtPlaca,
+        data: frtData, cotacao: frtCotacao, valor: frtValor, recebido: frtRecebido
+      },
+      oil: {
+        placa: oilPlaca, motorista: oilMotorista, data: oilData, kmAtual: oilKmAtual,
+        proximaKm: oilProximaKm, custo: oilCusto, categoria: oilCategoriaServico, obs: oilObs
+      }
+    };
+
+    const timer = setTimeout(() => {
+      localStorage.setItem("gdalog_form_drafts", JSON.stringify(draftData));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [
+    isAuthenticated, expPlaca, expData, expMotorista, expKm, expLitros, expAbastecimento, expArla,
+    expRastreador, expDepreciacao, expIpva, expDiaria, expSalario, expComissao, expPrestacao,
+    expSeguro, expOutros, expObs, frtEmpresa, frtOrigem, frtDestino, frtPlaca, frtData,
+    frtCotacao, frtValor, frtRecebido, oilPlaca, oilMotorista, oilData, oilKmAtual,
+    oilProximaKm, oilCusto, oilCategoriaServico, oilObs
+  ]);
+
+  // RESTORE DRAFTS ON MOUNT
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const saved = localStorage.getItem("gdalog_form_drafts");
+    if (saved) {
+      try {
+        const d = JSON.parse(saved);
+        if (d.expense && !expEditingId) {
+          if (d.expense.placa) setExpPlaca(d.expense.placa);
+          if (d.expense.data) setExpData(d.expense.data);
+          if (d.expense.motorista) setExpMotorista(d.expense.motorista);
+          if (d.expense.km !== "") setExpKm(d.expense.km);
+          if (d.expense.litros !== "") setExpLitros(d.expense.litros);
+          if (d.expense.abastecimento !== "") setExpAbastecimento(d.expense.abastecimento);
+          if (d.expense.arla !== "") setExpArla(d.expense.arla);
+          if (d.expense.rastreador !== "") setExpRastreador(d.expense.rastreador);
+          if (d.expense.depreciacao !== "") setExpDepreciacao(d.expense.depreciacao);
+          if (d.expense.ipva !== "") setExpIpva(d.expense.ipva);
+          if (d.expense.diaria !== "") setExpDiaria(d.expense.diaria);
+          if (d.expense.salario !== "") setExpSalario(d.expense.salario);
+          if (d.expense.comissao !== "") setExpComissao(d.expense.comissao);
+          if (d.expense.prestacao !== "") setExpPrestacao(d.expense.prestacao);
+          if (d.expense.seguro !== "") setExpSeguro(d.expense.seguro);
+          if (d.expense.outros !== "") setExpOutros(d.expense.outros);
+          if (d.expense.obs) setExpObs(d.expense.obs);
+        }
+        if (d.freight && !frtEditingId) {
+          if (d.freight.empresa) setFrtEmpresa(d.freight.empresa);
+          if (d.freight.origem) setFrtOrigem(d.freight.origem);
+          if (d.freight.destino) setFrtDestino(d.freight.destino);
+          if (d.freight.placa) setFrtPlaca(d.freight.placa);
+          if (d.freight.data) setFrtData(d.freight.data);
+          if (d.freight.cotacao !== "") setFrtCotacao(d.freight.cotacao);
+          if (d.freight.valor !== "") setFrtValor(d.freight.valor);
+          if (d.freight.recebido !== "") setFrtRecebido(d.freight.recebido);
+        }
+        if (d.oil && !oilEditingId) {
+          if (d.oil.placa) setOilPlaca(d.oil.placa);
+          if (d.oil.motorista) setOilMotorista(d.oil.motorista);
+          if (d.oil.data) setOilData(d.oil.data);
+          if (d.oil.kmAtual !== "") setOilKmAtual(d.oil.kmAtual);
+          if (d.oil.proximaKm !== "") setOilProximaKm(d.oil.proximaKm);
+          if (d.oil.custo !== "") setOilCusto(d.oil.custo);
+          if (d.oil.categoria) setOilCategoriaServico(d.oil.categoria);
+          if (d.oil.obs) setOilObs(d.oil.obs);
+        }
+      } catch (e) {
+        console.error("Erro ao restaurar rascunhos", e);
+      }
+    }
+  }, [isAuthenticated, expEditingId, frtEditingId, oilEditingId]);
 
   // Client Form
   const [cliNome, setCliNome] = useState("");
