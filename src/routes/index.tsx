@@ -1228,7 +1228,9 @@ export function TransportManagementSystem() {
       email: newUserEmail.trim(),
       password: newUserPassword,
       options: {
-        emailRedirectTo: window.location.origin,
+        data: {
+          full_name: newUserEmail.split('@')[0],
+        }
       },
     });
     setAuthLoading(false);
@@ -1245,7 +1247,7 @@ export function TransportManagementSystem() {
     
     setNewUserEmail("");
     setNewUserPassword("");
-    toast.success(`Usuário ${newUserEmail} cadastrado! Um e-mail de verificação foi enviado.`);
+    toast.success(`Usuário ${newUserEmail} cadastrado e liberado para acesso.`);
   };
 
   const handleDeleteSystemUser = async (id: string) => {
