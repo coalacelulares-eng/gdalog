@@ -1008,6 +1008,11 @@ export function TransportManagementSystem() {
     toast.info("Registro de manutenção removido.");
   };
 
+  const handleDeleteClient = (id: string) => {
+    persistClients(clients.filter((item) => item.id !== id));
+    toast.info("Cliente removido.");
+  };
+
   // LOGIN REAL (e-mail e senha da conta do sistema)
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
