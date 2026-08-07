@@ -1,5 +1,16 @@
 @import "tailwindcss" source(none);
 
+@keyframes pulse-orange {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(242, 92, 5, 0.4); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(242, 92, 5, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(242, 92, 5, 0); }
+}
+
+@utility animate-pulse-orange {
+  animation: pulse-orange 2s infinite;
+}
+
+
 /* Melhoria de acessibilidade e design para números em dispositivos móveis */
 @layer base {
   .overflow-x-auto {
