@@ -3807,7 +3807,7 @@ export function TransportManagementSystem() {
                     type="email"
                     value={newUserEmail}
                     onChange={(e) => setNewUserEmail(e.target.value)}
-                    placeholder="colaborador@gdalog.com.br"
+                    placeholder="E-mail"
                     className="mt-1 text-xs"
                     required
                   />
