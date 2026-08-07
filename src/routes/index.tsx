@@ -2292,6 +2292,8 @@ export function TransportManagementSystem() {
             setExpEditingId(null);
             setExpPlaca("");
             setExpMotorista("");
+            setExpVehicleSearch("");
+            setExpDriverSearch("");
             setExpKm("");
             setExpAbastecimento("");
             setExpArla("");
