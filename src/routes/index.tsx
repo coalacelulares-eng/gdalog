@@ -2958,6 +2958,36 @@ export function TransportManagementSystem() {
               />
             </div>
 
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">Foto do Veículo (Caminhão)</Label>
+              <div className="flex gap-2 mt-1">
+                <div className="relative flex-1">
+                  <Camera className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (uploadEvent) => {
+                          setVehFoto(uploadEvent.target?.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="pl-9 text-xs cursor-pointer h-9"
+                  />
+                </div>
+              </div>
+              {vehFoto && (
+                <div className="mt-2 flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                  <img src={vehFoto} alt="Pré-visualização" className="w-12 h-12 rounded-lg object-cover border" />
+                  <span className="text-[10px] text-green-600 font-bold uppercase tracking-wider">Foto carregada!</span>
+                </div>
+              )}
+            </div>
+
             <DialogFooter className="pt-2 border-t border-slate-100 flex gap-2 justify-end">
               <Button
                 type="button"
