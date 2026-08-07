@@ -3461,69 +3461,69 @@ export function TransportManagementSystem() {
       )}
 
       {/* MOBILE BOTTOM TAB BAR */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0c192c] border-t border-slate-800 z-50 flex items-center justify-around h-16 px-2 shadow-[0_-4px_10px_rgba(0,0,0,0.1)]">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0c192c]/95 backdrop-blur-md border-t border-slate-800 z-50 flex items-center justify-around h-16 px-1 shadow-[0_-4px_15px_rgba(0,0,0,0.3)]">
         <button
           onClick={() => setActiveTab("dashboard")}
-          className={`flex flex-col items-center justify-center gap-1 transition-all ${
-            activeTab === "dashboard" ? "text-[#f25c05]" : "text-slate-400"
+          className={`flex flex-col items-center justify-center min-w-[50px] transition-all duration-200 ${
+            activeTab === "dashboard" ? "text-[#f25c05] scale-105" : "text-slate-400"
           }`}
         >
-          <Home className="w-5 h-5" />
-          <span className="text-[9px] font-bold uppercase">Início</span>
+          <Home className="w-[18px] h-[18px]" />
+          <span className="text-[8px] font-bold uppercase tracking-tighter">Início</span>
         </button>
         <button
           onClick={() => setActiveTab("frota")}
-          className={`flex flex-col items-center justify-center gap-1 transition-all ${
-            activeTab === "frota" ? "text-[#f25c05]" : "text-slate-400"
+          className={`flex flex-col items-center justify-center min-w-[50px] transition-all duration-200 ${
+            activeTab === "frota" ? "text-[#f25c05] scale-105" : "text-slate-400"
           }`}
         >
-          <Truck className="w-5 h-5" />
-          <span className="text-[9px] font-bold uppercase">Frota</span>
+          <Truck className="w-[18px] h-[18px]" />
+          <span className="text-[8px] font-bold uppercase tracking-tighter">Frota</span>
         </button>
         <button
           onClick={() => setActiveTab("despesas")}
-          className={`flex flex-col items-center justify-center gap-1 transition-all ${
-            activeTab === "despesas" ? "text-[#f25c05]" : "text-slate-400"
+          className={`flex flex-col items-center justify-center min-w-[50px] transition-all duration-200 ${
+            activeTab === "despesas" ? "text-[#f25c05] scale-105" : "text-slate-400"
           }`}
         >
-          <DollarSign className="w-5 h-5" />
-          <span className="text-[9px] font-bold uppercase">Custos</span>
+          <DollarSign className="w-[18px] h-[18px]" />
+          <span className="text-[8px] font-bold uppercase tracking-tighter">Custos</span>
         </button>
         <button
           onClick={() => setActiveTab("oleo")}
-          className={`flex flex-col items-center justify-center gap-1 transition-all ${
-            activeTab === "oleo" ? "text-[#f25c05]" : "text-slate-400"
+          className={`flex flex-col items-center justify-center min-w-[50px] transition-all duration-200 ${
+            activeTab === "oleo" ? "text-[#f25c05] scale-105" : "text-slate-400"
           }`}
         >
-          <Wrench className="w-5 h-5" />
-          <span className="text-[9px] font-bold uppercase">Manut.</span>
+          <Wrench className="w-[18px] h-[18px]" />
+          <span className="text-[8px] font-bold uppercase tracking-tighter">Manut.</span>
         </button>
         <button
           onClick={() => setActiveTab("fretes")}
-          className={`flex flex-col items-center justify-center gap-1 transition-all ${
-            activeTab === "fretes" ? "text-[#f25c05]" : "text-slate-400"
+          className={`flex flex-col items-center justify-center min-w-[50px] transition-all duration-200 ${
+            activeTab === "fretes" ? "text-[#f25c05] scale-105" : "text-slate-400"
           }`}
         >
-          <CreditCard className="w-5 h-5" />
-          <span className="text-[9px] font-bold uppercase">Fretes</span>
+          <CreditCard className="w-[18px] h-[18px]" />
+          <span className="text-[8px] font-bold uppercase tracking-tighter">Fretes</span>
         </button>
         <button
           onClick={() => setActiveTab("financeiro")}
-          className={`flex flex-col items-center justify-center gap-1 transition-all ${
-            activeTab === "financeiro" ? "text-[#f25c05]" : "text-slate-400"
+          className={`flex flex-col items-center justify-center min-w-[50px] transition-all duration-200 ${
+            activeTab === "financeiro" ? "text-[#f25c05] scale-105" : "text-slate-400"
           }`}
         >
-          <BarChart3 className="w-5 h-5" />
-          <span className="text-[9px] font-bold uppercase">Relat.</span>
+          <BarChart3 className="w-[18px] h-[18px]" />
+          <span className="text-[8px] font-bold uppercase tracking-tighter">Relat.</span>
         </button>
         <button
           onClick={() => setActiveTab("clientes")}
-          className={`flex flex-col items-center justify-center gap-1 transition-all ${
-            activeTab === "clientes" ? "text-[#f25c05]" : "text-slate-400"
+          className={`flex flex-col items-center justify-center min-w-[50px] transition-all duration-200 ${
+            activeTab === "clientes" ? "text-[#f25c05] scale-105" : "text-slate-400"
           }`}
         >
-          <User className="w-5 h-5" />
-          <span className="text-[9px] font-bold uppercase">Cli.</span>
+          <User className="w-[18px] h-[18px]" />
+          <span className="text-[8px] font-bold uppercase tracking-tighter">Cli.</span>
         </button>
       </div>
     </div>
