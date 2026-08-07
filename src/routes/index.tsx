@@ -1188,12 +1188,12 @@ export function TransportManagementSystem() {
   // 2. MAIN APPLICATION INTERFACE
   // -------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-[#f4f6f9] text-slate-800 font-sans pb-24 md:pb-12">
+    <div className="min-h-screen bg-[#f4f6f9] text-slate-800 font-sans pb-24 md:pb-6">
       <Toaster position="top-right" />
 
       {/* TOP NAVBAR (Exact match to screenshots visual identity) */}
       <header className="bg-[#0c192c] text-white sticky top-0 z-30 shadow-md no-print">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
           
           {/* Logo Brand */}
           <div className="flex items-center gap-3">
@@ -1205,8 +1205,8 @@ export function TransportManagementSystem() {
             </span>
           </div>
 
-          {/* Navigation Links Desktop */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          {/* Navigation Links */}
+          <nav className="flex items-center space-x-1 lg:space-x-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
             <button
               onClick={() => setActiveTab("dashboard")}
               className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
@@ -1290,13 +1290,7 @@ export function TransportManagementSystem() {
               <span className="hidden sm:inline">Sair</span>
             </button>
             <div className="text-[10px] text-slate-500 font-medium px-2 py-1 border-l border-slate-700 hidden lg:block whitespace-pre-line">
-              '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
-                                            
-                                            Implementar filtros de busca na lista de clientes.
-
-Vincular o histórico de fretes diretamente no card de cada cliente.
-
-Adicionar validação de CPF/CNPJ nos formulários de cliente.
+              ajustar o layout no mobile e no desktop para deixar as categorias a mostra e da uma atualizada na categoria de clientes, pois não esta funcionando no mobile e no desktop
             </div>
           </div>
 
@@ -3239,15 +3233,22 @@ Adicionar validação de CPF/CNPJ nos formulários de cliente.
       {/* ------------------------------------------------------------- */}
       {activeTab === "clientes" && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-black text-[#0c192c] tracking-tight">Clientes</h1>
               <p className="text-slate-500 text-xs sm:text-sm">Gestão de clientes PF e PJ</p>
             </div>
 
             <Button
-              onClick={() => setIsClientModalOpen(true)}
-              className="bg-[#0c192c] hover:bg-[#162a45] text-white font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow cursor-pointer text-xs"
+              onClick={() => {
+                setCliEditingId(null);
+                setCliNome("");
+                setCliDocumento("");
+                setCliTipo("PF");
+                setCliContato("");
+                setIsClientModalOpen(true);
+              }}
+              className="bg-[#0c192c] hover:bg-[#162a45] text-white font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow cursor-pointer text-xs w-full sm:w-auto justify-center"
             >
               <Plus className="w-4 h-4" /> Novo Cliente
             </Button>
