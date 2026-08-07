@@ -1359,7 +1359,7 @@ export function TransportManagementSystem() {
       <Toaster position="top-right" />
 
       {/* TOP NAVBAR (Exact match to screenshots visual identity) */}
-      <header className="bg-[#0c192c] text-white no-print md:h-[72px] flex items-center w-full">
+      <header className="bg-[#0c192c] text-white no-print md:h-[72px] flex items-center w-full sticky top-0 z-50 shadow-md">
         <div className="max-w-[1920px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-3 flex flex-row items-center justify-between gap-4">
 
           
