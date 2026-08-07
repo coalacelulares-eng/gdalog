@@ -1369,7 +1369,7 @@ export function TransportManagementSystem() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-0.5 lg:space-x-1 flex-1 justify-center scrollbar-hide">
+          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 flex-1 justify-center scrollbar-hide">
             <button
               onClick={() => setActiveTab("dashboard")}
               className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
