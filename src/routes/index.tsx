@@ -2583,26 +2583,33 @@ export function TransportManagementSystem() {
             <div>
               <Label className="text-xs font-semibold text-slate-700">Empresa / Cliente</Label>
               <div className="flex flex-col gap-2">
-                <select
-                  value={frtEmpresa}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setFrtEmpresa(val);
-                    // Tenta encontrar o cliente pelo nome para associar o clienteId
-                    const client = clients.find(c => c.nome.toUpperCase() === val.toUpperCase());
-                    if (client) {
-                      // Se houver uma variável ou estado para clienteId no formulário de frete, atualizaríamos aqui.
-                      // Por enquanto o handleAddFreight já usa o nome para vincular no filtro da aba de clientes.
-                    }
-                  }}
-                  className="w-full mt-1 p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold"
-                  required
-                >
-                  <option value="">Selecione um cliente cadastrado...</option>
-                  {clients.map((c) => (
-                    <option key={c.id} value={c.nome}>{c.nome} ({c.tipo})</option>
-                  ))}
-                </select>
+                <div className="flex gap-2">
+                  <select
+                    value={frtEmpresa}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFrtEmpresa(val);
+                      const client = clients.find(c => c.nome.toUpperCase() === val.toUpperCase());
+                      // Se houver um estado frtClienteId, atualizaríamos aqui.
+                    }}
+                    className="flex-1 mt-1 p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold"
+                    required
+                  >
+                    <option value="">Selecione um cliente cadastrado...</option>
+                    {clients.map((c) => (
+                      <option key={c.id} value={c.nome}>{c.nome} ({c.tipo})</option>
+                    ))}
+                  </select>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsClientModalOpen(true)}
+                    className="mt-1 h-9 px-3 border-dashed border-[#f25c05] text-[#f25c05] hover:bg-orange-50"
+                    title="Cadastrar Novo Cliente"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] text-slate-400 font-bold uppercase">Ou digite:</span>
                   <Input
