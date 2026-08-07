@@ -1611,36 +1611,64 @@ export function TransportManagementSystem() {
                 {vehicles.map((veh) => (
                   <div
                     key={veh.id}
-                    className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm relative group hover:shadow-md transition-all"
+                    className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm relative group hover:shadow-md transition-all flex flex-col h-full"
                   >
-                    <div className="absolute top-4 right-4 flex items-center gap-1">
+                    <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
+                      <button
+                        onClick={() => {
+                          const text = `*VEÍCULO GDALog*\nPlaca: ${veh.placa}\nModelo: ${veh.modelo}\nMotorista: ${veh.motorista}\nCategoria: ${veh.categoria}`;
+                          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+                        }}
+                        className="text-slate-300 hover:text-[#25D366] transition-colors p-1.5 cursor-pointer bg-slate-50/80 rounded-lg backdrop-blur-sm"
+                        title="Compartilhar no WhatsApp"
+                      >
+                        <img src={whatsappIconAsset.url} alt="WhatsApp" className="w-3.5 h-3.5 object-contain" />
+                      </button>
                       <button
                         onClick={() => handleStartEditVehicle(veh)}
-                        className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
+                        className="text-slate-300 hover:text-[#0c192c] transition-colors p-1.5 cursor-pointer bg-slate-50/80 rounded-lg backdrop-blur-sm"
                         title="Editar veículo"
                       >
-                        <Settings className="w-4 h-4" />
+                        <Settings className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDeleteVehicle(veh.id)}
-                        className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                        className="text-slate-300 hover:text-red-500 transition-colors p-1.5 cursor-pointer bg-slate-50/80 rounded-lg backdrop-blur-sm"
                         title="Excluir veículo"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
 
-                    <div className="font-extrabold text-lg text-[#0c192c] tracking-wide">
-                      {veh.placa}
-                    </div>
-                    <div className="text-xs text-slate-500 font-medium mt-1">
-                      {veh.modelo}
-                    </div>
-                    <div className="text-xs text-slate-700 font-medium mt-2">
-                      Motorista: <span className="font-bold">{veh.motorista}</span>
-                    </div>
-                    <div className="text-[11px] font-bold text-[#f25c05] tracking-wider uppercase mt-3">
-                      {veh.categoria}
+                    <div className="flex gap-4 items-start">
+                      {veh.foto ? (
+                        <div className="w-20 h-20 rounded-xl overflow-hidden border border-slate-100 shadow-sm shrink-0">
+                          <img
+                            src={veh.foto}
+                            alt={veh.placa}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-20 h-20 rounded-xl bg-slate-50 flex flex-col items-center justify-center border border-dashed border-slate-200 shrink-0">
+                          <Truck className="w-8 h-8 text-slate-200" />
+                        </div>
+                      )}
+                      
+                      <div className="flex-1">
+                        <div className="font-extrabold text-lg text-[#0c192c] tracking-wide">
+                          {veh.placa}
+                        </div>
+                        <div className="text-xs text-slate-500 font-medium mt-1">
+                          {veh.modelo}
+                        </div>
+                        <div className="text-xs text-slate-700 font-medium mt-2">
+                          Motorista: <span className="font-bold">{veh.motorista}</span>
+                        </div>
+                        <div className="text-[11px] font-bold text-[#f25c05] tracking-wider uppercase mt-3">
+                          {veh.categoria}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
