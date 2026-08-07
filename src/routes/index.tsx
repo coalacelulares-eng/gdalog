@@ -599,6 +599,8 @@ export function TransportManagementSystem() {
   const [clientSearch, setClientSearch] = useState("");
 
   const [frtClientSearch, setFrtClientSearch] = useState("");
+  const [expVehicleSearch, setExpVehicleSearch] = useState("");
+  const [expDriverSearch, setExpDriverSearch] = useState("");
 
   // CALCULATED DASHBOARD METRICS
   const totalFreightsRevenue = useMemo(() => {
@@ -2290,6 +2292,8 @@ export function TransportManagementSystem() {
             setExpEditingId(null);
             setExpPlaca("");
             setExpMotorista("");
+            setExpVehicleSearch("");
+            setExpDriverSearch("");
             setExpKm("");
             setExpAbastecimento("");
             setExpArla("");
@@ -2316,21 +2320,44 @@ export function TransportManagementSystem() {
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
               <div>
                 <Label className="text-xs font-semibold text-slate-700">Veículo / Placa</Label>
-                <select
-                  value={expPlaca}
-                  onChange={(e) => {
-                    setExpPlaca(e.target.value);
-                    const found = vehicles.find((v) => v.placa === e.target.value);
-                    if (found) setExpMotorista(found.motorista);
-                  }}
-                  className="w-full mt-1 p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold"
-                  required
-                >
-                  <option value="">Selecione...</option>
-                  {vehicles.map((v) => (
-                    <option key={v.id} value={v.placa}>{v.placa} ({v.modelo})</option>
-                  ))}
-                </select>
+                <div className="flex flex-col gap-1 mt-1">
+                  <div className="relative">
+                    <div className="absolute left-2.5 top-2.5 text-slate-400">
+                      <Search className="w-3 h-3" />
+                    </div>
+                    <Input
+                      type="text"
+                      placeholder="Pesquisar placa..."
+                      value={expVehicleSearch}
+                      onChange={(e) => setExpVehicleSearch(e.target.value)}
+                      className="pl-8 h-8 text-[10px]"
+                    />
+                  </div>
+                  <select
+                    value={expPlaca}
+                    onChange={(e) => {
+                      setExpPlaca(e.target.value);
+                      const found = vehicles.find((v) => v.placa === e.target.value);
+                      if (found) setExpMotorista(found.motorista);
+                    }}
+                    className="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold h-9"
+                    required
+                  >
+                    <option value="">Selecione...</option>
+                    {vehicles.filter(v => 
+                      v.placa.toLowerCase().includes(expVehicleSearch.toLowerCase()) || 
+                      v.modelo.toLowerCase().includes(expVehicleSearch.toLowerCase())
+                    ).map((v) => (
+                      <option key={v.id} value={v.placa}>{v.placa} ({v.modelo})</option>
+                    ))}
+                    {vehicles.filter(v => 
+                      v.placa.toLowerCase().includes(expVehicleSearch.toLowerCase()) || 
+                      v.modelo.toLowerCase().includes(expVehicleSearch.toLowerCase())
+                    ).length === 0 && expVehicleSearch && (
+                      <option disabled>Nenhum veículo encontrado</option>
+                    )}
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -2339,20 +2366,44 @@ export function TransportManagementSystem() {
                   type="date"
                   value={expData}
                   onChange={(e) => setExpData(e.target.value)}
-                  className="mt-1 text-xs"
+                  className="mt-1 h-9 text-xs"
                   required
                 />
               </div>
 
               <div>
                 <Label className="text-xs font-semibold text-slate-700">Motorista</Label>
-                <Input
-                  type="text"
-                  value={expMotorista}
-                  onChange={(e) => setExpMotorista(e.target.value)}
-                  placeholder="Nome motorista"
-                  className="mt-1 text-xs"
-                />
+                <div className="flex flex-col gap-1 mt-1">
+                  <div className="relative">
+                    <div className="absolute left-2.5 top-2.5 text-slate-400">
+                      <Search className="w-3 h-3" />
+                    </div>
+                    <Input
+                      type="text"
+                      placeholder="Pesquisar motorista..."
+                      value={expDriverSearch}
+                      onChange={(e) => setExpDriverSearch(e.target.value)}
+                      className="pl-8 h-8 text-[10px]"
+                    />
+                  </div>
+                  <select
+                    value={expMotorista}
+                    onChange={(e) => setExpMotorista(e.target.value)}
+                    className="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold h-9"
+                  >
+                    <option value="">Selecione...</option>
+                    {drivers.filter(d => 
+                      d.nome.toLowerCase().includes(expDriverSearch.toLowerCase())
+                    ).map((d) => (
+                      <option key={d.id} value={d.nome}>{d.nome}</option>
+                    ))}
+                    {drivers.filter(d => 
+                      d.nome.toLowerCase().includes(expDriverSearch.toLowerCase())
+                    ).length === 0 && expDriverSearch && (
+                      <option disabled>Nenhum motorista encontrado</option>
+                    )}
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -2576,6 +2627,7 @@ export function TransportManagementSystem() {
             setFrtPlaca("");
             setFrtValor("");
             setFrtRecebido("");
+            setFrtClientSearch("");
           }
         }}
       >
@@ -2623,6 +2675,12 @@ export function TransportManagementSystem() {
                         <option key={c.id} value={c.nome}>{c.nome} ({c.tipo})</option>
                       ))
                     }
+                    {clients.filter(c => 
+                        c.nome.toLowerCase().includes(frtClientSearch.toLowerCase()) || 
+                        c.documento.includes(frtClientSearch)
+                      ).length === 0 && frtClientSearch && (
+                      <option disabled>Nenhum cliente encontrado</option>
+                    )}
                   </select>
                   <Button
                     type="button"
