@@ -2549,9 +2549,50 @@ export function TransportManagementSystem() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
               <div>
                 <Label className="text-xs font-semibold text-slate-700">Cotação (R$)</Label>
+                <div className="relative mt-1">
+                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                  <CurrencyInput
+                    value={frtCotacao}
+                    onChange={(val) => {
+                      setFrtCotacao(val);
+                      if (!frtValor && typeof val === "number") setFrtValor(val);
+                    }}
+                    placeholder="0,00"
+                    className="text-xs pl-8 font-bold"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">Recebido (R$)</Label>
+                <div className="relative mt-1">
+                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                  <CurrencyInput
+                    value={frtRecebido}
+                    onChange={setFrtRecebido}
+                    placeholder="0,00"
+                    className="text-xs pl-8 font-bold text-green-600"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-slate-50 p-2 rounded-lg border border-slate-100 flex flex-col justify-center">
+                <span className="text-[10px] text-slate-400 font-bold uppercase">Saldo a Receber</span>
+                <span className="text-sm font-black text-red-600">
+                  {formatBRL(
+                    (typeof frtValor === "number" ? frtValor : (typeof frtCotacao === "number" ? frtCotacao : 0)) - 
+                    (typeof frtRecebido === "number" ? frtRecebido : 0)
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">Valor Ajustado (R$)</Label>
                 <div className="relative mt-1">
                   <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
                   <CurrencyInput
