@@ -349,8 +349,9 @@ export function TransportManagementSystem() {
   useEffect(() => {
     if (!isAuthenticated) return;
     async function initData() {
-      const [d, v, e, f, o] = await Promise.all([
+      const [d, cl, v, e, f, o] = await Promise.all([
         loadFromDB("drivers", INITIAL_DATA.drivers),
+        loadFromDB("clients", INITIAL_DATA.clients),
         loadFromDB("vehicles", INITIAL_DATA.vehicles),
         loadFromDB("expenses", INITIAL_DATA.expenses),
         loadFromDB("freights", INITIAL_DATA.freights),
