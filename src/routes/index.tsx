@@ -1245,6 +1245,16 @@ export function TransportManagementSystem() {
             >
               Financeiro
             </button>
+            <button
+              onClick={() => setActiveTab("clientes")}
+              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                activeTab === "clientes"
+                  ? "bg-[#f25c05] text-white shadow"
+                  : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+              }`}
+            >
+              Clientes
+            </button>
           </nav>
 
           {/* Logout */}
