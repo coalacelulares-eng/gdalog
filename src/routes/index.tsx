@@ -1192,8 +1192,8 @@ export function TransportManagementSystem() {
       <Toaster position="top-right" />
 
       {/* TOP NAVBAR (Exact match to screenshots visual identity) */}
-      <header className="bg-[#0c192c] text-white sticky top-0 z-30 shadow-md no-print">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <header className="bg-[#0c192c] text-white sticky top-0 z-30 shadow-md no-print md:h-[72px] flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
           
           {/* Logo Brand */}
           <div className="flex items-center gap-3">
