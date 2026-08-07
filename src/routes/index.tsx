@@ -1290,7 +1290,7 @@ export function TransportManagementSystem() {
               <span className="hidden sm:inline">Sair</span>
             </button>
             <div className="text-[10px] text-slate-500 font-medium px-2 py-1 border-l border-slate-700 hidden lg:block whitespace-pre-line">
-              ajustar o layout no mobile e no desktop para deixar as categorias a mostra e da uma atualizada na categoria de clientes, pois não esta funcionando no mobile e no desktop
+              o layout do desktop nas categorias precisam ser fixa. adicione barra de rolagem para baixo e pra cima quando clicar no botão editar em todas categorias, para poder visualizar
             </div>
           </div>
 
