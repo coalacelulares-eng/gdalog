@@ -3239,15 +3239,22 @@ Adicionar validação de CPF/CNPJ nos formulários de cliente.
       {/* ------------------------------------------------------------- */}
       {activeTab === "clientes" && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-black text-[#0c192c] tracking-tight">Clientes</h1>
               <p className="text-slate-500 text-xs sm:text-sm">Gestão de clientes PF e PJ</p>
             </div>
 
             <Button
-              onClick={() => setIsClientModalOpen(true)}
-              className="bg-[#0c192c] hover:bg-[#162a45] text-white font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow cursor-pointer text-xs"
+              onClick={() => {
+                setCliEditingId(null);
+                setCliNome("");
+                setCliDocumento("");
+                setCliTipo("PF");
+                setCliContato("");
+                setIsClientModalOpen(true);
+              }}
+              className="bg-[#0c192c] hover:bg-[#162a45] text-white font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow cursor-pointer text-xs w-full sm:w-auto justify-center"
             >
               <Plus className="w-4 h-4" /> Novo Cliente
             </Button>
