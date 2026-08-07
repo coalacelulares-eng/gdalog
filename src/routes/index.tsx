@@ -1299,7 +1299,7 @@ export function TransportManagementSystem() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex items-center space-x-1 lg:space-x-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide md:overflow-x-visible">
+          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 scrollbar-hide">
             <button
               onClick={() => setActiveTab("dashboard")}
               className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
@@ -3459,6 +3459,73 @@ export function TransportManagementSystem() {
           </div>
         </div>
       )}
+
+      {/* MOBILE BOTTOM TAB BAR */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0c192c] border-t border-slate-800 z-50 flex items-center justify-around h-16 px-2 shadow-[0_-4px_10px_rgba(0,0,0,0.1)]">
+        <button
+          onClick={() => setActiveTab("dashboard")}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${
+            activeTab === "dashboard" ? "text-[#f25c05]" : "text-slate-400"
+          }`}
+        >
+          <Home className="w-5 h-5" />
+          <span className="text-[9px] font-bold uppercase">Início</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("frota")}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${
+            activeTab === "frota" ? "text-[#f25c05]" : "text-slate-400"
+          }`}
+        >
+          <Truck className="w-5 h-5" />
+          <span className="text-[9px] font-bold uppercase">Frota</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("despesas")}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${
+            activeTab === "despesas" ? "text-[#f25c05]" : "text-slate-400"
+          }`}
+        >
+          <DollarSign className="w-5 h-5" />
+          <span className="text-[9px] font-bold uppercase">Custos</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("oleo")}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${
+            activeTab === "oleo" ? "text-[#f25c05]" : "text-slate-400"
+          }`}
+        >
+          <Wrench className="w-5 h-5" />
+          <span className="text-[9px] font-bold uppercase">Manut.</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("fretes")}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${
+            activeTab === "fretes" ? "text-[#f25c05]" : "text-slate-400"
+          }`}
+        >
+          <CreditCard className="w-5 h-5" />
+          <span className="text-[9px] font-bold uppercase">Fretes</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("financeiro")}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${
+            activeTab === "financeiro" ? "text-[#f25c05]" : "text-slate-400"
+          }`}
+        >
+          <BarChart3 className="w-5 h-5" />
+          <span className="text-[9px] font-bold uppercase">Relat.</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("clientes")}
+          className={`flex flex-col items-center justify-center gap-1 transition-all ${
+            activeTab === "clientes" ? "text-[#f25c05]" : "text-slate-400"
+          }`}
+        >
+          <User className="w-5 h-5" />
+          <span className="text-[9px] font-bold uppercase">Cli.</span>
+        </button>
+      </div>
     </div>
   );
 }
