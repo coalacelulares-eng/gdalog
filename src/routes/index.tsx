@@ -367,6 +367,7 @@ export function TransportManagementSystem() {
       if (JSON.stringify(driversWithPhoto) !== JSON.stringify(d)) {
         void saveToDB("drivers", driversWithPhoto);
       }
+      setClients(cl);
       setVehicles(v);
       setExpenses(e);
       setFreights(f);
