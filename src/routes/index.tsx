@@ -2155,14 +2155,15 @@ export function TransportManagementSystem() {
         {/* TAB 6: FINANCEIRO (CONSOLIDADO + RELATÓRIO) */}
         {/* ------------------------------------------------------------- */}
         {activeTab === "financeiro" && (
-          <FinancialReport
-            expenses={expenses}
-            freights={freights}
-            maintenances={oilChanges}
-            vehicles={vehicles}
-            formatBRL={formatBRL}
-            formatDateBR={formatDateBR}
-          />
+              <FinancialReport
+                expenses={expenses}
+                freights={freights}
+                maintenances={oilChanges}
+                vehicles={vehicles}
+                clients={clients}
+                formatBRL={formatBRL}
+                formatDateBR={formatDateBR}
+              />
         )}
 
       </main>
