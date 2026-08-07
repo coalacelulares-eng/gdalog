@@ -1188,12 +1188,12 @@ export function TransportManagementSystem() {
   // 2. MAIN APPLICATION INTERFACE
   // -------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-[#f4f6f9] text-slate-800 font-sans pb-24 md:pb-12">
+    <div className="min-h-screen bg-[#f4f6f9] text-slate-800 font-sans pb-24 md:pb-6">
       <Toaster position="top-right" />
 
       {/* TOP NAVBAR (Exact match to screenshots visual identity) */}
       <header className="bg-[#0c192c] text-white sticky top-0 z-30 shadow-md no-print">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
           
           {/* Logo Brand */}
           <div className="flex items-center gap-3">
