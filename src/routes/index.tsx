@@ -498,6 +498,12 @@ export function TransportManagementSystem() {
   const [oilCategoriaServico, setOilCategoriaServico] = useState<MaintenanceCategory>("Troca de Óleo");
   const [oilObs, setOilObs] = useState("");
 
+  // Client Form
+  const [cliNome, setCliNome] = useState("");
+  const [cliDocumento, setCliDocumento] = useState("");
+  const [cliTipo, setCliTipo] = useState<"PF" | "PJ">("PJ");
+  const [cliContato, setCliContato] = useState("");
+
   // CALCULATED DASHBOARD METRICS
   const totalFreightsRevenue = useMemo(() => {
     return freights.reduce((acc, f) => acc + (f.valor || 0), 0);
