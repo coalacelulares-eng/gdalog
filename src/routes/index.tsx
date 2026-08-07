@@ -1447,27 +1447,29 @@ export function TransportManagementSystem() {
             </button>
           </nav>
 
-          {/* Logout */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Gestão de Usuários */}
+          <div className="flex items-center space-x-1 sm:space-x-2">
             <button
               onClick={() => setIsUsersModalOpen(true)}
-              className="flex items-center gap-2 text-slate-300 hover:text-white px-2 py-1.5 rounded transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 text-slate-300 hover:text-white px-1.5 py-1 rounded transition-all cursor-pointer group"
               title="Gerenciar Usuários"
             >
-              <div className="bg-white/10 hover:bg-white/20 p-1.5 rounded-full transition-all">
-                <img src={userIconAsset.url} alt="Usuários" className="w-5 h-5 object-contain" />
+              <div className="bg-white/10 group-hover:bg-white/20 p-1 rounded-full transition-all animate-pulse-orange">
+                <img src={userIconAsset.url} alt="Usuários" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
               </div>
-              <span className="hidden lg:inline text-xs font-semibold">Usuários</span>
+              <span className="hidden xl:inline text-[10px] sm:text-xs font-semibold">Usuários</span>
             </button>
+
 
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1 text-slate-300 hover:text-white px-2 py-1.5 rounded text-xs font-semibold cursor-pointer transition-colors"
+              className="flex items-center gap-1 text-slate-300 hover:text-white px-1.5 py-1 rounded text-[10px] sm:text-xs font-semibold cursor-pointer transition-colors"
               title="Sair do Sistema"
             >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline">Sair</span>
+              <LogOut className="w-3.5 h-3.5 sm:w-4 h-4" />
+              <span className="hidden xl:inline">Sair</span>
             </button>
+
             <div className="text-[10px] text-slate-500 font-medium px-2 py-1 border-l border-slate-700 hidden lg:block whitespace-pre-line">
               o layout do desktop nas categorias precisam ser fixa. adicione barra de rolagem para baixo e pra cima quando clicar no botão editar em todas categorias, para poder visualizar
             </div>
