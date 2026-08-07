@@ -891,6 +891,7 @@ export function TransportManagementSystem() {
     setVehModelo("");
     setVehMotorista("");
     setVehCategoria("LOGISTICA");
+    setVehFoto("");
     setIsVehicleModalOpen(false);
   };
 
@@ -900,6 +901,7 @@ export function TransportManagementSystem() {
     setVehModelo(veh.modelo);
     setVehMotorista(veh.motorista);
     setVehCategoria(veh.categoria);
+    setVehFoto(veh.foto || "");
     setIsVehicleModalOpen(true);
   };
 
