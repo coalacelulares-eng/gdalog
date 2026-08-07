@@ -38,6 +38,8 @@ import logoAsset from "@/assets/logo.png.asset.json";
 import whatsappIconAsset from "@/assets/whatsapp-icon.png.asset.json";
 import { FinancialReport } from "@/components/financial-report";
 import { CurrencyInput } from "@/components/currency-input";
+import userIconAsset from "@/assets/user-icon.png.asset.json";
+
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -1357,8 +1359,9 @@ export function TransportManagementSystem() {
       <Toaster position="top-right" />
 
       {/* TOP NAVBAR (Exact match to screenshots visual identity) */}
-      <header className="bg-[#0c192c] text-white sticky top-0 z-30 shadow-md no-print md:h-[72px] flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
+      <header className="bg-[#0c192c] text-white sticky top-0 z-30 shadow-md no-print md:h-[72px] flex items-center w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8 py-3 flex flex-row items-center justify-between gap-4">
+
           
           {/* Logo Brand */}
           <div className="flex items-center gap-3">
@@ -1448,12 +1451,15 @@ export function TransportManagementSystem() {
           <div className="flex items-center space-x-2 sm:space-x-3">
             <button
               onClick={() => setIsUsersModalOpen(true)}
-              className="flex items-center gap-1 text-slate-300 hover:text-white px-2 py-1.5 rounded text-xs font-semibold cursor-pointer transition-colors"
+              className="flex items-center gap-2 text-slate-300 hover:text-white px-2 py-1.5 rounded transition-colors cursor-pointer"
               title="Gerenciar Usuários"
             >
-              <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">Usuários</span>
+              <div className="bg-white/10 hover:bg-white/20 p-1.5 rounded-full transition-all">
+                <img src={userIconAsset.url} alt="Usuários" className="w-5 h-5 object-contain" />
+              </div>
+              <span className="hidden lg:inline text-xs font-semibold">Usuários</span>
             </button>
+
             <button
               onClick={handleLogout}
               className="flex items-center gap-1 text-slate-300 hover:text-white px-2 py-1.5 rounded text-xs font-semibold cursor-pointer transition-colors"
@@ -3744,7 +3750,7 @@ export function TransportManagementSystem() {
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-6 py-2 overflow-y-auto max-h-[70vh] px-1 scrollbar-thin">
+          <div className="space-y-6 py-2 overflow-y-auto max-h-[70vh] px-1 scrollbar-thin overflow-x-hidden">
             {/* Alterar Senha Atual */}
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
               <h3 className="text-sm font-bold text-[#0c192c] flex items-center gap-2">
