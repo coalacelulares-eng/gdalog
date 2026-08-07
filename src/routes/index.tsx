@@ -26,7 +26,8 @@ import {
   Settings,
   Disc,
   BarChart3,
-  MessageCircle
+  MessageCircle,
+  Search
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import logoAsset from "@/assets/logo.png.asset.json";
@@ -596,6 +597,8 @@ export function TransportManagementSystem() {
 
   // Client Search State
   const [clientSearch, setClientSearch] = useState("");
+
+  const [frtClientSearch, setFrtClientSearch] = useState("");
 
   // CALCULATED DASHBOARD METRICS
   const totalFreightsRevenue = useMemo(() => {
@@ -2586,51 +2589,52 @@ export function TransportManagementSystem() {
           <form onSubmit={handleAddFreight} className="space-y-3 py-2 overflow-y-auto max-h-[60vh] px-1 scrollbar-thin">
             <div>
               <Label className="text-xs font-semibold text-slate-700">Empresa / Cliente</Label>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 mt-1">
+                <div className="relative">
+                  <div className="absolute left-3 top-2.5 text-slate-400">
+                    <Search className="w-3.5 h-3.5" />
+                  </div>
+                  <Input
+                    type="text"
+                    placeholder="Pesquisar cliente cadastrado..."
+                    value={frtClientSearch}
+                    onChange={(e) => setFrtClientSearch(e.target.value)}
+                    className="pl-9 text-xs"
+                  />
+                </div>
+                
                 <div className="flex gap-2">
                   <select
                     value={frtEmpresa}
                     onChange={(e) => {
                       const val = e.target.value;
                       setFrtEmpresa(val);
-                      const client = clients.find(c => c.nome.toUpperCase() === val.toUpperCase());
-                      // Se houver um estado frtClienteId, atualizaríamos aqui.
                     }}
-                    className="flex-1 mt-1 p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold"
+                    className="flex-1 p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold h-9"
                     required
                   >
-                    <option value="">Selecione um cliente cadastrado...</option>
-                    {clients.map((c) => (
-                      <option key={c.id} value={c.nome}>{c.nome} ({c.tipo})</option>
-                    ))}
+                    <option value="">{frtClientSearch ? "Resultados da busca..." : "Selecione um cliente..."}</option>
+                    {clients
+                      .filter(c => 
+                        c.nome.toLowerCase().includes(frtClientSearch.toLowerCase()) || 
+                        c.documento.includes(frtClientSearch)
+                      )
+                      .map((c) => (
+                        <option key={c.id} value={c.nome}>{c.nome} ({c.tipo})</option>
+                      ))
+                    }
                   </select>
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setIsClientModalOpen(true)}
-                    className="mt-1 h-9 px-3 border-dashed border-[#f25c05] text-[#f25c05] hover:bg-orange-50"
+                    className="h-9 px-3 border-dashed border-[#f25c05] text-[#f25c05] hover:bg-orange-50"
                     title="Cadastrar Novo Cliente"
                   >
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase">Ou digite:</span>
-                  <Input
-                    type="text"
-                    list="empresas-fretes"
-                    value={frtEmpresa}
-                    onChange={(e) => setFrtEmpresa(e.target.value)}
-                    placeholder="Nome da empresa"
-                    className="flex-1 text-xs uppercase font-bold"
-                  />
-                </div>
               </div>
-              <datalist id="empresas-fretes">
-                {receivableByCompany.map((c) => (
-                  <option key={c.empresa} value={c.empresa} />
-                ))}
-              </datalist>
             </div>
 
             <div>
