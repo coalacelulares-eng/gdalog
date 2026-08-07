@@ -1192,8 +1192,8 @@ export function TransportManagementSystem() {
       <Toaster position="top-right" />
 
       {/* TOP NAVBAR (Exact match to screenshots visual identity) */}
-      <header className="bg-[#0c192c] text-white sticky top-0 z-30 shadow-md no-print">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <header className="bg-[#0c192c] text-white sticky top-0 z-30 shadow-md no-print md:h-[72px] flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
           
           {/* Logo Brand */}
           <div className="flex items-center gap-3">
@@ -1206,7 +1206,7 @@ export function TransportManagementSystem() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex items-center space-x-1 lg:space-x-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
+          <nav className="flex items-center space-x-1 lg:space-x-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide md:overflow-x-visible">
             <button
               onClick={() => setActiveTab("dashboard")}
               className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
@@ -1290,7 +1290,7 @@ export function TransportManagementSystem() {
               <span className="hidden sm:inline">Sair</span>
             </button>
             <div className="text-[10px] text-slate-500 font-medium px-2 py-1 border-l border-slate-700 hidden lg:block whitespace-pre-line">
-              ajustar o layout no mobile e no desktop para deixar as categorias a mostra e da uma atualizada na categoria de clientes, pois não esta funcionando no mobile e no desktop
+              o layout do desktop nas categorias precisam ser fixa. adicione barra de rolagem para baixo e pra cima quando clicar no botão editar em todas categorias, para poder visualizar
             </div>
           </div>
 
@@ -2214,7 +2214,7 @@ export function TransportManagementSystem() {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleAddExpense} className="space-y-4 py-2">
+          <form onSubmit={handleAddExpense} className="space-y-4 py-2 overflow-y-auto max-h-[60vh] px-1 scrollbar-thin">
             
             {/* Placa, Data, Motorista, Km */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -2490,7 +2490,7 @@ export function TransportManagementSystem() {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleAddFreight} className="space-y-3 py-2">
+          <form onSubmit={handleAddFreight} className="space-y-3 py-2 overflow-y-auto max-h-[60vh] px-1 scrollbar-thin">
             <div>
               <Label className="text-xs font-semibold text-slate-700">Empresa / Cliente</Label>
               <div className="flex gap-2">
@@ -2734,7 +2734,7 @@ export function TransportManagementSystem() {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleAddVehicle} className="space-y-3 py-2">
+          <form onSubmit={handleAddVehicle} className="space-y-3 py-2 overflow-y-auto max-h-[60vh] px-1 scrollbar-thin">
             <div>
               <Label className="text-xs font-semibold text-slate-700">Placa do Veículo</Label>
               <Input
@@ -2829,7 +2829,7 @@ export function TransportManagementSystem() {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleAddDriver} className="space-y-3 py-2">
+          <form onSubmit={handleAddDriver} className="space-y-3 py-2 overflow-y-auto max-h-[60vh] px-1 scrollbar-thin">
             <div>
               <Label className="text-xs font-semibold text-slate-700">Nome Completo</Label>
               <Input
@@ -2976,7 +2976,7 @@ export function TransportManagementSystem() {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleAddOilChange} className="space-y-3 py-2">
+          <form onSubmit={handleAddOilChange} className="space-y-3 py-2 overflow-y-auto max-h-[60vh] px-1 scrollbar-thin">
             <div>
               <Label className="text-xs font-semibold text-slate-700">Veículo / Placa</Label>
               <select
@@ -3134,7 +3134,7 @@ export function TransportManagementSystem() {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleAddClient} className="space-y-4 py-2">
+          <form onSubmit={handleAddClient} className="space-y-4 py-2 overflow-y-auto max-h-[60vh] px-1 scrollbar-thin">
             <div>
               <Label className="text-xs font-semibold text-slate-700">Nome do Cliente / Razão Social</Label>
               <Input
