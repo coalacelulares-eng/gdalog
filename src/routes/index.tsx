@@ -27,7 +27,9 @@ import {
   Disc,
   BarChart3,
   MessageCircle,
-  Search
+  Search,
+  Camera,
+  Share2
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import logoAsset from "@/assets/logo.png.asset.json";
@@ -86,6 +88,7 @@ interface Vehicle {
   modelo: string;
   motorista: string;
   categoria: string;
+  foto?: string;
 }
 
 interface ExpenseDetails {
@@ -492,6 +495,7 @@ export function TransportManagementSystem() {
   const [vehModelo, setVehModelo] = useState("");
   const [vehMotorista, setVehMotorista] = useState("");
   const [vehCategoria, setVehCategoria] = useState("LOGISTICA");
+  const [vehFoto, setVehFoto] = useState("");
 
   // Oil Form
   const [oilPlaca, setOilPlaca] = useState("");
@@ -864,6 +868,7 @@ export function TransportManagementSystem() {
               modelo: vehModelo,
               motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
               categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+              foto: vehFoto || item.foto || "",
             }
           : item,
       );
@@ -876,6 +881,7 @@ export function TransportManagementSystem() {
         modelo: vehModelo,
         motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
         categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+        foto: vehFoto || "",
       };
 
       persistVehicles([...vehicles, newVeh]);
@@ -887,6 +893,7 @@ export function TransportManagementSystem() {
     setVehModelo("");
     setVehMotorista("");
     setVehCategoria("LOGISTICA");
+    setVehFoto("");
     setIsVehicleModalOpen(false);
   };
 
@@ -896,6 +903,7 @@ export function TransportManagementSystem() {
     setVehModelo(veh.modelo);
     setVehMotorista(veh.motorista);
     setVehCategoria(veh.categoria);
+    setVehFoto(veh.foto || "");
     setIsVehicleModalOpen(true);
   };
 
@@ -1603,36 +1611,64 @@ export function TransportManagementSystem() {
                 {vehicles.map((veh) => (
                   <div
                     key={veh.id}
-                    className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm relative group hover:shadow-md transition-all"
+                    className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm relative group hover:shadow-md transition-all flex flex-col h-full"
                   >
-                    <div className="absolute top-4 right-4 flex items-center gap-1">
+                    <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
+                      <button
+                        onClick={() => {
+                          const text = `*VEÍCULO GDALog*\nPlaca: ${veh.placa}\nModelo: ${veh.modelo}\nMotorista: ${veh.motorista}\nCategoria: ${veh.categoria}`;
+                          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+                        }}
+                        className="text-slate-300 hover:text-[#25D366] transition-colors p-1.5 cursor-pointer bg-slate-50/80 rounded-lg backdrop-blur-sm"
+                        title="Compartilhar no WhatsApp"
+                      >
+                        <img src={whatsappIconAsset.url} alt="WhatsApp" className="w-3.5 h-3.5 object-contain" />
+                      </button>
                       <button
                         onClick={() => handleStartEditVehicle(veh)}
-                        className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
+                        className="text-slate-300 hover:text-[#0c192c] transition-colors p-1.5 cursor-pointer bg-slate-50/80 rounded-lg backdrop-blur-sm"
                         title="Editar veículo"
                       >
-                        <Settings className="w-4 h-4" />
+                        <Settings className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDeleteVehicle(veh.id)}
-                        className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                        className="text-slate-300 hover:text-red-500 transition-colors p-1.5 cursor-pointer bg-slate-50/80 rounded-lg backdrop-blur-sm"
                         title="Excluir veículo"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
 
-                    <div className="font-extrabold text-lg text-[#0c192c] tracking-wide">
-                      {veh.placa}
-                    </div>
-                    <div className="text-xs text-slate-500 font-medium mt-1">
-                      {veh.modelo}
-                    </div>
-                    <div className="text-xs text-slate-700 font-medium mt-2">
-                      Motorista: <span className="font-bold">{veh.motorista}</span>
-                    </div>
-                    <div className="text-[11px] font-bold text-[#f25c05] tracking-wider uppercase mt-3">
-                      {veh.categoria}
+                    <div className="flex gap-4 items-start">
+                      {veh.foto ? (
+                        <div className="w-20 h-20 rounded-xl overflow-hidden border border-slate-100 shadow-sm shrink-0">
+                          <img
+                            src={veh.foto}
+                            alt={veh.placa}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-20 h-20 rounded-xl bg-slate-50 flex flex-col items-center justify-center border border-dashed border-slate-200 shrink-0">
+                          <Truck className="w-8 h-8 text-slate-200" />
+                        </div>
+                      )}
+                      
+                      <div className="flex-1">
+                        <div className="font-extrabold text-lg text-[#0c192c] tracking-wide">
+                          {veh.placa}
+                        </div>
+                        <div className="text-xs text-slate-500 font-medium mt-1">
+                          {veh.modelo}
+                        </div>
+                        <div className="text-xs text-slate-700 font-medium mt-2">
+                          Motorista: <span className="font-bold">{veh.motorista}</span>
+                        </div>
+                        <div className="text-[11px] font-bold text-[#f25c05] tracking-wider uppercase mt-3">
+                          {veh.categoria}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -2948,6 +2984,36 @@ export function TransportManagementSystem() {
                 placeholder="Ex: LOGISTICA"
                 className="mt-1 text-xs uppercase"
               />
+            </div>
+
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">Foto do Veículo (Caminhão)</Label>
+              <div className="flex gap-2 mt-1">
+                <div className="relative flex-1">
+                  <Camera className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (uploadEvent) => {
+                          setVehFoto(uploadEvent.target?.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="pl-9 text-xs cursor-pointer h-9"
+                  />
+                </div>
+              </div>
+              {vehFoto && (
+                <div className="mt-2 flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                  <img src={vehFoto} alt="Pré-visualização" className="w-12 h-12 rounded-lg object-cover border" />
+                  <span className="text-[10px] text-green-600 font-bold uppercase tracking-wider">Foto carregada!</span>
+                </div>
+              )}
             </div>
 
             <DialogFooter className="pt-2 border-t border-slate-100 flex gap-2 justify-end">
