@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import logoAsset from "@/assets/logo.png.asset.json";
+import whatsappIconAsset from "@/assets/whatsapp-icon.png.asset.json";
 import { FinancialReport } from "@/components/financial-report";
 import { CurrencyInput } from "@/components/currency-input";
 
@@ -1982,7 +1983,7 @@ Adicionar validação de CPF/CNPJ nos formulários de cliente.
                         className="text-slate-300 hover:text-[#25D366] transition-colors p-1.5 cursor-pointer bg-slate-50 rounded-lg"
                         title="Compartilhar no WhatsApp"
                       >
-                        <MessageCircle className="w-4 h-4" />
+                        <img src={whatsappIconAsset.url} alt="WhatsApp" className="w-4 h-4 object-contain" />
                       </button>
                       <button
                         onClick={() => handleStartEditFreight(frt)}

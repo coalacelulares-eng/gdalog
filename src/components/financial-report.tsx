@@ -9,9 +9,9 @@ import {
   Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import whatsappIconAsset from "@/assets/whatsapp-icon.png.asset.json";
 
 export interface FinExpenseDetails {
   abastecimento: number;
@@ -503,7 +503,7 @@ export function FinancialReport({
             className="bg-[#25D366] hover:bg-[#128C7E] text-white font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow-sm cursor-pointer text-xs sm:text-sm"
             title="Compartilhar no WhatsApp"
           >
-            <MessageCircle className="w-4 h-4" />
+            <img src={whatsappIconAsset.url} alt="WhatsApp" className="w-4 h-4 object-contain" />
             <span className="hidden sm:inline">WhatsApp</span>
           </Button>
           <Button
