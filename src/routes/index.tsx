@@ -1794,7 +1794,17 @@ Adicionar validação de CPF/CNPJ nos formulários de cliente.
                     key={oil.id}
                     className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3 relative hover:shadow-md transition-all"
                   >
-                    <div className="absolute top-4 right-4 flex items-center gap-1">
+                    <div className="absolute top-4 right-4 flex items-center gap-1.5">
+                      <button
+                        onClick={() => {
+                          const text = `*MANUTENÇÃO GDALog*\nVeículo: ${oil.placa}\nServiço: ${oil.categoriaServico || "Troca de Óleo"}\nData: ${formatDateBR(oil.data)}\nKm: ${oil.kmAtual.toLocaleString()} km\nPróxima: ${oil.proximaTrocaKm.toLocaleString()} km\nCusto: ${formatBRL(oil.custo)}`;
+                          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+                        }}
+                        className="text-slate-300 hover:text-[#25D366] transition-colors p-1.5 cursor-pointer bg-slate-50 rounded-lg"
+                        title="Compartilhar no WhatsApp"
+                      >
+                        <img src={whatsappIconAsset.url} alt="WhatsApp" className="w-4 h-4 object-contain" />
+                      </button>
                       <button
                         onClick={() => handleStartEditOilChange(oil)}
                         className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
