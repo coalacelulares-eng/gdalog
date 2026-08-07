@@ -1228,7 +1228,9 @@ export function TransportManagementSystem() {
       email: newUserEmail.trim(),
       password: newUserPassword,
       options: {
-        emailRedirectTo: window.location.origin,
+        data: {
+          full_name: newUserEmail.split('@')[0],
+        }
       },
     });
     setAuthLoading(false);
