@@ -1341,8 +1341,6 @@ export function TransportManagementSystem() {
 
 
             <div className="pt-2 text-center text-[10px] text-slate-400">
-              Usuário Padrão: <b>gestor@gdalog.com.br</b> | Senha: <b>frota2026</b>
-              <br />
               Ambiente Seguro • GDALog Transportes v2.5
             </div>
           </form>
