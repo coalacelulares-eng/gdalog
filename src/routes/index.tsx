@@ -86,6 +86,7 @@ interface Vehicle {
   modelo: string;
   motorista: string;
   categoria: string;
+  foto?: string;
 }
 
 interface ExpenseDetails {
