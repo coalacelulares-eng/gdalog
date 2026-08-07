@@ -3361,7 +3361,10 @@ export function TransportManagementSystem() {
               )
               .map((cli) => {
                 // Filtra fretes vinculados a este cliente
-                const clientFreights = freights.filter(f => f.clienteId === cli.id || f.empresa.toUpperCase() === cli.nome.toUpperCase());
+                const clientFreights = freights.filter(f => 
+                  (f.clienteId && f.clienteId === cli.id) || 
+                  (f.empresa && f.empresa.toUpperCase() === cli.nome.toUpperCase())
+                );
                 const totalRevenue = clientFreights.reduce((acc, f) => acc + (f.valor || 0), 0);
                 const totalBalance = clientFreights.reduce((acc, f) => acc + ((f.valor || 0) - (f.recebido || 0)), 0);
 
