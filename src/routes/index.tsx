@@ -382,6 +382,7 @@ export function TransportManagementSystem() {
         loadFromDB(dataKey, null).then((val: any) => {
           if (val !== null) {
             if (dataKey === "drivers") setDrivers(val);
+            if (dataKey === "clients") setClients(val);
             if (dataKey === "vehicles") setVehicles(val);
             if (dataKey === "expenses") setExpenses(val);
             if (dataKey === "freights") setFreights(val);
