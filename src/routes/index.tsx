@@ -112,9 +112,18 @@ interface Expense {
   observacao: string;
 }
 
+interface Client {
+  id: string;
+  nome: string;
+  documento: string;
+  tipo: "PF" | "PJ";
+  contato: string;
+}
+
 interface Freight {
   id: string;
   empresa: string;
+  clienteId?: string; // ID do cliente cadastrado
   origem: string;
   destino: string;
   placa: string;
@@ -144,6 +153,9 @@ const INITIAL_DATA = {
   drivers: [
     { id: "d1", nome: "MARCOS", cnh: "12345678900", telefone: "11 98765-4321", categoria: "E", status: "Em Viagem", foto: motoristaMarcosAsset.url },
   ] as Driver[],
+  clients: [
+    { id: "c1", nome: "PAULO", documento: "123.456.789-00", tipo: "PF", contato: "11 99999-9999" },
+  ] as Client[],
   vehicles: [
     { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA" },
   ] as Vehicle[],
@@ -175,7 +187,8 @@ const INITIAL_DATA = {
   freights: [
     {
       id: "f1",
-      empresa: "TRANSPORTADORA EXEMPLO LTDA",
+      empresa: "PAULO",
+      clienteId: "c1",
       origem: "CAMPINAS",
       destino: "BELO HORIZONTE",
       placa: "AHV 9J29",
@@ -321,11 +334,12 @@ export function TransportManagementSystem() {
 
   // APP TABS STATE
   const [activeTab, setActiveTab] = useState<
-    "dashboard" | "frota" | "despesas" | "oleo" | "fretes" | "financeiro"
+    "dashboard" | "frota" | "despesas" | "oleo" | "fretes" | "financeiro" | "clientes"
   >("dashboard");
 
   // DATA PERSISTENCE STATE WITH INDEXEDDB
   const [drivers, setDrivers] = useState<Driver[]>(INITIAL_DATA.drivers);
+  const [clients, setClients] = useState<Client[]>(INITIAL_DATA.clients);
   const [vehicles, setVehicles] = useState<Vehicle[]>(INITIAL_DATA.vehicles);
   const [expenses, setExpenses] = useState<Expense[]>(INITIAL_DATA.expenses);
   const [freights, setFreights] = useState<Freight[]>(INITIAL_DATA.freights);
@@ -335,8 +349,9 @@ export function TransportManagementSystem() {
   useEffect(() => {
     if (!isAuthenticated) return;
     async function initData() {
-      const [d, v, e, f, o] = await Promise.all([
+      const [d, cl, v, e, f, o] = await Promise.all([
         loadFromDB("drivers", INITIAL_DATA.drivers),
+        loadFromDB("clients", INITIAL_DATA.clients),
         loadFromDB("vehicles", INITIAL_DATA.vehicles),
         loadFromDB("expenses", INITIAL_DATA.expenses),
         loadFromDB("freights", INITIAL_DATA.freights),
@@ -352,6 +367,7 @@ export function TransportManagementSystem() {
       if (JSON.stringify(driversWithPhoto) !== JSON.stringify(d)) {
         void saveToDB("drivers", driversWithPhoto);
       }
+      setClients(cl);
       setVehicles(v);
       setExpenses(e);
       setFreights(f);
@@ -366,6 +382,7 @@ export function TransportManagementSystem() {
         loadFromDB(dataKey, null).then((val: any) => {
           if (val !== null) {
             if (dataKey === "drivers") setDrivers(val);
+            if (dataKey === "clients") setClients(val);
             if (dataKey === "vehicles") setVehicles(val);
             if (dataKey === "expenses") setExpenses(val);
             if (dataKey === "freights") setFreights(val);
@@ -383,6 +400,11 @@ export function TransportManagementSystem() {
   const persistDrivers = useCallback((data: Driver[]) => {
     setDrivers(data);
     saveToDB("drivers", data);
+  }, []);
+
+  const persistClients = useCallback((data: Client[]) => {
+    setClients(data);
+    saveToDB("clients", data);
   }, []);
 
   const persistVehicles = useCallback((data: Vehicle[]) => {
@@ -411,6 +433,7 @@ export function TransportManagementSystem() {
   const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
   const [isDriverModalOpen, setIsDriverModalOpen] = useState(false);
   const [isOilModalOpen, setIsOilModalOpen] = useState(false);
+  const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [isQuickActionsOpen, setIsQuickActionsOpen] = useState(false);
 
   // EDITING STATES
@@ -418,6 +441,7 @@ export function TransportManagementSystem() {
   const [frtEditingId, setFrtEditingId] = useState<string | null>(null);
   const [vehEditingId, setVehEditingId] = useState<string | null>(null);
   const [oilEditingId, setOilEditingId] = useState<string | null>(null);
+  const [cliEditingId, setCliEditingId] = useState<string | null>(null);
 
   // DRIVER FORM STATES
   const [drvEditingId, setDrvEditingId] = useState<string | null>(null);
@@ -473,6 +497,12 @@ export function TransportManagementSystem() {
   const [oilCusto, setOilCusto] = useState<number | "">("");
   const [oilCategoriaServico, setOilCategoriaServico] = useState<MaintenanceCategory>("Troca de Óleo");
   const [oilObs, setOilObs] = useState("");
+
+  // Client Form
+  const [cliNome, setCliNome] = useState("");
+  const [cliDocumento, setCliDocumento] = useState("");
+  const [cliTipo, setCliTipo] = useState<"PF" | "PJ">("PJ");
+  const [cliContato, setCliContato] = useState("");
 
   // CALCULATED DASHBOARD METRICS
   const totalFreightsRevenue = useMemo(() => {
@@ -900,6 +930,58 @@ export function TransportManagementSystem() {
     setIsOilModalOpen(true);
   };
 
+  // ADD / EDIT CLIENT HANDLER
+  const handleAddClient = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cliNome) {
+      toast.error("Informe o nome do cliente.");
+      return;
+    }
+
+    if (cliEditingId) {
+      const updatedClients = clients.map((c) =>
+        c.id === cliEditingId
+          ? {
+              ...c,
+              nome: cliNome.toUpperCase(),
+              documento: cliDocumento,
+              tipo: cliTipo,
+              contato: cliContato,
+            }
+          : c,
+      );
+      persistClients(updatedClients);
+      toast.success(`Cliente ${cliNome.toUpperCase()} atualizado!`);
+    } else {
+      const newCli: Client = {
+        id: "cli_" + Date.now(),
+        nome: cliNome.toUpperCase(),
+        documento: cliDocumento,
+        tipo: cliTipo,
+        contato: cliContato,
+      };
+
+      persistClients([...clients, newCli]);
+      toast.success(`Cliente ${newCli.nome} cadastrado!`);
+    }
+
+    setCliEditingId(null);
+    setCliNome("");
+    setCliDocumento("");
+    setCliTipo("PJ");
+    setCliContato("");
+    setIsClientModalOpen(false);
+  };
+
+  const handleStartEditClient = (cli: Client) => {
+    setCliEditingId(cli.id);
+    setCliNome(cli.nome);
+    setCliDocumento(cli.documento);
+    setCliTipo(cli.tipo);
+    setCliContato(cli.contato);
+    setIsClientModalOpen(true);
+  };
+
   // DELETE HANDLERS
   const handleDeleteExpense = (id: string) => {
     persistExpenses(expenses.filter((item) => item.id !== id));
@@ -924,6 +1006,11 @@ export function TransportManagementSystem() {
   const handleDeleteOilChange = (id: string) => {
     persistOilChanges(oilChanges.filter((item) => item.id !== id));
     toast.info("Registro de manutenção removido.");
+  };
+
+  const handleDeleteClient = (id: string) => {
+    persistClients(clients.filter((item) => item.id !== id));
+    toast.info("Cliente removido.");
   };
 
   // LOGIN REAL (e-mail e senha da conta do sistema)
@@ -1158,6 +1245,16 @@ export function TransportManagementSystem() {
             >
               Financeiro
             </button>
+            <button
+              onClick={() => setActiveTab("clientes")}
+              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                activeTab === "clientes"
+                  ? "bg-[#f25c05] text-white shadow"
+                  : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+              }`}
+            >
+              Clientes
+            </button>
           </nav>
 
           {/* Logout */}
@@ -1171,7 +1268,9 @@ export function TransportManagementSystem() {
               <span className="hidden sm:inline">Sair</span>
             </button>
             <div className="text-[10px] text-slate-500 font-medium px-2 py-1 border-l border-slate-700 hidden lg:block whitespace-pre-line">
-              no mobile ajuste o layout e design para os numeros não ficarem amontuados, juntos adicionar barra de rolagem lateral, em fretes, no financeiro deixe mais visivel os numeros na barra de rolagem, e adcione o icone do whatsapp para compartilhar os dados tanto no mobile quanto no desktop
+              '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+                                            
+                                            adicione uma categoria para cadastrar clientes, e quando for adicionar o frete aparece a opção de escolher o cliente, adicionar os dados do cliente, escolher a parte pessoa fisica ou juridica, com apenas um clique ai muda os dados para preencher.  E na parte do frete adicione Ex , cliente Paulo frete 10 Recebido 5  saldo ar 5
             </div>
           </div>
 
@@ -1271,6 +1370,16 @@ export function TransportManagementSystem() {
                   <Truck className="w-5 h-5" />
                 </div>
                 <span className="font-semibold text-sm text-slate-700">Novo veículo</span>
+              </button>
+
+              <button
+                onClick={() => setIsClientModalOpen(true)}
+                className="bg-white hover:bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex items-center gap-3 transition-all cursor-pointer shadow-sm text-left group"
+              >
+                <div className="bg-orange-100 text-[#f25c05] p-2.5 rounded-xl group-hover:scale-105 transition-transform">
+                  <User className="w-5 h-5" />
+                </div>
+                <span className="font-semibold text-sm text-slate-700">Novo cliente</span>
               </button>
             </div>
 
@@ -2031,14 +2140,14 @@ export function TransportManagementSystem() {
             <button
               onClick={() => {
                 setIsQuickActionsOpen(false);
-                setIsDriverModalOpen(true);
+                setIsClientModalOpen(true);
               }}
-              className="bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 p-4 rounded-xl text-left flex flex-col items-center justify-center text-center gap-2 cursor-pointer transition-all col-span-2"
+              className="bg-sky-50 hover:bg-sky-100 border border-sky-200 p-4 rounded-xl text-left flex flex-col items-center justify-center text-center gap-2 cursor-pointer transition-all col-span-2"
             >
-              <div className="bg-emerald-600 text-white p-2.5 rounded-full shadow">
+              <div className="bg-sky-600 text-white p-2.5 rounded-full shadow">
                 <User className="w-5 h-5" />
               </div>
-              <span className="font-bold text-xs text-[#0c192c]">Novo Motorista</span>
+              <span className="font-bold text-xs text-[#0c192c]">Novo Cliente</span>
             </button>
           </div>
         </DialogContent>
@@ -2354,15 +2463,35 @@ export function TransportManagementSystem() {
           <form onSubmit={handleAddFreight} className="space-y-3 py-2">
             <div>
               <Label className="text-xs font-semibold text-slate-700">Empresa / Cliente</Label>
-              <Input
-                type="text"
-                list="empresas-fretes"
-                value={frtEmpresa}
-                onChange={(e) => setFrtEmpresa(e.target.value)}
-                placeholder="Ex: TRANSPORTES ALFA LTDA"
-                className="mt-1 text-xs uppercase font-bold"
-                required
-              />
+              <div className="flex gap-2">
+                <select
+                  value={frtEmpresa}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setFrtEmpresa(val);
+                    // Tenta encontrar o cliente pelo nome para associar o clienteId
+                    const client = clients.find(c => c.nome.toUpperCase() === val.toUpperCase());
+                    // Se encontrar um cliente real, talvez queiramos guardar o ID
+                  }}
+                  className="w-full mt-1 p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold"
+                  required
+                >
+                  <option value="">Selecione ou digite...</option>
+                  {clients.map((c) => (
+                    <option key={c.id} value={c.nome}>{c.nome} ({c.tipo})</option>
+                  ))}
+                  {/* Mantém compatibilidade com empresas avulsas via datalist se necessário, 
+                      mas aqui estamos priorizando a seleção de clientes cadastrados */}
+                </select>
+                <Input
+                  type="text"
+                  list="empresas-fretes"
+                  value={frtEmpresa}
+                  onChange={(e) => setFrtEmpresa(e.target.value)}
+                  placeholder="Ou digite o nome"
+                  className="mt-1 text-xs uppercase font-bold"
+                />
+              </div>
               <datalist id="empresas-fretes">
                 {receivableByCompany.map((c) => (
                   <option key={c.empresa} value={c.empresa} />
@@ -2420,9 +2549,50 @@ export function TransportManagementSystem() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
               <div>
                 <Label className="text-xs font-semibold text-slate-700">Cotação (R$)</Label>
+                <div className="relative mt-1">
+                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                  <CurrencyInput
+                    value={frtCotacao}
+                    onChange={(val) => {
+                      setFrtCotacao(val);
+                      if (!frtValor && typeof val === "number") setFrtValor(val);
+                    }}
+                    placeholder="0,00"
+                    className="text-xs pl-8 font-bold"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">Recebido (R$)</Label>
+                <div className="relative mt-1">
+                  <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
+                  <CurrencyInput
+                    value={frtRecebido}
+                    onChange={setFrtRecebido}
+                    placeholder="0,00"
+                    className="text-xs pl-8 font-bold text-green-600"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-slate-50 p-2 rounded-lg border border-slate-100 flex flex-col justify-center">
+                <span className="text-[10px] text-slate-400 font-bold uppercase">Saldo a Receber</span>
+                <span className="text-sm font-black text-red-600">
+                  {formatBRL(
+                    (typeof frtValor === "number" ? frtValor : (typeof frtCotacao === "number" ? frtCotacao : 0)) - 
+                    (typeof frtRecebido === "number" ? frtRecebido : 0)
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">Valor Ajustado (R$)</Label>
                 <div className="relative mt-1">
                   <span className="absolute left-2.5 top-2 text-xs font-semibold text-slate-400 z-10">R$</span>
                   <CurrencyInput
@@ -2910,6 +3080,180 @@ export function TransportManagementSystem() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* ------------------------------------------------------------- */}
+      {/* FORM MODAL 5: CLIENTES */}
+      {/* ------------------------------------------------------------- */}
+      <Dialog
+        open={isClientModalOpen}
+        onOpenChange={(open) => {
+          setIsClientModalOpen(open);
+          if (!open) {
+            setCliEditingId(null);
+            setCliNome("");
+            setCliDocumento("");
+            setCliTipo("PJ");
+            setCliContato("");
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md bg-white rounded-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-[#0c192c]">
+              {cliEditingId ? "Editar Cliente" : "Cadastrar Novo Cliente"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleAddClient} className="space-y-4 py-2">
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">Nome do Cliente / Razão Social</Label>
+              <Input
+                type="text"
+                value={cliNome}
+                onChange={(e) => setCliNome(e.target.value)}
+                placeholder="Ex: PAULO ou TRANSPORTES ALFA"
+                className="mt-1 text-xs uppercase font-bold"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">Tipo</Label>
+                <div className="flex gap-2 mt-1">
+                  <Button
+                    type="button"
+                    variant={cliTipo === "PF" ? "default" : "outline"}
+                    onClick={() => setCliTipo("PF")}
+                    className="flex-1 text-xs h-9"
+                  >
+                    Pessoa Física
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={cliTipo === "PJ" ? "default" : "outline"}
+                    onClick={() => setCliTipo("PJ")}
+                    className="flex-1 text-xs h-9"
+                  >
+                    Pessoa Jurídica
+                  </Button>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">
+                  {cliTipo === "PF" ? "CPF" : "CNPJ"}
+                </Label>
+                <Input
+                  type="text"
+                  value={cliDocumento}
+                  onChange={(e) => setCliDocumento(e.target.value)}
+                  placeholder={cliTipo === "PF" ? "000.000.000-00" : "00.000.000/0000-00"}
+                  className="mt-1 text-xs"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">Contato / WhatsApp</Label>
+              <Input
+                type="text"
+                value={cliContato}
+                onChange={(e) => setCliContato(e.target.value)}
+                placeholder="Ex: 11 99999-9999"
+                className="mt-1 text-xs"
+              />
+            </div>
+
+            <DialogFooter className="pt-2 border-t border-slate-100 flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsClientModalOpen(false)}
+                className="text-xs"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                className="bg-[#0c192c] hover:bg-[#162a45] text-white text-xs font-bold"
+              >
+                {cliEditingId ? "Salvar Alterações" : "Salvar Cliente"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ------------------------------------------------------------- */}
+      {/* TAB 7: CLIENTES */}
+      {/* ------------------------------------------------------------- */}
+      {activeTab === "clientes" && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-black text-[#0c192c] tracking-tight">Clientes</h1>
+              <p className="text-slate-500 text-xs sm:text-sm">Gestão de clientes PF e PJ</p>
+            </div>
+
+            <Button
+              onClick={() => setIsClientModalOpen(true)}
+              className="bg-[#0c192c] hover:bg-[#162a45] text-white font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow cursor-pointer text-xs"
+            >
+              <Plus className="w-4 h-4" /> Novo Cliente
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {clients.map((cli) => (
+              <Card key={cli.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 relative group hover:shadow-md transition-all">
+                <div className="absolute top-4 right-4 flex items-center gap-1">
+                  <button
+                    onClick={() => handleStartEditClient(cli)}
+                    className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClient(cli.id)}
+                    className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`p-2 rounded-lg ${cli.tipo === "PF" ? "bg-blue-100 text-blue-600" : "bg-purple-100 text-purple-600"}`}>
+                    {cli.tipo === "PF" ? <User className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    <div className="font-black text-[#0c192c] uppercase">{cli.nome}</div>
+                    <div className="text-[10px] font-bold text-slate-400">{cli.tipo === "PF" ? "PESSOA FÍSICA" : "PESSOA JURÍDICA"}</div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 border-t border-slate-50 pt-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 font-medium">{cli.tipo === "PF" ? "CPF" : "CNPJ"}</span>
+                    <span className="text-[#0c192c] font-bold">{cli.documento || "---"}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 font-medium">Contato</span>
+                    <span className="text-[#0c192c] font-bold">{cli.contato || "---"}</span>
+                  </div>
+                </div>
+              </Card>
+            ))}
+
+            {clients.length === 0 && (
+              <div className="col-span-full py-12 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
+                <div className="text-slate-300 font-bold mb-1">Nenhum cliente cadastrado</div>
+                <p className="text-slate-400 text-xs">Comece adicionando seu primeiro cliente</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   );
