@@ -339,6 +339,7 @@ export function TransportManagementSystem() {
 
   // DATA PERSISTENCE STATE WITH INDEXEDDB
   const [drivers, setDrivers] = useState<Driver[]>(INITIAL_DATA.drivers);
+  const [clients, setClients] = useState<Client[]>(INITIAL_DATA.clients);
   const [vehicles, setVehicles] = useState<Vehicle[]>(INITIAL_DATA.vehicles);
   const [expenses, setExpenses] = useState<Expense[]>(INITIAL_DATA.expenses);
   const [freights, setFreights] = useState<Freight[]>(INITIAL_DATA.freights);
