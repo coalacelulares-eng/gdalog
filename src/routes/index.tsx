@@ -132,6 +132,8 @@ interface Freight {
   cotacao: number;
   valor: number;
   recebido: number;
+  // Adicionando suporte para os dados do exemplo solicitado anteriormente
+  exemplo?: string; 
 }
 
 type MaintenanceCategory = "Troca de Óleo" | "Freios" | "Peças de Motor" | "Peças do Câmbio" | "Pneus";
