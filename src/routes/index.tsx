@@ -153,6 +153,9 @@ const INITIAL_DATA = {
   drivers: [
     { id: "d1", nome: "MARCOS", cnh: "12345678900", telefone: "11 98765-4321", categoria: "E", status: "Em Viagem", foto: motoristaMarcosAsset.url },
   ] as Driver[],
+  clients: [
+    { id: "c1", nome: "PAULO", documento: "123.456.789-00", tipo: "PF", contato: "11 99999-9999" },
+  ] as Client[],
   vehicles: [
     { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA" },
   ] as Vehicle[],
@@ -184,7 +187,8 @@ const INITIAL_DATA = {
   freights: [
     {
       id: "f1",
-      empresa: "TRANSPORTADORA EXEMPLO LTDA",
+      empresa: "PAULO",
+      clienteId: "c1",
       origem: "CAMPINAS",
       destino: "BELO HORIZONTE",
       placa: "AHV 9J29",
