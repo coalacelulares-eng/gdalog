@@ -504,6 +504,9 @@ export function TransportManagementSystem() {
   const [cliTipo, setCliTipo] = useState<"PF" | "PJ">("PJ");
   const [cliContato, setCliContato] = useState("");
 
+  // Client Search State
+  const [clientSearch, setClientSearch] = useState("");
+
   // CALCULATED DASHBOARD METRICS
   const totalFreightsRevenue = useMemo(() => {
     return freights.reduce((acc, f) => acc + (f.valor || 0), 0);
