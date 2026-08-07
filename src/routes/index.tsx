@@ -2240,8 +2240,6 @@ export function TransportManagementSystem() {
           <Building2 className="w-5 h-5" />
           <span>Clientes</span>
         </button>
-          <span>Clientes</span>
-        </button>
       </div>
 
       {/* FLOATING QUICK ACTION BUTTON (+) AT BOTTOM RIGHT (Exact orange match) */}
