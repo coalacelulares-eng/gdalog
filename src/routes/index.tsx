@@ -2671,8 +2671,8 @@ export function TransportManagementSystem() {
                       .map((c) => (
                         <option key={c.id} value={c.nome}>{c.nome} ({c.tipo})</option>
                       ))
-                    {clients
-                      .filter(c => 
+                    }
+                    {clients.filter(c => 
                         c.nome.toLowerCase().includes(frtClientSearch.toLowerCase()) || 
                         c.documento.includes(frtClientSearch)
                       ).length === 0 && frtClientSearch && (
