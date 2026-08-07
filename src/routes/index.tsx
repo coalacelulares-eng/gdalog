@@ -1205,8 +1205,8 @@ export function TransportManagementSystem() {
             </span>
           </div>
 
-          {/* Navigation Links Desktop */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+          {/* Navigation Links */}
+          <nav className="flex items-center space-x-1 lg:space-x-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
             <button
               onClick={() => setActiveTab("dashboard")}
               className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
