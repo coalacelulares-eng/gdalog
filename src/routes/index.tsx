@@ -3134,7 +3134,7 @@ export function TransportManagementSystem() {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleAddClient} className="space-y-4 py-2">
+          <form onSubmit={handleAddClient} className="space-y-4 py-2 overflow-y-auto max-h-[60vh] px-1 scrollbar-thin">
             <div>
               <Label className="text-xs font-semibold text-slate-700">Nome do Cliente / Razão Social</Label>
               <Input
