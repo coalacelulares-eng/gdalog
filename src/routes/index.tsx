@@ -599,6 +599,8 @@ export function TransportManagementSystem() {
   const [clientSearch, setClientSearch] = useState("");
 
   const [frtClientSearch, setFrtClientSearch] = useState("");
+  const [expVehicleSearch, setExpVehicleSearch] = useState("");
+  const [expDriverSearch, setExpDriverSearch] = useState("");
 
   // CALCULATED DASHBOARD METRICS
   const totalFreightsRevenue = useMemo(() => {
