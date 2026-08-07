@@ -1382,9 +1382,9 @@ export function TransportManagementSystem() {
             </button>
             <button
               onClick={() => setActiveTab("frota")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "frota"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
@@ -1392,29 +1392,29 @@ export function TransportManagementSystem() {
             </button>
             <button
               onClick={() => setActiveTab("despesas")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "despesas"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
-              Despesas
+              Custos
             </button>
             <button
               onClick={() => setActiveTab("oleo")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "oleo"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
-              Manutenção
+              Manut.
             </button>
             <button
               onClick={() => setActiveTab("fretes")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "fretes"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
@@ -1422,19 +1422,19 @@ export function TransportManagementSystem() {
             </button>
             <button
               onClick={() => setActiveTab("financeiro")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "financeiro"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
-              Financeiro
+              Relat.
             </button>
             <button
               onClick={() => setActiveTab("clientes")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "clientes"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
