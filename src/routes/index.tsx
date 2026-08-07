@@ -930,6 +930,58 @@ export function TransportManagementSystem() {
     setIsOilModalOpen(true);
   };
 
+  // ADD / EDIT CLIENT HANDLER
+  const handleAddClient = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cliNome) {
+      toast.error("Informe o nome do cliente.");
+      return;
+    }
+
+    if (cliEditingId) {
+      const updatedClients = clients.map((c) =>
+        c.id === cliEditingId
+          ? {
+              ...c,
+              nome: cliNome.toUpperCase(),
+              documento: cliDocumento,
+              tipo: cliTipo,
+              contato: cliContato,
+            }
+          : c,
+      );
+      persistClients(updatedClients);
+      toast.success(`Cliente ${cliNome.toUpperCase()} atualizado!`);
+    } else {
+      const newCli: Client = {
+        id: "cli_" + Date.now(),
+        nome: cliNome.toUpperCase(),
+        documento: cliDocumento,
+        tipo: cliTipo,
+        contato: cliContato,
+      };
+
+      persistClients([...clients, newCli]);
+      toast.success(`Cliente ${newCli.nome} cadastrado!`);
+    }
+
+    setCliEditingId(null);
+    setCliNome("");
+    setCliDocumento("");
+    setCliTipo("PJ");
+    setCliContato("");
+    setIsClientModalOpen(false);
+  };
+
+  const handleStartEditClient = (cli: Client) => {
+    setCliEditingId(cli.id);
+    setCliNome(cli.nome);
+    setCliDocumento(cli.documento);
+    setCliTipo(cli.tipo);
+    setCliContato(cli.contato);
+    setIsClientModalOpen(true);
+  };
+
   // DELETE HANDLERS
   const handleDeleteExpense = (id: string) => {
     persistExpenses(expenses.filter((item) => item.id !== id));
