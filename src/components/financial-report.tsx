@@ -602,8 +602,8 @@ export function FinancialReport({
           <h2 className="font-extrabold text-[#0c192c]">DRE final da operação</h2>
           <span className="text-[11px] text-slate-400">{periodoLabel}</span>
         </div>
-        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
-          <table className="w-full text-sm min-w-[420px]">
+        <div className="overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
+          <table className="w-full text-sm min-w-[500px]">
             <tbody>
               <tr className="border-b border-slate-100">
                 <td className="py-2 font-bold text-[#0c192c]">Receita total de fretes</td>
@@ -685,8 +685,8 @@ export function FinancialReport({
                 <div className="text-lg font-black text-[#0c192c]">{formatBRL(custoDieselPorKm)}</div>
               </div>
             </div>
-            <div className="overflow-x-auto mt-4 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
-              <table className="w-full text-sm min-w-[460px]">
+            <div className="overflow-x-auto mt-4 pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
+              <table className="w-full text-sm min-w-[600px]">
                 <thead>
                   <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
                     <th className="py-2">Veículo</th>
@@ -729,8 +729,8 @@ export function FinancialReport({
             {byTrip.length} viagens · margem média {margemMediaViagem.toFixed(1)}%
           </span>
         </div>
-        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
-          <table className="w-full text-sm min-w-[520px]">
+        <div className="overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
+          <table className="w-full text-sm min-w-[700px]">
             <thead>
               <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
                 <th className="py-2">Data</th>
@@ -788,8 +788,8 @@ export function FinancialReport({
       {/* APURAÇÃO FINAL DE MARGEM POR PLACA */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
         <h2 className="font-extrabold text-[#0c192c] mb-4">Apuração final de margem por placa</h2>
-        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
-          <table className="w-full text-sm min-w-[560px]">
+        <div className="overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
+          <table className="w-full text-sm min-w-[800px]">
             <thead>
               <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
                 <th className="py-2">Placa</th>
@@ -856,8 +856,8 @@ export function FinancialReport({
       {/* Custos por categoria */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
         <h2 className="font-extrabold text-[#0c192c] mb-4">Custos por categoria</h2>
-        <div className="overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
-          <div className="min-w-[320px] space-y-2">
+        <div className="overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
+          <div className="min-w-[400px] space-y-2">
             {allCostRows.map((c) => (
               <div key={c.key} className="flex items-center gap-3">
                 <div className="w-36 sm:w-40 text-xs font-semibold text-slate-600 shrink-0">{c.label}</div>
