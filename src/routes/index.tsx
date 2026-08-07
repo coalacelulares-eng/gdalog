@@ -3238,46 +3238,96 @@ export function TransportManagementSystem() {
             </Button>
           </div>
 
+          {/* Barra de Busca de Clientes */}
+          <div className="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
+            <Settings className="w-4 h-4 text-slate-400" />
+            <Input
+              type="text"
+              placeholder="Buscar cliente por nome ou documento..."
+              value={clientSearch}
+              onChange={(e) => setClientSearch(e.target.value)}
+              className="border-none bg-transparent text-xs focus-visible:ring-0 p-0 h-auto"
+            />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {clients.map((cli) => (
-              <Card key={cli.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 relative group hover:shadow-md transition-all">
-                <div className="absolute top-4 right-4 flex items-center gap-1">
-                  <button
-                    onClick={() => handleStartEditClient(cli)}
-                    className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
-                  >
-                    <Settings className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteClient(cli.id)}
-                    className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+            {clients
+              .filter(cli => 
+                cli.nome.toLowerCase().includes(clientSearch.toLowerCase()) || 
+                cli.documento.includes(clientSearch)
+              )
+              .map((cli) => {
+                // Filtra fretes vinculados a este cliente
+                const clientFreights = freights.filter(f => f.clienteId === cli.id || f.empresa.toUpperCase() === cli.nome.toUpperCase());
+                const totalRevenue = clientFreights.reduce((acc, f) => acc + (f.valor || 0), 0);
+                const totalBalance = clientFreights.reduce((acc, f) => acc + ((f.valor || 0) - (f.recebido || 0)), 0);
 
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`p-2 rounded-lg ${cli.tipo === "PF" ? "bg-blue-100 text-blue-600" : "bg-purple-100 text-purple-600"}`}>
-                    {cli.tipo === "PF" ? <User className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
-                  </div>
-                  <div>
-                    <div className="font-black text-[#0c192c] uppercase">{cli.nome}</div>
-                    <div className="text-[10px] font-bold text-slate-400">{cli.tipo === "PF" ? "PESSOA FÍSICA" : "PESSOA JURÍDICA"}</div>
-                  </div>
-                </div>
+                return (
+                  <Card key={cli.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 relative group hover:shadow-md transition-all">
+                    <div className="absolute top-4 right-4 flex items-center gap-1">
+                      <button
+                        onClick={() => handleStartEditClient(cli)}
+                        className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
+                      >
+                        <Settings className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClient(cli.id)}
+                        className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
 
-                <div className="space-y-2 border-t border-slate-50 pt-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400 font-medium">{cli.tipo === "PF" ? "CPF" : "CNPJ"}</span>
-                    <span className="text-[#0c192c] font-bold">{cli.documento || "---"}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400 font-medium">Contato</span>
-                    <span className="text-[#0c192c] font-bold">{cli.contato || "---"}</span>
-                  </div>
-                </div>
-              </Card>
-            ))}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`p-2 rounded-lg ${cli.tipo === "PF" ? "bg-blue-100 text-blue-600" : "bg-purple-100 text-purple-600"}`}>
+                        {cli.tipo === "PF" ? <User className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
+                      </div>
+                      <div>
+                        <div className="font-black text-[#0c192c] uppercase">{cli.nome}</div>
+                        <div className="text-[10px] font-bold text-slate-400">{cli.tipo === "PF" ? "PESSOA FÍSICA" : "PESSOA JURÍDICA"}</div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 border-t border-slate-50 pt-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-400 font-medium">{cli.tipo === "PF" ? "CPF" : "CNPJ"}</span>
+                        <span className="text-[#0c192c] font-bold">{cli.documento || "---"}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-400 font-medium">Contato</span>
+                        <span className="text-[#0c192c] font-bold">{cli.contato || "---"}</span>
+                      </div>
+                      
+                      {/* Histórico Vinculado */}
+                      <div className="mt-3 pt-3 border-t border-slate-50 space-y-2">
+                        <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
+                          <span className="text-slate-400">Total em Fretes</span>
+                          <span className="text-[#16a34a]">{formatBRL(totalRevenue)}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
+                          <span className="text-slate-400">Saldo Pendente</span>
+                          <span className={totalBalance > 0 ? "text-[#dc2626]" : "text-slate-400"}>{formatBRL(totalBalance)}</span>
+                        </div>
+                        
+                        {clientFreights.length > 0 ? (
+                          <div className="mt-2 space-y-1">
+                            <span className="text-[9px] font-bold text-slate-400 uppercase">Últimos Fretes:</span>
+                            {clientFreights.slice(0, 2).map(f => (
+                              <div key={f.id} className="text-[9px] bg-slate-50 p-1 rounded border border-slate-100 flex justify-between">
+                                <span className="text-slate-600 font-medium truncate max-w-[120px]">{f.origem} → {f.destino}</span>
+                                <span className="text-[#0c192c] font-bold">{formatBRL(f.valor)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-[9px] text-slate-400 italic">Sem histórico de fretes</div>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
 
             {clients.length === 0 && (
               <div className="col-span-full py-12 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
@@ -3288,7 +3338,6 @@ export function TransportManagementSystem() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
