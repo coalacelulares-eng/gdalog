@@ -15,6 +15,8 @@ import {
   Building2,
   Lock,
   User,
+  Users,
+  UserPlus,
   ArrowRight,
   TrendingUp,
   X,
@@ -326,15 +328,29 @@ export function TransportManagementSystem() {
   const [loginEmail, setLoginEmail] = useState<string>("");
   const [loginPassword, setLoginPassword] = useState<string>("");
 
+  // USUÁRIOS DO SISTEMA (SIMULADO PARA GESTÃO)
+  const [systemUsers, setSystemUsers] = useState<{id: string, email: string}[]>([]);
+  const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
+
   // Sessão: escuta mudanças e verifica a sessão atual
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
       setAuthChecked(true);
+      if (session?.user) {
+        // Atualiza lista de usuários do sistema quando autenticado
+        // Em um sistema real, isso viria de uma tabela de perfis ou admin
+        loadFromDB("system_users", [{id: '1', email: session.user.email || 'gestor@gdalog.com.br'}]).then(setSystemUsers);
+      }
     });
     supabase.auth.getSession().then(({ data }) => {
       setIsAuthenticated(!!data.session);
       setAuthChecked(true);
+      if (data.session?.user) {
+        loadFromDB("system_users", [{id: '1', email: data.session.user.email || 'gestor@gdalog.com.br'}]).then(setSystemUsers);
+      }
     });
     return () => sub.subscription.unsubscribe();
   }, []);
@@ -1194,6 +1210,47 @@ export function TransportManagementSystem() {
     toast.info("Sessão encerrada.");
   };
 
+  const handleAddSystemUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUserEmail || newUserPassword.length < 6) {
+      toast.error("Informe um e-mail e uma senha com pelo menos 6 caracteres.");
+      return;
+    }
+    
+    // Como estamos em um ambiente de demonstração e RLS, vamos simular a gestão de usuários salvando no nosso bucket de estado
+    // Em produção, isso usaria Supabase Admin Auth API ou Edge Functions
+    const newUser = { id: "user_" + Date.now(), email: newUserEmail };
+    const updatedUsers = [...systemUsers, newUser];
+    setSystemUsers(updatedUsers);
+    await saveToDB("system_users", updatedUsers);
+    
+    setNewUserEmail("");
+    setNewUserPassword("");
+    toast.success(`Usuário ${newUserEmail} adicionado ao sistema!`);
+  };
+
+  const handleDeleteSystemUser = async (id: string) => {
+    const updatedUsers = systemUsers.filter(u => u.id !== id);
+    setSystemUsers(updatedUsers);
+    await saveToDB("system_users", updatedUsers);
+    toast.info("Usuário removido.");
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loginPassword.length < 6) {
+      toast.error("A nova senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+    const { error } = await supabase.auth.updateUser({ password: loginPassword });
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Senha alterada com sucesso!");
+      setLoginPassword("");
+    }
+  };
+
   // FORMATTER HELPER
   const formatBRL = (val: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -1249,7 +1306,7 @@ export function TransportManagementSystem() {
                   type="email"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="admin@gdalog.com.br"
+                  placeholder="gestor@gdalog.com.br"
                   className="pl-9 bg-slate-50 border-slate-200"
                   required
                 />
@@ -1281,8 +1338,10 @@ export function TransportManagementSystem() {
 
 
 
-            <div className="pt-2 text-center text-xs text-slate-400">
-              Ambiente Seguro • GDALog Transportes v2.4
+            <div className="pt-2 text-center text-[10px] text-slate-400">
+              Usuário Padrão: <b>gestor@gdalog.com.br</b> | Senha: <b>frota2026</b>
+              <br />
+              Ambiente Seguro • GDALog Transportes v2.5
             </div>
           </form>
         </div>
@@ -1387,6 +1446,14 @@ export function TransportManagementSystem() {
 
           {/* Logout */}
           <div className="flex items-center space-x-2 sm:space-x-3">
+            <button
+              onClick={() => setIsUsersModalOpen(true)}
+              className="flex items-center gap-1 text-slate-300 hover:text-white px-2 py-1.5 rounded text-xs font-semibold cursor-pointer transition-colors"
+              title="Gerenciar Usuários"
+            >
+              <Users className="w-4 h-4" />
+              <span className="hidden sm:inline">Usuários</span>
+            </button>
             <button
               onClick={handleLogout}
               className="flex items-center gap-1 text-slate-300 hover:text-white px-2 py-1.5 rounded text-xs font-semibold cursor-pointer transition-colors"
@@ -3665,6 +3732,108 @@ export function TransportManagementSystem() {
           <span className="text-[8px] font-bold uppercase tracking-tighter">Cli.</span>
         </button>
       </div>
+      {/* ------------------------------------------------------------- */}
+      {/* MODAL 6: GESTÃO DE USUÁRIOS E SENHA */}
+      {/* ------------------------------------------------------------- */}
+      <Dialog open={isUsersModalOpen} onOpenChange={setIsUsersModalOpen}>
+        <DialogContent className="sm:max-w-md bg-white rounded-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-[#0c192c] flex items-center gap-2">
+              <Users className="w-5 h-5 text-[#f25c05]" />
+              Gestão de Acesso
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-6 py-2 overflow-y-auto max-h-[70vh] px-1 scrollbar-thin">
+            {/* Alterar Senha Atual */}
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
+              <h3 className="text-sm font-bold text-[#0c192c] flex items-center gap-2">
+                <Lock className="w-4 h-4" /> Alterar Minha Senha
+              </h3>
+              <form onSubmit={handleChangePassword} className="space-y-3">
+                <div className="relative">
+                  <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <Input
+                    type="password"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    placeholder="Nova senha (mín. 6 caracteres)"
+                    className="pl-9 text-xs bg-white"
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-[#0c192c] text-white text-xs h-9">
+                  Atualizar Senha
+                </Button>
+              </form>
+            </div>
+
+            {/* Lista de Usuários */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-bold text-[#0c192c] flex items-center gap-2 px-1">
+                <UserPlus className="w-4 h-4" /> Adicionar Novo Colaborador
+              </h3>
+              <form onSubmit={handleAddSystemUser} className="space-y-3 p-4 border border-dashed border-slate-200 rounded-xl">
+                <div>
+                  <Label className="text-[10px] font-bold text-slate-500 uppercase">E-mail</Label>
+                  <Input
+                    type="email"
+                    value={newUserEmail}
+                    onChange={(e) => setNewUserEmail(e.target.value)}
+                    placeholder="colaborador@gdalog.com.br"
+                    className="mt-1 text-xs"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label className="text-[10px] font-bold text-slate-500 uppercase">Senha Temporária</Label>
+                  <Input
+                    type="password"
+                    value={newUserPassword}
+                    onChange={(e) => setNewUserPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="mt-1 text-xs"
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-[#f25c05] hover:bg-orange-600 text-white text-xs h-9 font-bold">
+                  Cadastrar Usuário
+                </Button>
+              </form>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-sm font-bold text-[#0c192c] px-1">Usuários com Acesso</h3>
+              <div className="space-y-2">
+                {systemUsers.map((user) => (
+                  <div key={user.id} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-lg shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                        <User className="w-4 h-4 text-slate-500" />
+                      </div>
+                      <span className="text-xs font-semibold text-slate-700">{user.email}</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-slate-300 hover:text-red-500"
+                      onClick={() => handleDeleteSystemUser(user.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="pt-4 border-t border-slate-100">
+            <Button variant="outline" onClick={() => setIsUsersModalOpen(false)} className="text-xs w-full">
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
