@@ -1357,27 +1357,24 @@ export function TransportManagementSystem() {
       <Toaster position="top-right" />
 
       {/* TOP NAVBAR (Exact match to screenshots visual identity) */}
-      <header className="bg-[#0c192c] text-white no-print md:h-[72px] flex items-center w-full sticky top-0 z-50 shadow-md">
+      <header className="bg-[#0c192c] text-white no-print md:h-[100px] flex items-center w-full sticky top-0 z-50 shadow-lg">
         <div className="max-w-[1920px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-3 flex flex-row items-center justify-between gap-4">
 
           
           {/* Logo Brand */}
           <div className="flex items-center gap-3">
-            <div className="bg-white px-3 py-0.5 rounded-lg shadow-sm flex items-center">
-              <img src={logoAsset.url} alt="GDALog" className="h-14 w-auto object-contain" />
+            <div className="bg-white px-4 py-1.5 rounded-xl shadow-md flex items-center transform hover:scale-105 transition-transform duration-300">
+              <img src={logoAsset.url} alt="GDALog" className="h-16 md:h-20 w-auto object-contain" />
             </div>
-            <span className="font-bold text-sm sm:text-base tracking-tight hidden sm:inline-block border-l border-slate-700 pl-3 text-slate-200">
-              Gestão de Transportes
-            </span>
           </div>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-0.5 lg:space-x-1 flex-1 justify-center scrollbar-hide">
+          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 flex-1 justify-center scrollbar-hide">
             <button
               onClick={() => setActiveTab("dashboard")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "dashboard"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
@@ -1385,9 +1382,9 @@ export function TransportManagementSystem() {
             </button>
             <button
               onClick={() => setActiveTab("frota")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "frota"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
@@ -1395,29 +1392,29 @@ export function TransportManagementSystem() {
             </button>
             <button
               onClick={() => setActiveTab("despesas")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "despesas"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
-              Despesas
+              Custos
             </button>
             <button
               onClick={() => setActiveTab("oleo")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "oleo"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
-              Manutenção
+              Manut.
             </button>
             <button
               onClick={() => setActiveTab("fretes")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "fretes"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
@@ -1425,19 +1422,19 @@ export function TransportManagementSystem() {
             </button>
             <button
               onClick={() => setActiveTab("financeiro")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "financeiro"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
-              Financeiro
+              Relat.
             </button>
             <button
               onClick={() => setActiveTab("clientes")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "clientes"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
