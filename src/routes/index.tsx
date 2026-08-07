@@ -402,6 +402,11 @@ export function TransportManagementSystem() {
     saveToDB("drivers", data);
   }, []);
 
+  const persistClients = useCallback((data: Client[]) => {
+    setClients(data);
+    saveToDB("clients", data);
+  }, []);
+
   const persistVehicles = useCallback((data: Vehicle[]) => {
     setVehicles(data);
     saveToDB("vehicles", data);
