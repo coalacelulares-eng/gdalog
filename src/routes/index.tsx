@@ -2627,6 +2627,7 @@ export function TransportManagementSystem() {
             setFrtPlaca("");
             setFrtValor("");
             setFrtRecebido("");
+            setFrtClientSearch("");
           }
         }}
       >
