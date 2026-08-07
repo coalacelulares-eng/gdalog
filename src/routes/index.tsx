@@ -1284,7 +1284,19 @@ export function TransportManagementSystem() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#0b192c] flex flex-col justify-center items-center p-4 relative overflow-hidden font-sans">
-        <Toaster position="top-right" />
+      <Toaster position="top-right" />
+      <style dangerouslySetInnerHTML={{ __html: `
+        * {
+          -webkit-user-select: text !important;
+          -moz-user-select: text !important;
+          -ms-user-select: text !important;
+          user-select: text !important;
+        }
+        input, textarea {
+          -webkit-user-select: text !important;
+          cursor: text !important;
+        }
+      `}} />
         {/* Background glow effects */}
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-orange-600/20 rounded-full blur-3xl pointer-events-none" />
@@ -1355,6 +1367,18 @@ export function TransportManagementSystem() {
   return (
     <div className="min-h-screen bg-[#f4f6f9] text-slate-800 font-sans pb-24 md:pb-6">
       <Toaster position="top-right" />
+      <style dangerouslySetInnerHTML={{ __html: `
+        * {
+          -webkit-user-select: text !important;
+          -moz-user-select: text !important;
+          -ms-user-select: text !important;
+          user-select: text !important;
+        }
+        input, textarea {
+          -webkit-user-select: text !important;
+          cursor: text !important;
+        }
+      `}} />
 
       {/* TOP NAVBAR (Exact match to screenshots visual identity) */}
       <header className="bg-[#0c192c] text-white no-print md:h-[100px] flex items-center w-full sticky top-0 z-50 shadow-lg">
