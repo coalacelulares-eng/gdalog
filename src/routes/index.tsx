@@ -112,9 +112,18 @@ interface Expense {
   observacao: string;
 }
 
+interface Client {
+  id: string;
+  nome: string;
+  documento: string;
+  tipo: "PF" | "PJ";
+  contato: string;
+}
+
 interface Freight {
   id: string;
   empresa: string;
+  clienteId?: string; // ID do cliente cadastrado
   origem: string;
   destino: string;
   placa: string;
