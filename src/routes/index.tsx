@@ -1372,9 +1372,9 @@ export function TransportManagementSystem() {
           <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 flex-1 justify-center scrollbar-hide">
             <button
               onClick={() => setActiveTab("dashboard")}
-              className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all cursor-pointer ${
                 activeTab === "dashboard"
-                  ? "bg-[#f25c05] text-white shadow"
+                  ? "bg-[#f25c05] text-white shadow-lg scale-105"
                   : "text-slate-300 hover:text-white hover:bg-slate-800/60"
               }`}
             >
