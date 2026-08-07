@@ -2490,7 +2490,7 @@ export function TransportManagementSystem() {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleAddFreight} className="space-y-3 py-2">
+          <form onSubmit={handleAddFreight} className="space-y-3 py-2 overflow-y-auto max-h-[60vh] px-1 scrollbar-thin">
             <div>
               <Label className="text-xs font-semibold text-slate-700">Empresa / Cliente</Label>
               <div className="flex gap-2">
