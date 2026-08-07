@@ -2463,15 +2463,35 @@ export function TransportManagementSystem() {
           <form onSubmit={handleAddFreight} className="space-y-3 py-2">
             <div>
               <Label className="text-xs font-semibold text-slate-700">Empresa / Cliente</Label>
-              <Input
-                type="text"
-                list="empresas-fretes"
-                value={frtEmpresa}
-                onChange={(e) => setFrtEmpresa(e.target.value)}
-                placeholder="Ex: TRANSPORTES ALFA LTDA"
-                className="mt-1 text-xs uppercase font-bold"
-                required
-              />
+              <div className="flex gap-2">
+                <select
+                  value={frtEmpresa}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setFrtEmpresa(val);
+                    // Tenta encontrar o cliente pelo nome para associar o clienteId
+                    const client = clients.find(c => c.nome.toUpperCase() === val.toUpperCase());
+                    // Se encontrar um cliente real, talvez queiramos guardar o ID
+                  }}
+                  className="w-full mt-1 p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold"
+                  required
+                >
+                  <option value="">Selecione ou digite...</option>
+                  {clients.map((c) => (
+                    <option key={c.id} value={c.nome}>{c.nome} ({c.tipo})</option>
+                  ))}
+                  {/* Mantém compatibilidade com empresas avulsas via datalist se necessário, 
+                      mas aqui estamos priorizando a seleção de clientes cadastrados */}
+                </select>
+                <Input
+                  type="text"
+                  list="empresas-fretes"
+                  value={frtEmpresa}
+                  onChange={(e) => setFrtEmpresa(e.target.value)}
+                  placeholder="Ou digite o nome"
+                  className="mt-1 text-xs uppercase font-bold"
+                />
+              </div>
               <datalist id="empresas-fretes">
                 {receivableByCompany.map((c) => (
                   <option key={c.empresa} value={c.empresa} />
