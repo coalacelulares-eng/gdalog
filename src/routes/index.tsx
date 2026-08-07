@@ -124,7 +124,7 @@ interface Client {
 interface Freight {
   id: string;
   empresa: string;
-  clienteId?: string; // ID do cliente cadastrado
+  clienteId?: string | null; // ID do cliente cadastrado
   origem: string;
   destino: string;
   placa: string;
