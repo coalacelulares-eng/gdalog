@@ -1371,6 +1371,16 @@ export function TransportManagementSystem() {
                 </div>
                 <span className="font-semibold text-sm text-slate-700">Novo veículo</span>
               </button>
+
+              <button
+                onClick={() => setIsClientModalOpen(true)}
+                className="bg-white hover:bg-slate-50 border border-slate-200/80 rounded-2xl p-4 flex items-center gap-3 transition-all cursor-pointer shadow-sm text-left group"
+              >
+                <div className="bg-orange-100 text-[#f25c05] p-2.5 rounded-xl group-hover:scale-105 transition-transform">
+                  <User className="w-5 h-5" />
+                </div>
+                <span className="font-semibold text-sm text-slate-700">Novo cliente</span>
+              </button>
             </div>
 
             {/* Bottom 2 Columns Grid: Veículos vs Últimos lançamentos */}
