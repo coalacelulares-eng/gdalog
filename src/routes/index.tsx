@@ -1290,13 +1290,7 @@ export function TransportManagementSystem() {
               <span className="hidden sm:inline">Sair</span>
             </button>
             <div className="text-[10px] text-slate-500 font-medium px-2 py-1 border-l border-slate-700 hidden lg:block whitespace-pre-line">
-              '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
-                                            
-                                            Implementar filtros de busca na lista de clientes.
-
-Vincular o histórico de fretes diretamente no card de cada cliente.
-
-Adicionar validação de CPF/CNPJ nos formulários de cliente.
+              ajustar o layout no mobile e no desktop para deixar as categorias a mostra e da uma atualizada na categoria de clientes, pois não esta funcionando no mobile e no desktop
             </div>
           </div>
 
