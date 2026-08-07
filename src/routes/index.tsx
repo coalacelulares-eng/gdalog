@@ -2214,7 +2214,7 @@ export function TransportManagementSystem() {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleAddExpense} className="space-y-4 py-2">
+          <form onSubmit={handleAddExpense} className="space-y-4 py-2 overflow-y-auto max-h-[60vh] px-1 scrollbar-thin">
             
             {/* Placa, Data, Motorista, Km */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
