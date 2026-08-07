@@ -27,7 +27,9 @@ import {
   Disc,
   BarChart3,
   MessageCircle,
-  Search
+  Search,
+  Camera,
+  Share2
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import logoAsset from "@/assets/logo.png.asset.json";
