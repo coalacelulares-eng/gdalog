@@ -1223,16 +1223,29 @@ export function TransportManagementSystem() {
       return;
     }
     
-    // Como estamos em um ambiente de demonstração e RLS, vamos simular a gestão de usuários salvando no nosso bucket de estado
-    // Em produção, isso usaria Supabase Admin Auth API ou Edge Functions
-    const newUser = { id: "user_" + Date.now(), email: newUserEmail };
+    setAuthLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email: newUserEmail.trim(),
+      password: newUserPassword,
+      options: {
+        emailRedirectTo: window.location.origin,
+      },
+    });
+    setAuthLoading(false);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    const newUser = { id: data.user?.id || "user_" + Date.now(), email: newUserEmail };
     const updatedUsers = [...systemUsers, newUser];
     setSystemUsers(updatedUsers);
     await saveToDB("system_users", updatedUsers);
     
     setNewUserEmail("");
     setNewUserPassword("");
-    toast.success(`Usuário ${newUserEmail} adicionado ao sistema!`);
+    toast.success(`Usuário ${newUserEmail} cadastrado! Um e-mail de verificação foi enviado.`);
   };
 
   const handleDeleteSystemUser = async (id: string) => {
