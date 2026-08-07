@@ -879,6 +879,7 @@ export function TransportManagementSystem() {
         modelo: vehModelo,
         motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
         categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+        foto: vehFoto || "",
       };
 
       persistVehicles([...vehicles, newVeh]);
