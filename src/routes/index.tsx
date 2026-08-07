@@ -933,11 +933,29 @@ export function TransportManagementSystem() {
     setIsOilModalOpen(true);
   };
 
+  // Validação de Documentos (CPF/CNPJ)
+  const validateDoc = (doc: string, tipo: "PF" | "PJ") => {
+    const cleanDoc = doc.replace(/\D/g, "");
+    if (tipo === "PF") {
+      if (cleanDoc.length !== 11) return false;
+      // Validação simplificada (existem algoritmos reais para isso, mas aqui focaremos no tamanho e formato)
+      return true;
+    } else {
+      if (cleanDoc.length !== 14) return false;
+      return true;
+    }
+  };
+
   // ADD / EDIT CLIENT HANDLER
   const handleAddClient = (e: React.FormEvent) => {
     e.preventDefault();
     if (!cliNome) {
       toast.error("Informe o nome do cliente.");
+      return;
+    }
+
+    if (cliDocumento && !validateDoc(cliDocumento, cliTipo)) {
+      toast.error(`O ${cliTipo === "PF" ? "CPF" : "CNPJ"} informado parece inválido.`);
       return;
     }
 
