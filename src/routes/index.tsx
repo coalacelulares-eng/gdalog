@@ -31,7 +31,9 @@ import {
   MessageCircle,
   Search,
   Camera,
-  Share2
+  Share2,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import logoAsset from "@/assets/logo.png.asset.json";
@@ -329,12 +331,14 @@ export function TransportManagementSystem() {
   const [authLoading, setAuthLoading] = useState<boolean>(false);
   const [loginEmail, setLoginEmail] = useState<string>("");
   const [loginPassword, setLoginPassword] = useState<string>("");
+  const [showLoginPassword, setShowLoginPassword] = useState<boolean>(false);
 
   // USUÁRIOS DO SISTEMA (SIMULADO PARA GESTÃO)
   const [systemUsers, setSystemUsers] = useState<{id: string, email: string}[]>([]);
   const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserPassword, setNewUserPassword] = useState("");
+  const [showNewUserPassword, setShowNewUserPassword] = useState<boolean>(false);
 
   // Sessão: escuta mudanças e verifica a sessão atual
   useEffect(() => {
@@ -1332,13 +1336,20 @@ export function TransportManagementSystem() {
               <div className="relative mt-1">
                 <Lock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
                 <Input
-                  type="password"
+                  type={showLoginPassword ? "text" : "password"}
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="pl-9 bg-slate-50 border-slate-200"
+                  className="pl-9 pr-10 bg-slate-50 border-slate-200"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowLoginPassword(!showLoginPassword)}
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-[#f25c05] transition-colors"
+                >
+                  {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
 
@@ -3814,14 +3825,23 @@ export function TransportManagementSystem() {
                 </div>
                 <div>
                   <Label className="text-[10px] font-bold text-slate-500 uppercase">Senha Temporária</Label>
-                  <Input
-                    type="password"
-                    value={newUserPassword}
-                    onChange={(e) => setNewUserPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="mt-1 text-xs"
-                    required
-                  />
+                  <div className="relative mt-1">
+                    <Input
+                      type={showNewUserPassword ? "text" : "password"}
+                      value={newUserPassword}
+                      onChange={(e) => setNewUserPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="text-xs pr-10"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewUserPassword(!showNewUserPassword)}
+                      className="absolute right-3 top-2.5 text-slate-400 hover:text-[#f25c05] transition-colors"
+                    >
+                      {showNewUserPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full bg-[#f25c05] hover:bg-orange-600 text-white text-xs h-9 font-bold">
                   Cadastrar Usuário
