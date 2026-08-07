@@ -2582,7 +2582,7 @@ export function TransportManagementSystem() {
           <form onSubmit={handleAddFreight} className="space-y-3 py-2 overflow-y-auto max-h-[60vh] px-1 scrollbar-thin">
             <div>
               <Label className="text-xs font-semibold text-slate-700">Empresa / Cliente</Label>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2">
                 <select
                   value={frtEmpresa}
                   onChange={(e) => {
@@ -2590,26 +2590,30 @@ export function TransportManagementSystem() {
                     setFrtEmpresa(val);
                     // Tenta encontrar o cliente pelo nome para associar o clienteId
                     const client = clients.find(c => c.nome.toUpperCase() === val.toUpperCase());
-                    // Se encontrar um cliente real, talvez queiramos guardar o ID
+                    if (client) {
+                      // Se houver uma variável ou estado para clienteId no formulário de frete, atualizaríamos aqui.
+                      // Por enquanto o handleAddFreight já usa o nome para vincular no filtro da aba de clientes.
+                    }
                   }}
                   className="w-full mt-1 p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold"
                   required
                 >
-                  <option value="">Selecione ou digite...</option>
+                  <option value="">Selecione um cliente cadastrado...</option>
                   {clients.map((c) => (
                     <option key={c.id} value={c.nome}>{c.nome} ({c.tipo})</option>
                   ))}
-                  {/* Mantém compatibilidade com empresas avulsas via datalist se necessário, 
-                      mas aqui estamos priorizando a seleção de clientes cadastrados */}
                 </select>
-                <Input
-                  type="text"
-                  list="empresas-fretes"
-                  value={frtEmpresa}
-                  onChange={(e) => setFrtEmpresa(e.target.value)}
-                  placeholder="Ou digite o nome"
-                  className="mt-1 text-xs uppercase font-bold"
-                />
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase">Ou digite:</span>
+                  <Input
+                    type="text"
+                    list="empresas-fretes"
+                    value={frtEmpresa}
+                    onChange={(e) => setFrtEmpresa(e.target.value)}
+                    placeholder="Nome da empresa"
+                    className="flex-1 text-xs uppercase font-bold"
+                  />
+                </div>
               </div>
               <datalist id="empresas-fretes">
                 {receivableByCompany.map((c) => (
