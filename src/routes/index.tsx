@@ -779,14 +779,14 @@ export function TransportManagementSystem() {
 
     const foundClient = clients.find(c => c.nome.toUpperCase() === frtEmpresa.toUpperCase());
 
-    let updatedFreights = [...freights];
+    let updatedFreights: Freight[] = [...freights];
     if (frtEditingId) {
       updatedFreights = freights.map((item) =>
         item.id === frtEditingId
           ? {
               ...item,
               empresa: frtEmpresa.toUpperCase(),
-              clienteId: foundClient?.id || item.clienteId,
+              clienteId: foundClient?.id || item.clienteId || null,
               origem: frtOrigem.toUpperCase(),
               destino: frtDestino.toUpperCase(),
               placa: frtPlaca.toUpperCase(),
@@ -802,7 +802,7 @@ export function TransportManagementSystem() {
       const newFrt: Freight = {
         id: "frt_" + Date.now(),
         empresa: frtEmpresa.toUpperCase(),
-        clienteId: foundClient?.id,
+        clienteId: foundClient?.id || null,
         origem: frtOrigem.toUpperCase(),
         destino: frtDestino.toUpperCase(),
         placa: frtPlaca.toUpperCase(),
