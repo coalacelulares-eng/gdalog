@@ -4,8 +4,10 @@
   "description": "Painel GDALog: acompanhe frota, despesas, fretes e manutenção em tempo real.",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#334155",
+  "categories": ["business", "utilities"],
   "icons": [
     {
       "src": "/icon-192.png",
