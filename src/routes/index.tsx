@@ -1268,7 +1268,9 @@ export function TransportManagementSystem() {
               <span className="hidden sm:inline">Sair</span>
             </button>
             <div className="text-[10px] text-slate-500 font-medium px-2 py-1 border-l border-slate-700 hidden lg:block whitespace-pre-line">
-              no mobile ajuste o layout e design para os numeros não ficarem amontuados, juntos adicionar barra de rolagem lateral, em fretes, no financeiro deixe mais visivel os numeros na barra de rolagem, e adcione o icone do whatsapp para compartilhar os dados tanto no mobile quanto no desktop
+              '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+                                            
+                                            adicione uma categoria para cadastrar clientes, e quando for adicionar o frete aparece a opção de escolher o cliente, adicionar os dados do cliente, escolher a parte pessoa fisica ou juridica, com apenas um clique ai muda os dados para preencher.  E na parte do frete adicione Ex , cliente Paulo frete 10 Recebido 5  saldo ar 5
             </div>
           </div>
 
