@@ -3081,6 +3081,180 @@ export function TransportManagementSystem() {
         </DialogContent>
       </Dialog>
 
+      {/* ------------------------------------------------------------- */}
+      {/* FORM MODAL 5: CLIENTES */}
+      {/* ------------------------------------------------------------- */}
+      <Dialog
+        open={isClientModalOpen}
+        onOpenChange={(open) => {
+          setIsClientModalOpen(open);
+          if (!open) {
+            setCliEditingId(null);
+            setCliNome("");
+            setCliDocumento("");
+            setCliTipo("PJ");
+            setCliContato("");
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md bg-white rounded-2xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-[#0c192c]">
+              {cliEditingId ? "Editar Cliente" : "Cadastrar Novo Cliente"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleAddClient} className="space-y-4 py-2">
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">Nome do Cliente / Razão Social</Label>
+              <Input
+                type="text"
+                value={cliNome}
+                onChange={(e) => setCliNome(e.target.value)}
+                placeholder="Ex: PAULO ou TRANSPORTES ALFA"
+                className="mt-1 text-xs uppercase font-bold"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">Tipo</Label>
+                <div className="flex gap-2 mt-1">
+                  <Button
+                    type="button"
+                    variant={cliTipo === "PF" ? "default" : "outline"}
+                    onClick={() => setCliTipo("PF")}
+                    className="flex-1 text-xs h-9"
+                  >
+                    Pessoa Física
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={cliTipo === "PJ" ? "default" : "outline"}
+                    onClick={() => setCliTipo("PJ")}
+                    className="flex-1 text-xs h-9"
+                  >
+                    Pessoa Jurídica
+                  </Button>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold text-slate-700">
+                  {cliTipo === "PF" ? "CPF" : "CNPJ"}
+                </Label>
+                <Input
+                  type="text"
+                  value={cliDocumento}
+                  onChange={(e) => setCliDocumento(e.target.value)}
+                  placeholder={cliTipo === "PF" ? "000.000.000-00" : "00.000.000/0000-00"}
+                  className="mt-1 text-xs"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">Contato / WhatsApp</Label>
+              <Input
+                type="text"
+                value={cliContato}
+                onChange={(e) => setCliContato(e.target.value)}
+                placeholder="Ex: 11 99999-9999"
+                className="mt-1 text-xs"
+              />
+            </div>
+
+            <DialogFooter className="pt-2 border-t border-slate-100 flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsClientModalOpen(false)}
+                className="text-xs"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                className="bg-[#0c192c] hover:bg-[#162a45] text-white text-xs font-bold"
+              >
+                {cliEditingId ? "Salvar Alterações" : "Salvar Cliente"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ------------------------------------------------------------- */}
+      {/* TAB 7: CLIENTES */}
+      {/* ------------------------------------------------------------- */}
+      {activeTab === "clientes" && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-black text-[#0c192c] tracking-tight">Clientes</h1>
+              <p className="text-slate-500 text-xs sm:text-sm">Gestão de clientes PF e PJ</p>
+            </div>
+
+            <Button
+              onClick={() => setIsClientModalOpen(true)}
+              className="bg-[#0c192c] hover:bg-[#162a45] text-white font-semibold rounded-xl px-4 py-2 flex items-center gap-1.5 shadow cursor-pointer text-xs"
+            >
+              <Plus className="w-4 h-4" /> Novo Cliente
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {clients.map((cli) => (
+              <Card key={cli.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 relative group hover:shadow-md transition-all">
+                <div className="absolute top-4 right-4 flex items-center gap-1">
+                  <button
+                    onClick={() => handleStartEditClient(cli)}
+                    className="text-slate-300 hover:text-[#0c192c] transition-colors p-1 cursor-pointer"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClient(cli.id)}
+                    className="text-slate-300 hover:text-red-500 transition-colors p-1 cursor-pointer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`p-2 rounded-lg ${cli.tipo === "PF" ? "bg-blue-100 text-blue-600" : "bg-purple-100 text-purple-600"}`}>
+                    {cli.tipo === "PF" ? <User className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    <div className="font-black text-[#0c192c] uppercase">{cli.nome}</div>
+                    <div className="text-[10px] font-bold text-slate-400">{cli.tipo === "PF" ? "PESSOA FÍSICA" : "PESSOA JURÍDICA"}</div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 border-t border-slate-50 pt-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 font-medium">{cli.tipo === "PF" ? "CPF" : "CNPJ"}</span>
+                    <span className="text-[#0c192c] font-bold">{cli.documento || "---"}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 font-medium">Contato</span>
+                    <span className="text-[#0c192c] font-bold">{cli.contato || "---"}</span>
+                  </div>
+                </div>
+              </Card>
+            ))}
+
+            {clients.length === 0 && (
+              <div className="col-span-full py-12 text-center bg-white rounded-2xl border-2 border-dashed border-slate-100">
+                <div className="text-slate-300 font-bold mb-1">Nenhum cliente cadastrado</div>
+                <p className="text-slate-400 text-xs">Comece adicionando seu primeiro cliente</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
