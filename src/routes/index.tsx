@@ -3349,7 +3349,7 @@ export function TransportManagementSystem() {
               placeholder="Buscar cliente por nome ou documento..."
               value={clientSearch}
               onChange={(e) => setClientSearch(e.target.value)}
-              className="border-none bg-transparent text-xs focus-visible:ring-0 p-0 h-auto"
+              className="border-none bg-transparent text-xs focus-visible:ring-0 p-0 h-auto w-full"
             />
           </div>
 
