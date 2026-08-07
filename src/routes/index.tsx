@@ -1359,8 +1359,8 @@ export function TransportManagementSystem() {
       <Toaster position="top-right" />
 
       {/* TOP NAVBAR (Exact match to screenshots visual identity) */}
-      <header className="bg-[#0c192c] text-white sticky top-0 z-30 shadow-md no-print md:h-[72px] flex items-center w-full">
-        <div className="w-full px-4 sm:px-6 lg:px-8 py-3 flex flex-row items-center justify-between gap-4">
+      <header className="bg-[#0c192c] text-white no-print md:h-[72px] flex items-center w-full">
+        <div className="max-w-[1920px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-3 flex flex-row items-center justify-between gap-4">
 
           
           {/* Logo Brand */}
@@ -1374,7 +1374,7 @@ export function TransportManagementSystem() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 scrollbar-hide">
+          <nav className="hidden md:flex items-center space-x-0.5 lg:space-x-1 flex-1 justify-center scrollbar-hide">
             <button
               onClick={() => setActiveTab("dashboard")}
               className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
@@ -1455,7 +1455,7 @@ export function TransportManagementSystem() {
               title="Gerenciar Usuários"
             >
               <div className="bg-white/10 group-hover:bg-white/20 p-1 rounded-full transition-all animate-pulse-orange">
-                <img src={userIconAsset.url} alt="Usuários" className="w-4 h-4 sm:w-5 sm:h-5 object-contain" />
+                <Users className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <span className="hidden xl:inline text-[10px] sm:text-xs font-semibold">Usuários</span>
             </button>
