@@ -2208,12 +2208,12 @@ export function TransportManagementSystem() {
           }`}
         >
           <Droplet className="w-5 h-5" />
-          <span>Manutenção</span>
+          <span>Manut.</span>
         </button>
 
         <button
           onClick={() => setActiveTab("fretes")}
-          className={`flex flex-col items-center gap-0.5 p-1 rounded-lg text-[10px] font-bold transition-all ${
+          className={`flex flex-col items-center gap-0.5 p-1 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all ${
             activeTab === "fretes" ? "text-[#f25c05]" : "text-slate-400 hover:text-slate-200"
           }`}
         >
@@ -2223,7 +2223,7 @@ export function TransportManagementSystem() {
 
         <button
           onClick={() => setActiveTab("financeiro")}
-          className={`flex flex-col items-center gap-0.5 p-1 rounded-lg text-[10px] font-bold transition-all ${
+          className={`flex flex-col items-center gap-0.5 p-1 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all ${
             activeTab === "financeiro" ? "text-[#f25c05]" : "text-slate-400 hover:text-slate-200"
           }`}
         >
@@ -2233,11 +2233,13 @@ export function TransportManagementSystem() {
 
         <button
           onClick={() => setActiveTab("clientes")}
-          className={`flex flex-col items-center gap-0.5 p-1 rounded-lg text-[10px] font-bold transition-all ${
+          className={`flex flex-col items-center gap-0.5 p-1 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all ${
             activeTab === "clientes" ? "text-[#f25c05]" : "text-slate-400 hover:text-slate-200"
           }`}
         >
           <Building2 className="w-5 h-5" />
+          <span>Clientes</span>
+        </button>
           <span>Clientes</span>
         </button>
       </div>
