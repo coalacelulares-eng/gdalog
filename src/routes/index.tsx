@@ -1291,7 +1291,11 @@ export function TransportManagementSystem() {
             <div className="text-[10px] text-slate-500 font-medium px-2 py-1 border-l border-slate-700 hidden lg:block whitespace-pre-line">
               '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
                                             
-                                            adicione uma categoria para cadastrar clientes, e quando for adicionar o frete aparece a opção de escolher o cliente, adicionar os dados do cliente, escolher a parte pessoa fisica ou juridica, com apenas um clique ai muda os dados para preencher.  E na parte do frete adicione Ex , cliente Paulo frete 10 Recebido 5  saldo ar 5
+                                            Implementar filtros de busca na lista de clientes.
+
+Vincular o histórico de fretes diretamente no card de cada cliente.
+
+Adicionar validação de CPF/CNPJ nos formulários de cliente.
             </div>
           </div>
 
