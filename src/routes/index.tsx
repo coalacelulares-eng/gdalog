@@ -441,6 +441,7 @@ export function TransportManagementSystem() {
   const [frtEditingId, setFrtEditingId] = useState<string | null>(null);
   const [vehEditingId, setVehEditingId] = useState<string | null>(null);
   const [oilEditingId, setOilEditingId] = useState<string | null>(null);
+  const [cliEditingId, setCliEditingId] = useState<string | null>(null);
 
   // DRIVER FORM STATES
   const [drvEditingId, setDrvEditingId] = useState<string | null>(null);
