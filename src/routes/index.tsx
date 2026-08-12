@@ -1827,13 +1827,26 @@ export function TransportManagementSystem() {
 
                         {veh.reboques && veh.reboques.length > 0 && (
                           <div className="mt-3 pt-3 border-t border-slate-50">
-                            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mb-1">Reboques</div>
-                            <div className="flex flex-wrap gap-1">
-                              {veh.reboques.map((reb) => (
-                                <span key={reb} className="text-[9px] font-black bg-slate-100 text-[#0c192c] px-1.5 py-0.5 rounded border border-slate-200">
-                                  {reb}
-                                </span>
-                              ))}
+                            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mb-1">Reboques & Fotos</div>
+                            <div className="grid grid-cols-2 gap-2">
+                              {veh.reboques.map((reb) => {
+                                const photo = veh.reboquesFotos?.[reb];
+                                return (
+                                  <div key={reb} className="flex flex-col gap-1 p-1.5 bg-slate-50 rounded-lg border border-slate-100">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[9px] font-black text-[#0c192c] uppercase truncate">{reb}</span>
+                                      {photo && <Camera className="w-2.5 h-2.5 text-orange-400" />}
+                                    </div>
+                                    {photo ? (
+                                      <img src={photo} alt={reb} className="w-full h-10 object-cover rounded shadow-sm" />
+                                    ) : (
+                                      <div className="w-full h-10 bg-slate-100/50 rounded flex items-center justify-center border border-dashed border-slate-200">
+                                        <Camera className="w-3 h-3 text-slate-200" />
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           </div>
                         )}
