@@ -518,6 +518,7 @@ export function TransportManagementSystem() {
   const [vehModelo, setVehModelo] = useState("");
   const [vehMotorista, setVehMotorista] = useState("");
   const [vehCategoria, setVehCategoria] = useState("LOGISTICA");
+  const [vehReboques, setVehReboques] = useState<string[]>([]);
   const [vehFoto, setVehFoto] = useState("");
 
   // Oil Form
