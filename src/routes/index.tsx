@@ -94,6 +94,8 @@ interface Vehicle {
   modelo: string;
   motorista: string;
   categoria: string;
+  reboques: string[];
+  reboquePersonalizado?: string;
   foto?: string;
 }
 
@@ -170,7 +172,7 @@ const INITIAL_DATA = {
     { id: "c1", nome: "PAULO", documento: "123.456.789-00", tipo: "PF", contato: "11 99999-9999" },
   ] as Client[],
   vehicles: [
-    { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA" },
+    { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA", reboques: [] },
   ] as Vehicle[],
   expenses: [
     {
@@ -517,6 +519,8 @@ export function TransportManagementSystem() {
   const [vehModelo, setVehModelo] = useState("");
   const [vehMotorista, setVehMotorista] = useState("");
   const [vehCategoria, setVehCategoria] = useState("LOGISTICA");
+  const [vehReboques, setVehReboques] = useState<string[]>([]);
+  const [vehReboquePersonalizado, setVehReboquePersonalizado] = useState("");
   const [vehFoto, setVehFoto] = useState("");
 
   // Oil Form
@@ -890,6 +894,8 @@ export function TransportManagementSystem() {
               modelo: vehModelo,
               motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
               categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+              reboques: vehReboques,
+              reboquePersonalizado: vehReboquePersonalizado,
               foto: vehFoto || item.foto || "",
             }
           : item,
@@ -903,6 +909,8 @@ export function TransportManagementSystem() {
         modelo: vehModelo,
         motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
         categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+        reboques: vehReboques,
+        reboquePersonalizado: vehReboquePersonalizado,
         foto: vehFoto || "",
       };
 
@@ -915,6 +923,8 @@ export function TransportManagementSystem() {
     setVehModelo("");
     setVehMotorista("");
     setVehCategoria("LOGISTICA");
+    setVehReboques([]);
+    setVehReboquePersonalizado("");
     setVehFoto("");
     setIsVehicleModalOpen(false);
   };
@@ -925,6 +935,8 @@ export function TransportManagementSystem() {
     setVehModelo(veh.modelo);
     setVehMotorista(veh.motorista);
     setVehCategoria(veh.categoria);
+    setVehReboques(veh.reboques || []);
+    setVehReboquePersonalizado(veh.reboquePersonalizado || "");
     setVehFoto(veh.foto || "");
     setIsVehicleModalOpen(true);
   };
@@ -1733,7 +1745,8 @@ export function TransportManagementSystem() {
                     <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
                       <button
                         onClick={() => {
-                          const text = `*VEÍCULO GDALog*\nPlaca: ${veh.placa}\nModelo: ${veh.modelo}\nMotorista: ${veh.motorista}\nCategoria: ${veh.categoria}`;
+                          const reboquesStr = veh.reboques?.length > 0 ? `\nReboques: ${veh.reboques.map(r => r === "OUTROS" ? veh.reboquePersonalizado : r).join(", ")}` : "";
+                          const text = `*VEÍCULO GDALog*\nPlaca: ${veh.placa}\nModelo: ${veh.modelo}\nMotorista: ${veh.motorista}\nCategoria: ${veh.categoria}${reboquesStr}`;
                           window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
                         }}
                         className="text-slate-300 hover:text-[#25D366] transition-colors p-1.5 cursor-pointer bg-slate-50/80 rounded-lg backdrop-blur-sm"
@@ -1785,6 +1798,16 @@ export function TransportManagementSystem() {
                         <div className="text-[11px] font-bold text-[#f25c05] tracking-wider uppercase mt-3">
                           {veh.categoria}
                         </div>
+                        
+                        {(veh.reboques?.length > 0) && (
+                          <div className="mt-3 flex flex-wrap gap-1.5">
+                            {veh.reboques.map(r => (
+                              <span key={r} className="px-2 py-0.5 bg-[#0c192c]/5 text-[#0c192c] text-[9px] font-bold rounded uppercase border border-[#0c192c]/10">
+                                {r === "OUTROS" ? (veh.reboquePersonalizado || "OUTRO") : r}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -3112,6 +3135,42 @@ export function TransportManagementSystem() {
                 placeholder="Ex: LOGISTICA"
                 className="mt-1 text-xs uppercase"
               />
+            </div>
+            
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-slate-700">Reboques</Label>
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                {["SIDER", "GRANELEIRA", "BAÚ", "CAÇAMBA", "PRANCHA", "OUTROS"].map((reb) => (
+                  <label key={reb} className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors border border-slate-200">
+                    <input
+                      type="checkbox"
+                      checked={vehReboques.includes(reb)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setVehReboques([...vehReboques, reb]);
+                        } else {
+                          setVehReboques(vehReboques.filter(r => r !== reb));
+                        }
+                      }}
+                      className="w-4 h-4 accent-[#0c192c]"
+                    />
+                    <span className="text-[11px] font-bold text-[#0c192c]">{reb}</span>
+                  </label>
+                ))}
+              </div>
+              
+              {vehReboques.includes("OUTROS") && (
+                <div className="mt-2 animate-in fade-in slide-in-from-top-1">
+                  <Label className="text-[10px] font-bold text-slate-500">Especifique o reboque</Label>
+                  <Input
+                    type="text"
+                    value={vehReboquePersonalizado}
+                    onChange={(e) => setVehReboquePersonalizado(e.target.value)}
+                    placeholder="Ex: Cegonha, Frigorífico..."
+                    className="mt-1 text-xs"
+                  />
+                </div>
+              )}
             </div>
 
             <div>
