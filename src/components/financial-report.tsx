@@ -123,16 +123,49 @@ export function FinancialReport({
     !placaFilter || placa.toUpperCase() === placaFilter.toUpperCase();
 
   const fExpenses = useMemo(
-    () => expenses.filter((e) => inRange(e.data) && matchPlaca(e.placa)),
-    [expenses, dateFrom, dateTo, placaFilter],
+    () => expenses.filter((e) => {
+      const matchRange = inRange(e.data);
+      const matchPlacaVal = matchPlaca(e.placa);
+      if (!matchRange || !matchPlacaVal) return false;
+      
+      if (trailerFilter) {
+        const veh = vehicles.find(v => v.placa.toUpperCase() === e.placa.toUpperCase());
+        const reboques = veh?.reboques?.length ? veh.reboques : ["SEM REBOQUE"];
+        if (!reboques.includes(trailerFilter)) return false;
+      }
+      return true;
+    }),
+    [expenses, dateFrom, dateTo, placaFilter, trailerFilter, vehicles],
   );
   const fFreights = useMemo(
-    () => freights.filter((f) => inRange(f.data) && matchPlaca(f.placa)),
-    [freights, dateFrom, dateTo, placaFilter],
+    () => freights.filter((f) => {
+      const matchRange = inRange(f.data);
+      const matchPlacaVal = matchPlaca(f.placa);
+      if (!matchRange || !matchPlacaVal) return false;
+
+      if (trailerFilter) {
+        const veh = vehicles.find(v => v.placa.toUpperCase() === f.placa.toUpperCase());
+        const reboques = veh?.reboques?.length ? veh.reboques : ["SEM REBOQUE"];
+        if (!reboques.includes(trailerFilter)) return false;
+      }
+      return true;
+    }),
+    [freights, dateFrom, dateTo, placaFilter, trailerFilter, vehicles],
   );
   const fMaint = useMemo(
-    () => maintenances.filter((m) => inRange(m.data) && matchPlaca(m.placa)),
-    [maintenances, dateFrom, dateTo, placaFilter],
+    () => maintenances.filter((m) => {
+      const matchRange = inRange(m.data);
+      const matchPlacaVal = matchPlaca(m.placa);
+      if (!matchRange || !matchPlacaVal) return false;
+
+      if (trailerFilter) {
+        const veh = vehicles.find(v => v.placa.toUpperCase() === m.placa.toUpperCase());
+        const reboques = veh?.reboques?.length ? veh.reboques : ["SEM REBOQUE"];
+        if (!reboques.includes(trailerFilter)) return false;
+      }
+      return true;
+    }),
+    [maintenances, dateFrom, dateTo, placaFilter, trailerFilter, vehicles],
   );
 
   const sumDetails = (d: FinExpenseDetails) =>
