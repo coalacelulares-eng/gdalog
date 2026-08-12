@@ -935,6 +935,8 @@ export function TransportManagementSystem() {
     setVehModelo(veh.modelo);
     setVehMotorista(veh.motorista);
     setVehCategoria(veh.categoria);
+    setVehReboques(veh.reboques || []);
+    setVehReboquePersonalizado(veh.reboquePersonalizado || "");
     setVehFoto(veh.foto || "");
     setIsVehicleModalOpen(true);
   };
