@@ -951,6 +951,7 @@ export function FinancialReport({
         <p className="text-[11px] text-slate-400 mt-3 italic">
           * Para veículos com múltiplos reboques, os valores financeiros são rateados igualmente entre as categorias.
         </p>
+      </div>
 
 
       {/* Custos por categoria */}
