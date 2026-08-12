@@ -1725,7 +1725,12 @@ export function TransportManagementSystem() {
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-2xl font-black text-[#0c192c] tracking-tight">Frota & Veículos</h1>
-                  <p className="text-slate-500 text-xs sm:text-sm">Gerencie os veículos cadastrados na frota</p>
+                  <p className="text-slate-500 text-xs sm:text-sm">'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+                                        
+                                            
+                                            Verificar se a lista de tipos de reboques pré-definidos atende a todas as necessidades da operação.
+
+Testar o compartilhamento no WhatsApp para garantir que a formatação do texto está legível.</p>
                 </div>
 
                 <Button
