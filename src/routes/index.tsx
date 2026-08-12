@@ -3139,7 +3139,7 @@ export function TransportManagementSystem() {
             <div>
               <Label className="text-xs font-semibold text-slate-700">Reboques</Label>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                {["SIDER", "GRANELEIRA", "BAÚ", "CAÇAMBA", "PRANCHA", "OUTROS"].map((opt) => (
+                {["NGT 3J12", "Bsf 5C60", "IgM 0j75", "NFT 1H83", "EFV 8A24"].map((opt) => (
                   <label key={opt} className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-100 transition-colors">
                     <input
                       type="checkbox"
