@@ -3733,19 +3733,6 @@ export function TransportManagementSystem() {
                         )}
                       </div>
                     </div>
-                    
-                    {cli.reboques && cli.reboques.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-slate-50">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Reboques:</span>
-                        <div className="flex flex-wrap gap-1">
-                          {cli.reboques.map(reb => (
-                            <span key={reb} className="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-bold uppercase">
-                              {reb}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </Card>
                 );
               })}
