@@ -3123,6 +3123,29 @@ export function TransportManagementSystem() {
             </div>
 
             <div>
+              <Label className="text-xs font-semibold text-slate-700">Reboques</Label>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {["SIDER", "GRANELEIRA", "BAÚ", "CAÇAMBA", "PRANCHA", "OUTROS"].map((opt) => (
+                  <label key={opt} className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-100 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={vehReboques.includes(opt)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setVehReboques([...vehReboques, opt]);
+                        } else {
+                          setVehReboques(vehReboques.filter((r) => r !== opt));
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-slate-300 text-[#0c192c] focus:ring-[#0c192c]"
+                    />
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-tighter">{opt}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
               <Label className="text-xs font-semibold text-slate-700">Foto do Veículo (Caminhão)</Label>
               <div className="flex gap-2 mt-1">
                 <div className="relative flex-1">
