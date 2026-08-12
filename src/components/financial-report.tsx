@@ -112,6 +112,7 @@ export function FinancialReport({
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [placaFilter, setPlacaFilter] = useState("");
+  const [trailerFilter, setTrailerFilter] = useState("");
 
   const inRange = (data: string) => {
     if (dateFrom && data < dateFrom) return false;
@@ -122,16 +123,49 @@ export function FinancialReport({
     !placaFilter || placa.toUpperCase() === placaFilter.toUpperCase();
 
   const fExpenses = useMemo(
-    () => expenses.filter((e) => inRange(e.data) && matchPlaca(e.placa)),
-    [expenses, dateFrom, dateTo, placaFilter],
+    () => expenses.filter((e) => {
+      const matchRange = inRange(e.data);
+      const matchPlacaVal = matchPlaca(e.placa);
+      if (!matchRange || !matchPlacaVal) return false;
+      
+      if (trailerFilter) {
+        const veh = vehicles.find(v => v.placa.toUpperCase() === e.placa.toUpperCase());
+        const reboques = veh?.reboques?.length ? veh.reboques : ["SEM REBOQUE"];
+        if (!reboques.includes(trailerFilter)) return false;
+      }
+      return true;
+    }),
+    [expenses, dateFrom, dateTo, placaFilter, trailerFilter, vehicles],
   );
   const fFreights = useMemo(
-    () => freights.filter((f) => inRange(f.data) && matchPlaca(f.placa)),
-    [freights, dateFrom, dateTo, placaFilter],
+    () => freights.filter((f) => {
+      const matchRange = inRange(f.data);
+      const matchPlacaVal = matchPlaca(f.placa);
+      if (!matchRange || !matchPlacaVal) return false;
+
+      if (trailerFilter) {
+        const veh = vehicles.find(v => v.placa.toUpperCase() === f.placa.toUpperCase());
+        const reboques = veh?.reboques?.length ? veh.reboques : ["SEM REBOQUE"];
+        if (!reboques.includes(trailerFilter)) return false;
+      }
+      return true;
+    }),
+    [freights, dateFrom, dateTo, placaFilter, trailerFilter, vehicles],
   );
   const fMaint = useMemo(
-    () => maintenances.filter((m) => inRange(m.data) && matchPlaca(m.placa)),
-    [maintenances, dateFrom, dateTo, placaFilter],
+    () => maintenances.filter((m) => {
+      const matchRange = inRange(m.data);
+      const matchPlacaVal = matchPlaca(m.placa);
+      if (!matchRange || !matchPlacaVal) return false;
+
+      if (trailerFilter) {
+        const veh = vehicles.find(v => v.placa.toUpperCase() === m.placa.toUpperCase());
+        const reboques = veh?.reboques?.length ? veh.reboques : ["SEM REBOQUE"];
+        if (!reboques.includes(trailerFilter)) return false;
+      }
+      return true;
+    }),
+    [maintenances, dateFrom, dateTo, placaFilter, trailerFilter, vehicles],
   );
 
   const sumDetails = (d: FinExpenseDetails) =>
@@ -251,13 +285,25 @@ export function FinancialReport({
   // Agrupamento por tipo de reboque
   const byTrailerType = useMemo(() => {
     const map = new Map<string, { receita: number; despesa: number; count: number }>();
-    
+
+    // Primeiro, identificamos todos os tipos de reboque existentes na frota
+    const allTrailerTypes = new Set<string>();
+    vehicles.forEach(v => {
+      if (v.reboques && v.reboques.length > 0) {
+        v.reboques.forEach(t => allTrailerTypes.add(t));
+      }
+    });
+
     byVehicle.forEach((v) => {
-      const types = v.reboques.length > 0 ? v.reboques : ["SEM REBOQUE"];
+      const types = v.reboques && v.reboques.length > 0 ? v.reboques : ["SEM REBOQUE"];
+      
+      // Filtro de reboque (se ativo)
+      if (trailerFilter && !types.includes(trailerFilter)) return;
+
       types.forEach((type) => {
         const cur = map.get(type) || { receita: 0, despesa: 0, count: 0 };
-        // Se o veículo tem múltiplos reboques, o custo/receita é rateado entre eles para fins de análise
-        // (ou poderíamos somar o total em cada, mas ratear parece mais justo para uma DRE)
+        // Rateio preciso: dividimos os valores totais do veículo pelo número de reboques ativos nele.
+        // Se for "SEM REBOQUE", o divisor é 1.
         const divisor = types.length;
         map.set(type, {
           receita: cur.receita + v.receita / divisor,
@@ -277,7 +323,16 @@ export function FinancialReport({
         count: data.count,
       }))
       .sort((a, b) => b.receita - a.receita);
-  }, [byVehicle]);
+  }, [byVehicle, trailerFilter, vehicles]);
+
+  // Tipos de reboque disponíveis para o filtro
+  const availableTrailerTypes = useMemo(() => {
+    const types = new Set<string>();
+    vehicles.forEach(v => {
+      if (v.reboques) v.reboques.forEach(t => types.add(t));
+    });
+    return Array.from(types).sort();
+  }, [vehicles]);
 
   // Soma de uma categoria de custo lançada
   const sumKey = (k: keyof FinExpenseDetails) =>
@@ -572,7 +627,7 @@ export function FinancialReport({
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 no-print">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 grid grid-cols-1 sm:grid-cols-4 gap-3 no-print">
         <div>
           <Label className="text-xs font-semibold text-slate-700">Data inicial</Label>
           <Input
@@ -604,6 +659,22 @@ export function FinancialReport({
                 {v.placa} — {v.modelo}
               </option>
             ))}
+          </select>
+        </div>
+        <div>
+          <Label className="text-xs font-semibold text-slate-700">Tipo de Reboque</Label>
+          <select
+            value={trailerFilter}
+            onChange={(e) => setTrailerFilter(e.target.value)}
+            className="mt-1 w-full h-9 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm"
+          >
+            <option value="">Todos os reboques</option>
+            {availableTrailerTypes.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+            <option value="SEM REBOQUE">Sem reboque (Toco/Truck)</option>
           </select>
         </div>
       </div>
