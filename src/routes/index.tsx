@@ -923,6 +923,8 @@ export function TransportManagementSystem() {
     setVehModelo("");
     setVehMotorista("");
     setVehCategoria("LOGISTICA");
+    setVehReboques([]);
+    setVehReboquePersonalizado("");
     setVehFoto("");
     setIsVehicleModalOpen(false);
   };
