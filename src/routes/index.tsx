@@ -3125,6 +3125,42 @@ export function TransportManagementSystem() {
                 className="mt-1 text-xs uppercase"
               />
             </div>
+            
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold text-slate-700">Reboques</Label>
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                {["SIDER", "GRANELEIRA", "BAÚ", "CAÇAMBA", "PRANCHA", "OUTROS"].map((reb) => (
+                  <label key={reb} className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg cursor-pointer hover:bg-slate-100 transition-colors border border-slate-200">
+                    <input
+                      type="checkbox"
+                      checked={vehReboques.includes(reb)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setVehReboques([...vehReboques, reb]);
+                        } else {
+                          setVehReboques(vehReboques.filter(r => r !== reb));
+                        }
+                      }}
+                      className="w-4 h-4 accent-[#0c192c]"
+                    />
+                    <span className="text-[11px] font-bold text-[#0c192c]">{reb}</span>
+                  </label>
+                ))}
+              </div>
+              
+              {vehReboques.includes("OUTROS") && (
+                <div className="mt-2 animate-in fade-in slide-in-from-top-1">
+                  <Label className="text-[10px] font-bold text-slate-500">Especifique o reboque</Label>
+                  <Input
+                    type="text"
+                    value={vehReboquePersonalizado}
+                    onChange={(e) => setVehReboquePersonalizado(e.target.value)}
+                    placeholder="Ex: Cegonha, Frigorífico..."
+                    className="mt-1 text-xs"
+                  />
+                </div>
+              )}
+            </div>
 
             <div>
               <Label className="text-xs font-semibold text-slate-700">Foto do Veículo (Caminhão)</Label>
