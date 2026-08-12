@@ -171,7 +171,7 @@ const INITIAL_DATA = {
     { id: "c1", nome: "PAULO", documento: "123.456.789-00", tipo: "PF", contato: "11 99999-9999" },
   ] as Client[],
   vehicles: [
-    { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA" },
+    { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA", reboques: [] },
   ] as Vehicle[],
   expenses: [
     {
