@@ -916,6 +916,7 @@ export function FinancialReport({
             <thead>
               <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
                 <th className="py-2">Placa</th>
+                <th className="py-2">Reboques</th>
                 <th className="py-2 text-right">Receita</th>
                 <th className="py-2 text-right">Custo total</th>
                 <th className="py-2 text-right">Margem R$</th>
@@ -931,6 +932,21 @@ export function FinancialReport({
                     <div className="font-bold text-slate-800">{v.placa}</div>
                     <div className="text-[11px] text-slate-400">{v.modelo}</div>
                   </td>
+                  <td className="py-2">
+                    <div className="flex flex-wrap gap-1">
+                      {v.reboques.length > 0 ? (
+                        v.reboques.map((r) => (
+                          <span
+                            key={r}
+                            className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-600"
+                          >
+                            {r}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-[9px] text-slate-300 italic">Nenhum</span>
+                      )}
+                    </div>
                   <td className="py-2 text-right text-[#16a34a] font-semibold">
                     {formatBRL(v.receita)}
                   </td>
@@ -953,6 +969,7 @@ export function FinancialReport({
               ))}
               <tr>
                 <td className="py-2 font-black text-[#0c192c]">Total da operação</td>
+                <td className="py-2"></td>
                 <td className="py-2 text-right font-black text-[#0c192c]">
                   {formatBRL(totalReceita)}
                 </td>
