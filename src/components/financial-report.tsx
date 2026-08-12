@@ -65,6 +65,7 @@ export interface FinVehicle {
   placa: string;
   modelo: string;
   motorista: string;
+  reboques?: string[];
 }
 
 interface FinancialReportProps {
@@ -225,9 +226,11 @@ export function FinancialReport({
         const diesel = fExpenses
           .filter((e) => e.placa.toUpperCase() === placa)
           .reduce((a, e) => a + (Number(e.detalhes?.abastecimento) || 0), 0);
+        const vehData = vehicles.find((v) => v.placa.toUpperCase() === placa);
         return {
           placa,
-          modelo: vehicles.find((v) => v.placa.toUpperCase() === placa)?.modelo ?? "—",
+          modelo: vehData?.modelo ?? "—",
+          reboques: vehData?.reboques ?? [],
           despesa: despTotal,
           receita: rec,
           manutencao: manut,
@@ -244,6 +247,37 @@ export function FinancialReport({
       })
       .sort((a, b) => b.receita - a.receita);
   }, [vehicles, fExpenses, fFreights, fMaint, placaFilter]);
+
+  // Agrupamento por tipo de reboque
+  const byTrailerType = useMemo(() => {
+    const map = new Map<string, { receita: number; despesa: number; count: number }>();
+    
+    byVehicle.forEach((v) => {
+      const types = v.reboques.length > 0 ? v.reboques : ["SEM REBOQUE"];
+      types.forEach((type) => {
+        const cur = map.get(type) || { receita: 0, despesa: 0, count: 0 };
+        // Se o veículo tem múltiplos reboques, o custo/receita é rateado entre eles para fins de análise
+        // (ou poderíamos somar o total em cada, mas ratear parece mais justo para uma DRE)
+        const divisor = types.length;
+        map.set(type, {
+          receita: cur.receita + v.receita / divisor,
+          despesa: cur.despesa + v.despesa / divisor,
+          count: cur.count + 1,
+        });
+      });
+    });
+
+    return [...map.entries()]
+      .map(([tipo, data]) => ({
+        tipo,
+        receita: data.receita,
+        despesa: data.despesa,
+        saldo: data.receita - data.despesa,
+        margemPct: data.receita > 0 ? ((data.receita - data.despesa) / data.receita) * 100 : 0,
+        count: data.count,
+      }))
+      .sort((a, b) => b.receita - a.receita);
+  }, [byVehicle]);
 
   // Soma de uma categoria de custo lançada
   const sumKey = (k: keyof FinExpenseDetails) =>
@@ -484,12 +518,21 @@ export function FinancialReport({
   };
 
   const handleShareWhatsApp = () => {
+    let trailerSummary = "";
+    if (byTrailerType.length > 0) {
+      trailerSummary = "\n\n*POR TIPO DE REBOQUE:*";
+      byTrailerType.forEach(t => {
+        trailerSummary += `\n- ${t.tipo}: ${formatBRL(t.saldo)} (${t.margemPct.toFixed(1)}%)`;
+      });
+    }
+
     const text = `*RELATÓRIO FINANCEIRO — GDALog*\n` +
       `Período: ${periodoLabel}\n` +
       `Receita: ${formatBRL(totalReceita)}\n` +
       `Despesas: ${formatBRL(totalDespesas)}\n` +
       `Resultado: ${formatBRL(lucro)}\n` +
-      `Margem: ${margem.toFixed(1)}%`;
+      `Margem: ${margem.toFixed(1)}%` +
+      trailerSummary;
     
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   };
@@ -859,6 +902,55 @@ export function FinancialReport({
             </tbody>
           </table>
         </div>
+      </div>
+      
+      {/* RESULTADO POR TIPO DE REBOQUE */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 print-break">
+        <h2 className="font-extrabold text-[#0c192c] mb-4">Resultado por tipo de reboque</h2>
+        <div className="overflow-x-auto pb-2 -mx-2 px-2 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-transparent">
+          <table className="w-full text-sm min-w-[600px]">
+            <thead>
+              <tr className="text-left text-[11px] uppercase text-slate-400 border-b border-slate-100">
+                <th className="py-2">Tipo de Reboque</th>
+                <th className="py-2 text-center">Veículos</th>
+                <th className="py-2 text-right">Receita</th>
+                <th className="py-2 text-right">Despesa</th>
+                <th className="py-2 text-right">Saldo</th>
+                <th className="py-2 text-right">Margem %</th>
+              </tr>
+            </thead>
+            <tbody>
+              {byTrailerType.map((t) => (
+                <tr key={t.tipo} className="border-b border-slate-50">
+                  <td className="py-2">
+                    <div className="font-bold text-slate-800">{t.tipo}</div>
+                  </td>
+                  <td className="py-2 text-center text-slate-500">{t.count}</td>
+                  <td className="py-2 text-right text-[#16a34a] font-semibold">
+                    {formatBRL(t.receita)}
+                  </td>
+                  <td className="py-2 text-right text-[#f25c05] font-semibold">
+                    {formatBRL(t.despesa)}
+                  </td>
+                  <td className={`py-2 text-right font-bold ${t.saldo >= 0 ? "text-slate-800" : "text-red-600"}`}>
+                    {formatBRL(t.saldo)}
+                  </td>
+                  <td className={`py-2 text-right font-black ${t.margemPct >= 0 ? "text-[#16a34a]" : "text-red-600"}`}>
+                    {t.margemPct.toFixed(1)}%
+                  </td>
+                </tr>
+              ))}
+              {byTrailerType.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-4 text-center text-slate-400">Sem dados de reboques.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-slate-400 mt-3 italic">
+          * Para veículos com múltiplos reboques, os valores financeiros são rateados igualmente entre as categorias.
+        </p>
       </div>
 
 
