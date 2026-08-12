@@ -947,6 +947,7 @@ export function FinancialReport({
                         <span className="text-[9px] text-slate-300 italic">Nenhum</span>
                       )}
                     </div>
+                  </td>
                   <td className="py-2 text-right text-[#16a34a] font-semibold">
                     {formatBRL(v.receita)}
                   </td>
