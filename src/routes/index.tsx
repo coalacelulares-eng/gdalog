@@ -1728,7 +1728,7 @@ export function TransportManagementSystem() {
                   <p className="text-slate-500 text-xs sm:text-sm">'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
                                         
                                             
-                                            Verificar se a lista de tipos de reboques pré-definidos atende a todas as necessidades da operação.
+                                            retire esse texto da categoria frota Verificar se a lista de tipos de reboques pré-definidos atende a todas as necessidades da operação.
 
 Testar o compartilhamento no WhatsApp para garantir que a formatação do texto está legível.</p>
                 </div>
