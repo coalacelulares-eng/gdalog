@@ -909,6 +909,8 @@ export function TransportManagementSystem() {
         modelo: vehModelo,
         motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
         categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+        reboques: vehReboques,
+        reboquePersonalizado: vehReboquePersonalizado,
         foto: vehFoto || "",
       };
 
