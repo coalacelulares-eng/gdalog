@@ -1739,7 +1739,8 @@ export function TransportManagementSystem() {
                     <div className="absolute top-4 right-4 flex items-center gap-1.5 z-10">
                       <button
                         onClick={() => {
-                          const text = `*VEÍCULO GDALog*\nPlaca: ${veh.placa}\nModelo: ${veh.modelo}\nMotorista: ${veh.motorista}\nCategoria: ${veh.categoria}`;
+                          const reboquesStr = veh.reboques && veh.reboques.length > 0 ? `\nReboques: ${veh.reboques.join(", ")}` : "";
+                          const text = `*VEÍCULO GDALog*\nPlaca: ${veh.placa}\nModelo: ${veh.modelo}\nMotorista: ${veh.motorista}\nCategoria: ${veh.categoria}${reboquesStr}`;
                           window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
                         }}
                         className="text-slate-300 hover:text-[#25D366] transition-colors p-1.5 cursor-pointer bg-slate-50/80 rounded-lg backdrop-blur-sm"
