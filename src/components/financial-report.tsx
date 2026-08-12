@@ -594,7 +594,7 @@ export function FinancialReport({
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 no-print">
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 grid grid-cols-1 sm:grid-cols-4 gap-3 no-print">
         <div>
           <Label className="text-xs font-semibold text-slate-700">Data inicial</Label>
           <Input
@@ -626,6 +626,22 @@ export function FinancialReport({
                 {v.placa} — {v.modelo}
               </option>
             ))}
+          </select>
+        </div>
+        <div>
+          <Label className="text-xs font-semibold text-slate-700">Tipo de Reboque</Label>
+          <select
+            value={trailerFilter}
+            onChange={(e) => setTrailerFilter(e.target.value)}
+            className="mt-1 w-full h-9 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm"
+          >
+            <option value="">Todos os reboques</option>
+            {availableTrailerTypes.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+            <option value="SEM REBOQUE">Sem reboque (Toco/Truck)</option>
           </select>
         </div>
       </div>
