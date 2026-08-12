@@ -3060,6 +3060,8 @@ export function TransportManagementSystem() {
             setVehModelo("");
             setVehMotorista("");
             setVehCategoria("LOGISTICA");
+            setVehReboques([]);
+            setVehFoto("");
           }
         }}
       >
