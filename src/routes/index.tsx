@@ -892,6 +892,7 @@ export function TransportManagementSystem() {
               modelo: vehModelo,
               motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
               categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+              reboques: vehReboques,
               foto: vehFoto || item.foto || "",
             }
           : item,
@@ -905,6 +906,7 @@ export function TransportManagementSystem() {
         modelo: vehModelo,
         motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
         categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+        reboques: vehReboques,
         foto: vehFoto || "",
       };
 
@@ -917,6 +919,7 @@ export function TransportManagementSystem() {
     setVehModelo("");
     setVehMotorista("");
     setVehCategoria("LOGISTICA");
+    setVehReboques([]);
     setVehFoto("");
     setIsVehicleModalOpen(false);
   };
@@ -927,6 +930,7 @@ export function TransportManagementSystem() {
     setVehModelo(veh.modelo);
     setVehMotorista(veh.motorista);
     setVehCategoria(veh.categoria);
+    setVehReboques(veh.reboques || []);
     setVehFoto(veh.foto || "");
     setIsVehicleModalOpen(true);
   };
