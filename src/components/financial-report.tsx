@@ -295,15 +295,15 @@ export function FinancialReport({
     });
 
     byVehicle.forEach((v) => {
-      const types = v.reboques.length > 0 ? v.reboques : ["SEM REBOQUE"];
+      const types = v.reboques && v.reboques.length > 0 ? v.reboques : ["SEM REBOQUE"];
       
       // Filtro de reboque (se ativo)
       if (trailerFilter && !types.includes(trailerFilter)) return;
 
       types.forEach((type) => {
         const cur = map.get(type) || { receita: 0, despesa: 0, count: 0 };
-        // Se o veículo tem múltiplos reboques, o custo/receita é rateado entre eles para fins de análise
-        // Rateio preciso: dividimos os valores totais do veículo pelo número de reboques ativos nele
+        // Rateio preciso: dividimos os valores totais do veículo pelo número de reboques ativos nele.
+        // Se for "SEM REBOQUE", o divisor é 1.
         const divisor = types.length;
         map.set(type, {
           receita: cur.receita + v.receita / divisor,
