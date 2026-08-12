@@ -1797,6 +1797,16 @@ export function TransportManagementSystem() {
                         <div className="text-[11px] font-bold text-[#f25c05] tracking-wider uppercase mt-3">
                           {veh.categoria}
                         </div>
+                        
+                        {(veh.reboques?.length > 0) && (
+                          <div className="mt-3 flex flex-wrap gap-1.5">
+                            {veh.reboques.map(r => (
+                              <span key={r} className="px-2 py-0.5 bg-[#0c192c]/5 text-[#0c192c] text-[9px] font-bold rounded uppercase border border-[#0c192c]/10">
+                                {r === "OUTROS" ? (veh.reboquePersonalizado || "OUTRO") : r}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
