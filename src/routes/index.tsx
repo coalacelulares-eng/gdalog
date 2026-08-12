@@ -94,6 +94,8 @@ interface Vehicle {
   modelo: string;
   motorista: string;
   categoria: string;
+  reboques: string[];
+  reboquePersonalizado?: string;
   foto?: string;
 }
 
