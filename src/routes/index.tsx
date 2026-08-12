@@ -94,6 +94,7 @@ interface Vehicle {
   modelo: string;
   motorista: string;
   categoria: string;
+  reboques: string[];
   foto?: string;
 }
 
@@ -170,7 +171,7 @@ const INITIAL_DATA = {
     { id: "c1", nome: "PAULO", documento: "123.456.789-00", tipo: "PF", contato: "11 99999-9999" },
   ] as Client[],
   vehicles: [
-    { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA" },
+    { id: "v1", placa: "AHV 9J29", modelo: "Volvo FH 460", motorista: "MARCOS", categoria: "LOGISTICA", reboques: [] },
   ] as Vehicle[],
   expenses: [
     {
@@ -517,6 +518,7 @@ export function TransportManagementSystem() {
   const [vehModelo, setVehModelo] = useState("");
   const [vehMotorista, setVehMotorista] = useState("");
   const [vehCategoria, setVehCategoria] = useState("LOGISTICA");
+  const [vehReboques, setVehReboques] = useState<string[]>([]);
   const [vehFoto, setVehFoto] = useState("");
 
   // Oil Form
@@ -890,6 +892,7 @@ export function TransportManagementSystem() {
               modelo: vehModelo,
               motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
               categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+              reboques: vehReboques,
               foto: vehFoto || item.foto || "",
             }
           : item,
@@ -903,6 +906,7 @@ export function TransportManagementSystem() {
         modelo: vehModelo,
         motorista: vehMotorista.toUpperCase() || "NÃO ATRIBUÍDO",
         categoria: vehCategoria.toUpperCase() || "LOGISTICA",
+        reboques: vehReboques,
         foto: vehFoto || "",
       };
 
@@ -915,6 +919,7 @@ export function TransportManagementSystem() {
     setVehModelo("");
     setVehMotorista("");
     setVehCategoria("LOGISTICA");
+    setVehReboques([]);
     setVehFoto("");
     setIsVehicleModalOpen(false);
   };
@@ -925,6 +930,7 @@ export function TransportManagementSystem() {
     setVehModelo(veh.modelo);
     setVehMotorista(veh.motorista);
     setVehCategoria(veh.categoria);
+    setVehReboques(veh.reboques || []);
     setVehFoto(veh.foto || "");
     setIsVehicleModalOpen(true);
   };
@@ -1785,6 +1791,19 @@ export function TransportManagementSystem() {
                         <div className="text-[11px] font-bold text-[#f25c05] tracking-wider uppercase mt-3">
                           {veh.categoria}
                         </div>
+
+                        {veh.reboques && veh.reboques.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-slate-50">
+                            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mb-1">Reboques</div>
+                            <div className="flex flex-wrap gap-1">
+                              {veh.reboques.map((reb) => (
+                                <span key={reb} className="text-[9px] font-black bg-slate-100 text-[#0c192c] px-1.5 py-0.5 rounded border border-slate-200">
+                                  {reb}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -3054,6 +3073,8 @@ export function TransportManagementSystem() {
             setVehModelo("");
             setVehMotorista("");
             setVehCategoria("LOGISTICA");
+            setVehReboques([]);
+            setVehFoto("");
           }
         }}
       >
@@ -3112,6 +3133,29 @@ export function TransportManagementSystem() {
                 placeholder="Ex: LOGISTICA"
                 className="mt-1 text-xs uppercase"
               />
+            </div>
+
+            <div>
+              <Label className="text-xs font-semibold text-slate-700">Reboques</Label>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {["SIDER", "GRANELEIRA", "BAÚ", "CAÇAMBA", "PRANCHA", "OUTROS"].map((opt) => (
+                  <label key={opt} className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-100 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={vehReboques.includes(opt)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setVehReboques([...vehReboques, opt]);
+                        } else {
+                          setVehReboques(vehReboques.filter((r) => r !== opt));
+                        }
+                      }}
+                      className="w-4 h-4 rounded border-slate-300 text-[#0c192c] focus:ring-[#0c192c]"
+                    />
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-tighter">{opt}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
             <div>
