@@ -112,6 +112,7 @@ export function FinancialReport({
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [placaFilter, setPlacaFilter] = useState("");
+  const [trailerFilter, setTrailerFilter] = useState("");
 
   const inRange = (data: string) => {
     if (dateFrom && data < dateFrom) return false;
@@ -251,13 +252,25 @@ export function FinancialReport({
   // Agrupamento por tipo de reboque
   const byTrailerType = useMemo(() => {
     const map = new Map<string, { receita: number; despesa: number; count: number }>();
-    
+
+    // Primeiro, identificamos todos os tipos de reboque existentes na frota
+    const allTrailerTypes = new Set<string>();
+    vehicles.forEach(v => {
+      if (v.reboques && v.reboques.length > 0) {
+        v.reboques.forEach(t => allTrailerTypes.add(t));
+      }
+    });
+
     byVehicle.forEach((v) => {
       const types = v.reboques.length > 0 ? v.reboques : ["SEM REBOQUE"];
+      
+      // Filtro de reboque (se ativo)
+      if (trailerFilter && !types.includes(trailerFilter)) return;
+
       types.forEach((type) => {
         const cur = map.get(type) || { receita: 0, despesa: 0, count: 0 };
         // Se o veículo tem múltiplos reboques, o custo/receita é rateado entre eles para fins de análise
-        // (ou poderíamos somar o total em cada, mas ratear parece mais justo para uma DRE)
+        // Rateio preciso: dividimos os valores totais do veículo pelo número de reboques ativos nele
         const divisor = types.length;
         map.set(type, {
           receita: cur.receita + v.receita / divisor,
@@ -277,7 +290,16 @@ export function FinancialReport({
         count: data.count,
       }))
       .sort((a, b) => b.receita - a.receita);
-  }, [byVehicle]);
+  }, [byVehicle, trailerFilter, vehicles]);
+
+  // Tipos de reboque disponíveis para o filtro
+  const availableTrailerTypes = useMemo(() => {
+    const types = new Set<string>();
+    vehicles.forEach(v => {
+      if (v.reboques) v.reboques.forEach(t => types.add(t));
+    });
+    return Array.from(types).sort();
+  }, [vehicles]);
 
   // Soma de uma categoria de custo lançada
   const sumKey = (k: keyof FinExpenseDetails) =>
